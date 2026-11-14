@@ -154,7 +154,7 @@ export default function ThemedContent({
       onClickCapture={handleClickCapture}
       className="min-h-screen bg-[#F8FAF8] text-slate-800 font-sans selection:bg-brand-500 selection:text-white"
     >
-      {currentPath !== "/" && <Navbar />}
+      {!["/", "/jurnal", "/journal"].includes(currentPath) && <Navbar />}
       {renderPage()}
     </div>
   );

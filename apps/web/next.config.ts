@@ -10,6 +10,7 @@ const normalizedApiUrl = rawApiUrl.replace(/\/+$/, "");
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@permata/ui"],
+  serverExternalPackages: ["pg", "@neondatabase/serverless"],
   reactStrictMode: false,
   devIndicators: false,
   turbopack: {},

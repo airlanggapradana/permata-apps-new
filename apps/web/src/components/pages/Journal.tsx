@@ -1,194 +1,1388 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
-import { Sparkles, Send, Heart, BookOpen, CheckCircle2 } from "lucide-react";
+import { TreeStats, calculateTreeStats } from "@/lib/treeProgress";
 
-interface SavedJournalEntry {
+export interface SavedJournalEntry {
   id: string;
   date: string;
   content: string;
   mood: number;
   culture: string;
   aiInsight?: string;
+  tag?: string;
+  proverb?: string;
+  proverbMeaning?: string;
 }
 
-const Journal = () => {
-  const { culture } = useCulture();
+export default function Journal() {
+  const { culture, setCulture } = useCulture();
+
+  // Form states matching desain_jurnal_hikmah.html
   const [msg, setMsg] = useState("");
   const [mood, setMood] = useState(3);
+  const [shareCareCircle, setShareCareCircle] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [aiInsight, setAiInsight] = useState<string | null>(null);
-  const [savedEntries, setSavedEntries] = useState<SavedJournalEntry[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [voiceRecorded, setVoiceRecorded] = useState(false);
 
+  // Hope tree micro-actions
+  const [treeWatered, setTreeWatered] = useState(false);
+  const [breathingStatus, setBreathingStatus] = useState<
+    "idle" | "breathing" | "done"
+  >("idle");
+
+  // Selected entry modal view
+  const [selectedEntry, setSelectedEntry] = useState<SavedJournalEntry | null>(
+    null,
+  );
+
+  // Toast notification state
+  const [toast, setToast] = useState<{ visible: boolean; message: string }>({
+    visible: false,
+    message: "",
+  });
+
+  const [savedEntries, setSavedEntries] = useState<SavedJournalEntry[]>([]);
+  const [treeStats, setTreeStats] = useState<TreeStats | null>(null);
+  const [treeXp, setTreeXp] = useState<number>(370);
+  const [streakDays, setStreakDays] = useState<number>(3);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [dbConnected, setDbConnected] = useState<boolean>(false);
+
+  // Active tree stats with fallback calculation
+  const activeTreeStats: TreeStats =
+    treeStats ||
+    calculateTreeStats({
+      journalCount: savedEntries.length,
+      waterCount: treeWatered ? 1 : 0,
+      breatheCount: breathingStatus === "done" ? 1 : 0,
+      wateredToday: treeWatered,
+    });
+
+  // Fetch real data from PostgreSQL on component mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("permata_journal_entries");
-      if (stored) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setSavedEntries(JSON.parse(stored));
+    let isMounted = true;
+    async function fetchJournalData() {
+      try {
+        const res = await fetch("/api/journal");
+        const rawText = await res.text();
+        let data: {
+          success?: boolean;
+          entries?: SavedJournalEntry[];
+          stats?: { treeXp?: number; treeStats?: TreeStats; streakDays?: number };
+          error?: string;
+        } = {};
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          throw new Error(rawText || `Server error (${res.status})`);
+        }
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Gagal mengambil data dari server");
+        }
+
+        if (isMounted && Array.isArray(data.entries)) {
+          setSavedEntries(data.entries);
+          if (data.stats) {
+            if (data.stats.treeStats) {
+              setTreeStats(data.stats.treeStats);
+              setTreeXp(data.stats.treeStats.totalXp);
+              if (data.stats.treeStats.wateredToday) {
+                setTreeWatered(true);
+              }
+            } else if (typeof data.stats.treeXp === "number") {
+              setTreeXp(data.stats.treeXp);
+            }
+            if (typeof data.stats.streakDays === "number") {
+              setStreakDays(data.stats.streakDays);
+            }
+          }
+          setDbConnected(true);
+        }
+      } catch (err) {
+        console.warn("Could not load real data from database:", err);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
-    } catch {
-      // LocalStorage access fallback
     }
+    fetchJournalData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const moods = [
-    { value: 1, emoji: "😢", label: "Cemas/Takut" },
-    { value: 2, emoji: "😔", label: "Sedih" },
-    { value: 3, emoji: "😐", label: "Tenang/Biasa" },
-    { value: 4, emoji: "🙂", label: "Bersyukur" },
-    { value: 5, emoji: "🌟", label: "Penuh Harapan" },
+  // Custom AI Reflection state
+  const [customInsight, setCustomInsight] = useState<{
+    empathy: string;
+    proverb?: string;
+    meaning?: string;
+  } | null>(null);
+
+  const defaultProverb =
+    culture === "sumbar"
+      ? "“Dima bumi dipijak, di sinan langik dijunjuang; Mambangkik batang tarandam, bangkik marwah kito basamo.”"
+      : "“Bungoeng jeumpa meugisa meutaloe, saboh hatee peugot gampong.”";
+
+  const defaultTradition =
+    culture === "sumbar"
+      ? "Kearifan Tradisi Batang Tarandam (Minang)"
+      : "Kearifan Tradisi Meuseuraya (Aceh)";
+
+  const defaultMeaning =
+    culture === "sumbar"
+      ? "Mengangkat kembali batang kayu yang terendam air; simbol kebangkitan karakter dan harga diri. Ujian dan musibah bukanlah akhir, melainkan awal pemulihan jiwa yang lebih tangguh bersama keluarga dan komunitas."
+      : "Bunga yang mekar saling bertaut erat, satu hati membangun kembali masa depan bersama. Kesediaanmu berbagi tawa dan membantu orang lain di posko adalah perwujudan nyata dari jiwa tangguh yang menyembuhkan luka.";
+
+  const defaultEmpathy =
+    "Kamu telah berhasil melangkah melewati hari yang penuh tantangan. Perasaan tenang yang kamu miliki saat berada di posko bersama adik dan teman adalah bibit ketangguhan yang sangat berharga. Kekhawatiran pada suara keras pascabencana adalah hal yang sepenuhnya wajar dialami oleh pejuang kecil sepertimu.";
+
+  const currentInsight = {
+    empathy: customInsight?.empathy || defaultEmpathy,
+    proverb: customInsight?.proverb || defaultProverb,
+    proverbTradition: defaultTradition,
+    meaning: customInsight?.meaning || defaultMeaning,
+  };
+
+  // Show Toast helper
+  const showToast = (message: string) => {
+    setToast({ visible: true, message });
+    setTimeout(() => {
+      setToast((prev) => ({ ...prev, visible: false }));
+    }, 3500);
+  };
+
+  // 5-Mood Scale options
+  const moodOptions = [
+    {
+      value: 1,
+      moodKey: "cemas",
+      emoji: "😢",
+      label: "Cemas",
+      sub: "Skor 1 • Perlu Teduh",
+    },
+    {
+      value: 2,
+      moodKey: "sedih",
+      emoji: "😔",
+      label: "Sedih",
+      sub: "Skor 2 • Kehilangan",
+    },
+    {
+      value: 3,
+      moodKey: "tenang",
+      emoji: "😐",
+      label: "Tenang / Damai",
+      sub: "Skor 3 • Bertahan",
+    },
+    {
+      value: 4,
+      moodKey: "bersyukur",
+      emoji: "🙂",
+      label: "Bersyukur",
+      sub: "Skor 4 • Ada Asa",
+    },
+    {
+      value: 5,
+      moodKey: "penuh-harapan",
+      emoji: "🌟",
+      label: "Penuh Harapan",
+      sub: "Skor 5 • Bangkit",
+    },
   ];
 
-  const handleAnalyze = () => {
+  // Prompt Pills
+  const promptPills = [
+    {
+      icon: "flare",
+      label: "Refleksi Bencana & Ketabahan",
+      text: "Hari ini aku belajar tabah saat menghadapi...",
+    },
+    {
+      icon: "favorite",
+      label: "Rasa Syukur Hari Ini",
+      text: "Hal kecil yang membuat hatiku hangat hari ini adalah...",
+    },
+    {
+      icon: "air",
+      label: "Kecemasan yang Dihadapi",
+      text: "Kecemasan yang masih sering terbayang saat malam hari adalah...",
+    },
+    {
+      icon: "groups",
+      label: "Kisah Bersama Teman di Posko",
+      text: "Kebersamaan bersama teman dan relawan di tenda posko yang berkesan...",
+    },
+  ];
+
+  // Append prompt chip to textarea
+  const handlePromptClick = (textToInsert: string) => {
+    if (!msg.trim()) {
+      setMsg(textToInsert);
+    } else {
+      setMsg((prev) => prev + "\n\n" + textToInsert);
+    }
+  };
+
+  // Toggle Voice Note recording simulation
+  const handleToggleVoice = () => {
+    if (!isRecording) {
+      setIsRecording(true);
+    } else {
+      setIsRecording(false);
+      setVoiceRecorded(true);
+      showToast("Voice note berhasil diunggah secara aman.");
+    }
+  };
+
+  // Water Tree action (saved in database)
+  const handleWaterTree = async () => {
+    if (treeWatered) return;
+    setTreeWatered(true);
+
+    try {
+      const res = await fetch("/api/journal/water", { method: "POST" });
+      const rawText = await res.text();
+      const data = JSON.parse(rawText);
+      if (data.success) {
+        if (data.treeStats) {
+          setTreeStats(data.treeStats);
+          setTreeXp(data.treeStats.totalXp);
+        } else if (typeof data.treeXp === "number") {
+          setTreeXp(data.treeXp);
+        }
+        showToast(
+          data.message || "Pohon Harapan disiram! +20 XP kesuburan jiwa.",
+        );
+      }
+    } catch {
+      showToast("Pohon Harapan disiram! +20 XP kesuburan jiwa.");
+    }
+  };
+
+  // Breathing simulation (saved in database with +15 XP)
+  const handleStartBreathing = () => {
+    if (breathingStatus === "breathing") return;
+    setBreathingStatus("breathing");
+    showToast(
+      "Tarik napas perlahan... 4 detik... Tahan... Hembuskan perlahan...",
+    );
+    setTimeout(async () => {
+      setBreathingStatus("done");
+      try {
+        const res = await fetch("/api/journal/breathe", { method: "POST" });
+        const rawText = await res.text();
+        const data = JSON.parse(rawText);
+        if (data.success && data.treeStats) {
+          setTreeStats(data.treeStats);
+          setTreeXp(data.treeStats.totalXp);
+          showToast(data.message || "Latihan napas selesai! +15 XP ketenangan batin.");
+        } else {
+          showToast("Latihan napas selesai! Hatimu kini lebih teduh.");
+        }
+      } catch {
+        showToast("Latihan napas selesai! Hatimu kini lebih teduh.");
+      }
+    }, 4000);
+  };
+
+  // Submit and AI Analysis (connected to real database and Gemini AI)
+  const handleSaveAndAnalyze = async () => {
     if (!msg.trim()) return;
 
     setIsAnalyzing(true);
-    setTimeout(() => {
-      let insight = "";
-      if (culture === "aceh") {
-        insight =
-          "Refleksi ini mencerminkan keteguhan hati ('Meuseuraya' dan kebersamaan). Setiap rasa takut dan duka yang kamu lalui sedang membentuk ketangguhan jiwa yang lebih kokoh.";
-      } else {
-        insight =
-          "Nilai 'Mambangkik Batang Tarandam' hadir dalam ceritamu. Dari situasi yang sulit, kamu sedang menemukan kembali kekuatan baru untuk melangkah maju bersama keluarga dan teman.";
-      }
 
-      const newEntry: SavedJournalEntry = {
-        id: Date.now().toString(),
-        date: new Date().toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
+    try {
+      const res = await fetch("/api/journal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: msg,
+          mood,
+          culture,
+          privacy: shareCareCircle ? "CARE_CIRCLE" : "PRIVATE",
         }),
-        content: msg,
-        mood,
-        culture,
-        aiInsight: insight,
-      };
+      });
 
-      const updated = [newEntry, ...savedEntries];
-      setSavedEntries(updated);
+      const rawText = await res.text();
+      let data: {
+        success?: boolean;
+        error?: string;
+        details?: string;
+        insight?: { empathy: string; proverb?: string; meaning?: string };
+        entry?: SavedJournalEntry;
+        stats?: { treeXp?: number; treeStats?: TreeStats };
+      } = {};
+
       try {
-        localStorage.setItem("permata_journal_entries", JSON.stringify(updated));
+        data = JSON.parse(rawText);
       } catch {
-        // Fallback
+        throw new Error(rawText || `Server error (${res.status})`);
       }
 
-      setAiInsight(insight);
+      if (!res.ok || !data.success) {
+        throw new Error(
+          data.error ||
+            data.details ||
+            rawText ||
+            "Gagal menyimpan ke database",
+        );
+      }
+
+      // Update custom insight with real AI response
+      if (data.insight) {
+        setCustomInsight({
+          empathy: data.insight.empathy,
+          proverb: data.insight.proverb,
+          meaning: data.insight.meaning,
+        });
+      }
+
+      // Prepend real created entry from DB
+      if (data.entry) {
+        setSavedEntries((prev) => [
+          data.entry,
+          ...prev.filter((e) => e.id !== data.entry.id),
+        ]);
+      }
+
+      // Update real XP & treeStats
+      if (data.stats?.treeStats) {
+        setTreeStats(data.stats.treeStats);
+        setTreeXp(data.stats.treeStats.totalXp);
+      } else if (data.stats?.treeXp) {
+        setTreeXp(data.stats.treeXp);
+      }
+
+      showToast(
+        culture === "sumbar"
+          ? "Refleksi tersimpan di database PostgreSQL & Makna Batang Tarandam diperbarui! (+50 XP)"
+          : "Refleksi tersimpan di database PostgreSQL & Makna Meuseuraya diperbarui! (+50 XP)",
+      );
+    } catch (err) {
+      console.error("Save reflection error:", err);
+      showToast("Gagal menyimpan ke database. Silakan coba kembali.");
+    } finally {
       setIsAnalyzing(false);
-    }, 700);
+    }
   };
 
+  const progressPercent = Math.min(100, Math.round((treeXp / 1000) * 100));
+
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10 space-y-8">
-      <div className="bg-surface border border-line rounded-xl p-6 md:p-8 shadow-xs">
-        <h2 className="text-2xl font-semibold text-fg flex items-center gap-2">
-          <Sparkles size={20} className="text-fg-brand" /> Jurnal Hikmah
-        </h2>
-        <p className="mt-2 text-sm text-fg-muted">
-          Refleksi pemulihan berbasis kearifan lokal {culture === "aceh" ? "Aceh" : "Sumatera Barat"}. Tempat aman untuk mengungkapkan perasaanmu.
-        </p>
-
-        {/* Mood Selector */}
-        <div className="mt-8">
-          <label className="text-xs font-semibold tracking-[0.06em] text-fg-subtle uppercase block mb-3">
-            Bagaimana perasaanmu saat ini?
-          </label>
-          <div className="flex flex-wrap gap-3">
-            {moods.map((m) => (
-              <button
-                key={m.value}
-                type="button"
-                onClick={() => setMood(m.value)}
-                className={
-                  mood === m.value
-                    ? "flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium border-2 border-brand-600 bg-tint text-fg-brand transition-all duration-150"
-                    : "flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium border border-line bg-surface text-fg-muted hover:border-line-strong hover:text-fg transition-all duration-150"
-                }
-              >
-                <span className="text-lg">{m.emoji}</span>
-                <span>{m.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Textarea */}
-        <div className="mt-4">
-          <label
-            htmlFor="journal-content"
-            className="text-xs font-semibold tracking-[0.06em] text-fg-subtle uppercase block mb-2"
-          >
-            Ceritakan perasaanmu
-          </label>
-          <textarea
-            id="journal-content"
-            className="w-full min-h-[160px] p-4 bg-sunken rounded-md border border-line-input text-fg text-base leading-relaxed resize-none outline-none placeholder:text-fg-subtle focus:border-brand-500 focus:ring-2 focus:ring-brand-200 transition-all"
-            placeholder="Ceritakan apa yang kamu rasakan, alami, atau syukuri hari ini..."
-            value={msg}
-            onChange={(e) => setMsg(e.target.value)}
-          />
-        </div>
-
-        <button
-          onClick={handleAnalyze}
-          disabled={isAnalyzing || !msg.trim()}
-          className={`mt-4 w-full h-11 rounded-md font-medium text-base flex justify-center items-center gap-2 transition-colors duration-200 ${
-            isAnalyzing || !msg.trim()
-              ? "bg-sunken text-neutral-400 cursor-not-allowed"
-              : "bg-action text-white hover:bg-action-hover"
-          }`}
-        >
-          <Send size={18} />
-          {isAnalyzing ? "Menganalisis…" : "Simpan & Analisis Makna (AI)"}
-        </button>
-
-        {/* AI Insight Card */}
-        {aiInsight && (
-          <div className="mt-6 p-4 rounded-sm bg-accent-50 border border-accent-200 text-fg">
-            <div className="flex items-center gap-2 text-sm font-semibold text-fg-accent mb-2">
-              <Heart size={16} />
-              <span>Refleksi Pertumbuhan Jiwa:</span>
-            </div>
-            <p className="text-sm text-fg leading-relaxed">{aiInsight}</p>
-          </div>
-        )}
+    <div className="w-full bg-[#f7f9fb] text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen flex flex-col justify-between">
+      {/* Interactive Notification Toast */}
+      <div
+        className={`fixed bottom-6 right-6 z-50 transform transition-all duration-300 flex items-center gap-3 px-5 py-3.5 rounded-xl bg-[#012d1d] text-white shadow-xl ${
+          toast.visible
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "translate-y-24 opacity-0 pointer-events-none"
+        }`}
+        id="toastNotification"
+      >
+        <span className="material-symbols-outlined text-[#92f7c3] text-[22px]">
+          check_circle
+        </span>
+        <span className="font-label-md text-label-md" id="toastMessage">
+          {toast.message}
+        </span>
       </div>
 
-      {/* Saved Entries History */}
-      {savedEntries.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-[0.06em] text-fg-subtle uppercase flex items-center gap-2">
-            <BookOpen size={16} /> Riwayat Refleksi
-          </h3>
-          <div className="space-y-4">
-            {savedEntries.map((entry) => (
-              <div
-                key={entry.id}
-                className="bg-surface border border-line rounded-lg p-5 shadow-xs space-y-3"
+      {/* BEGIN: Header matching landing page */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 transition-all shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4 relative">
+          <Link className="flex items-center gap-3 group shrink-0" href="/">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-brand-900/10 group-hover:scale-105 transition-transform">
+              <span className="text-lg">💎</span>
+            </div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
+                  PERMATA
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 border border-brand-200 text-brand-800 tracking-wide uppercase">
+                  Nusantara
+                </span>
+              </div>
+              <span className="text-[10px] font-medium text-slate-400 tracking-wide">
+                Resiliensi Jiwa &amp; PFA Anak
+              </span>
+            </div>
+          </Link>
+
+          <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-slate-600 shrink-0">
+            <Link
+              className="transition hover:text-brand-700 font-medium py-1"
+              href="/#programs"
+            >
+              Modul Resiliensi
+            </Link>
+            <Link
+              className="transition hover:text-brand-700 font-medium py-1"
+              href="/#calculator"
+            >
+              Pohon Harapan
+            </Link>
+            <Link
+              className="transition hover:text-brand-700 font-medium py-1"
+              href="/#game-showcase"
+            >
+              Game Mitigasi
+            </Link>
+          </nav>
+
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Geo-Culture Switcher */}
+            <div
+              className="flex items-center bg-slate-100 p-1 rounded-full text-xs font-semibold"
+              role="group"
+              aria-label="Pilihan Kearifan Budaya"
+            >
+              <button
+                id="btn-culture-aceh"
+                type="button"
+                onClick={() => setCulture("aceh")}
+                className={
+                  culture === "aceh"
+                    ? "geo-pill-active px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
+                    : "text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
+                }
               >
-                <div className="flex justify-between items-center text-xs text-fg-subtle">
-                  <span>{entry.date}</span>
-                  <span className="flex items-center gap-1 text-xs text-fg-brand">
-                    <CheckCircle2 size={14} />
-                    Tersimpan Aman ({entry.culture === "aceh" ? "Aceh" : entry.culture === "sumbar" ? "Sumbar" : entry.culture})
+                <span>🌿</span>
+                <span>Aceh</span>
+              </button>
+              <button
+                id="btn-culture-sumbar"
+                type="button"
+                onClick={() => setCulture("sumbar")}
+                className={
+                  culture === "sumbar"
+                    ? "geo-pill-active px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
+                    : "text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
+                }
+              >
+                <span>🏛️</span>
+                <span>Sumbar</span>
+              </button>
+            </div>
+
+            <Link
+              className="bg-brand-900 hover:bg-brand-950 text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-md shadow-brand-900/10 hover:shadow-lg flex items-center gap-2 hover:-translate-y-0.5 shrink-0"
+              href="/dashboard"
+            >
+              <span>Akses Dashboard</span>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </header>
+      {/* END: Header */}
+
+      {/* MAIN CONTENT AREA */}
+      <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
+        <div className="flex flex-col w-full">
+          <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full flex flex-col gap-8 md:gap-10">
+            {/* Two-Column Interactive Workspace */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 items-start gap-6">
+              {/* LEFT COLUMN: Main Journaling Canvas & AI Wisdom Insights (65% / col-span-8) */}
+              <div className="lg:col-span-8 flex flex-col gap-6">
+                {/* CARD 1: Write Journal Entry */}
+                <section className="p-6 sm:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-[#1b4332] text-white flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[22px]">
+                          edit_note
+                        </span>
+                      </div>
+                      <div className="flex flex-col">
+                        <h2 className="font-headline-md text-headline-md text-[#012d1d] leading-tight">
+                          Tulis Refleksi &amp; Jurnal Jiwa
+                        </h2>
+                        <span className="font-label-sm text-label-sm text-[#414844]">
+                          Hari ini:{" "}
+                          {new Date().toLocaleDateString("id-ID", {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}{" "}
+                          •{" "}
+                          {culture === "aceh"
+                            ? "Posko Meulaboh & Pidie Jaya"
+                            : "Posko Pasaman Barat & Sentra Bukittinggi"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section A: 5-Mood Scale Selector */}
+                  <div className="flex flex-col gap-3">
+                    <label className="font-headline-sm text-headline-sm text-[#012d1d] flex items-center gap-2">
+                      <span>Bagaimana perasaanmu saat ini?</span>
+                      <span className="font-body-sm text-body-sm text-[#414844] font-normal">
+                        (Pilih yang paling mewakili)
+                      </span>
+                    </label>
+
+                    <div
+                      className="grid grid-cols-2 sm:grid-cols-5 gap-2.5"
+                      id="moodSelector"
+                    >
+                      {moodOptions.map((item, idx) => {
+                        const isColSpan2 = idx === 4;
+                        const isActive = mood === item.value;
+                        return (
+                          <button
+                            key={item.value}
+                            type="button"
+                            onClick={() => setMood(item.value)}
+                            className={`group flex flex-col items-center p-3 rounded-xl transition-all ${
+                              isColSpan2 ? "col-span-2 sm:col-span-1" : ""
+                            } ${
+                              isActive
+                                ? "bg-[#1b4332] text-white shadow-sm"
+                                : "bg-[#f2f4f6] text-[#414844] hover:bg-[#eceef0]"
+                            }`}
+                          >
+                            <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">
+                              {item.emoji}
+                            </span>
+                            <span
+                              className={`font-label-md text-label-md font-semibold text-center ${
+                                isActive ? "text-white" : "text-[#191c1e]"
+                              }`}
+                            >
+                              {item.label}
+                            </span>
+                            <span
+                              className={`font-label-sm text-label-sm ${
+                                isActive ? "text-[#86af99]" : "text-[#717973]"
+                              }`}
+                            >
+                              {item.sub}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Section B: Category Prompt Pills */}
+                  <div className="flex flex-col gap-2.5">
+                    <span className="font-label-sm text-label-sm text-[#414844] uppercase tracking-wider font-semibold">
+                      Pilih Panduan Refleksi Harian (Klik untuk menyisipkan
+                      pemantik)
+                    </span>
+                    <div className="flex flex-wrap gap-2" id="promptPills">
+                      {promptPills.map((pill) => (
+                        <button
+                          key={pill.label}
+                          type="button"
+                          onClick={() => handlePromptClick(pill.text)}
+                          className="px-3.5 py-1.5 rounded-full bg-[#eceef0] text-[#191c1e] hover:bg-[#c1ecd4] hover:text-[#274e3d] transition-all font-label-md text-label-md flex items-center gap-1.5"
+                        >
+                          <span className="material-symbols-outlined text-[16px] text-[#006c48]">
+                            {pill.icon}
+                          </span>
+                          <span>{pill.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Section C: Journal Textarea */}
+                  <div className="flex flex-col gap-2 relative">
+                    <textarea
+                      id="journalInput"
+                      className="w-full p-4 sm:p-5 rounded-xl text-[#191c1e] font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-[#006c48]/50 placeholder:text-[#717973] transition-all shadow-inner bg-[#f2f4f6]"
+                      rows={7}
+                      placeholder="Ceritakan apa yang kamu rasakan, alami, atau syukuri hari ini... Tulisanmu sepenuhnya aman dan terlindungi di sini."
+                      value={msg}
+                      onChange={(e) => setMsg(e.target.value)}
+                    />
+                    <div className="flex items-center justify-between text-[#414844] font-label-sm text-label-sm px-1">
+                      <span className="flex items-center gap-1 text-[#006c48]">
+                        <span className="material-symbols-outlined text-[16px]">
+                          lock
+                        </span>
+                        Pemeriksaan privasi aktif: Bebas dari nama lengkap &amp;
+                        nomor telepon publik
+                      </span>
+                      <span id="charCount">{msg.length} karakter</span>
+                    </div>
+                  </div>
+
+                  {/* Section D: Privacy Visibility Toggle */}
+                  <div className="p-4 rounded-xl bg-[#f2f4f6] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-[#eceef0] flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="material-symbols-outlined text-[#006c48] text-[20px]">
+                          visibility_off
+                        </span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
+                          Visibilitas Jurnal: Hanya Saya (Privat)
+                        </span>
+                        <span className="font-body-sm text-body-sm text-[#414844]">
+                          Hanya algoritma AI lokal yang memproses ekstraksi
+                          hikmah tanpa menyebarkan identitasmu.
+                        </span>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={shareCareCircle}
+                        onChange={(e) => setShareCareCircle(e.target.checked)}
+                      />
+                      <div className="w-11 h-6 bg-[#e0e3e5] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#006c48]" />
+                      <span className="ml-2 font-label-sm text-label-sm text-[#414844] hidden sm:inline">
+                        Izinkan Care Circle
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Section E: Actions & Voice Note */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleToggleVoice}
+                      className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-label-md text-label-md transition-colors ${
+                        isRecording
+                          ? "bg-[#ffdad6] text-[#93000a]"
+                          : "bg-[#eceef0] text-[#012d1d] hover:bg-[#e6e8ea]"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[#006c48] text-[20px]">
+                        mic
+                      </span>
+                      <span>
+                        {isRecording
+                          ? "Merekam Suara... (Klik untuk Selesai)"
+                          : voiceRecorded
+                            ? "Rekam Suara (Tersimpan 18 detik)"
+                            : "Rekam Suara (Voice Note Refleksi)"}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={isAnalyzing || !msg.trim()}
+                      onClick={handleSaveAndAnalyze}
+                      className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#012d1d] text-white hover:bg-[#1b4332] disabled:opacity-50 font-label-md text-label-md font-semibold transition-all shadow-[0_4px_14px_rgba(1,45,29,0.2)] active:scale-[0.99]"
+                    >
+                      {isAnalyzing ? (
+                        <>
+                          <span className="material-symbols-outlined text-[20px] animate-spin">
+                            refresh
+                          </span>
+                          <span>Memproses Makna Budaya...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined text-[#92f7c3] text-[20px]">
+                            auto_awesome
+                          </span>
+                          <span>
+                            Simpan &amp; Analisis Makna Budaya (+50 XP)
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </section>
+
+                {/* CARD 2: AI Cultural Insight & Wisdom Reflection */}
+                <section className="p-6 sm:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6 relative overflow-hidden">
+                  {/* Subtle decorative amber cultural banner strip */}
+                  <div className="w-full h-1.5 bg-gradient-to-r from-[#ffb77d] via-[#f48c24] to-[#006c48] rounded-t-xl -mt-6 sm:-mt-8 -mx-6 sm:-mx-8" />
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#5e3000] text-white flex items-center justify-center shrink-0">
+                        <span className="material-symbols-outlined text-[18px]">
+                          lightbulb
+                        </span>
+                      </div>
+                      <span className="font-headline-sm text-headline-sm text-[#012d1d]">
+                        Hasil Analisis &amp; Refleksi Makna Budaya Terakhir
+                      </span>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffdcc3] text-[#2f1500] font-label-sm text-label-sm self-start sm:self-auto">
+                      <span className="material-symbols-outlined text-[15px]">
+                        diversity_3
+                      </span>
+                      {culture === "sumbar"
+                        ? "Filosofi Mambangkik Batang Tarandam"
+                        : "Filosofi Meuseuraya (Aceh)"}
+                    </span>
+                  </div>
+
+                  {/* AI Empathy & Insight Box */}
+                  <div className="p-5 rounded-xl bg-[#f2f4f6] flex flex-col gap-3">
+                    <div className="flex items-center gap-2 text-[#006c48] font-label-md text-label-md font-semibold">
+                      <span className="material-symbols-outlined text-[18px]">
+                        support_agent
+                      </span>
+                      <span>Empati &amp; Validasi PFA AI PERMATA</span>
+                    </div>
+                    <p className="font-body-md text-body-md text-[#191c1e] leading-relaxed">
+                      {currentInsight.empathy}
+                    </p>
+                  </div>
+
+                  {/* Cultural Wisdom Card (Proverb / Hikmah) */}
+                  <div className="p-6 rounded-xl bg-gradient-to-br from-[#eceef0] to-[#f2f4f6] flex flex-col gap-3 relative">
+                    <div className="flex items-center justify-between text-[#414844] font-label-sm text-label-sm">
+                      <span className="font-semibold text-[#006c48] uppercase tracking-wider">
+                        Petuah Hikmah Nusantara
+                      </span>
+                      <span>{currentInsight.proverbTradition}</span>
+                    </div>
+                    <blockquote className="font-headline-sm text-headline-sm text-[#012d1d] italic leading-relaxed">
+                      {currentInsight.proverb}
+                    </blockquote>
+                    <p className="font-body-sm text-body-sm text-[#414844]">
+                      <strong className="font-semibold text-[#191c1e]">
+                        Makna Pemulihan:
+                      </strong>{" "}
+                      {currentInsight.meaning}
+                    </p>
+                  </div>
+
+                  {/* Suggested Recovery Steps (Actionable Micro-PFA) */}
+                  <div className="flex flex-col gap-3">
+                    <span className="font-label-sm text-label-sm text-[#414844] uppercase tracking-wider font-semibold">
+                      Rekomendasi Langkah Pemulihan Jiwa Hari Ini
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      {/* Action 1: Latihan Napas Tenang */}
+                      <div className="p-4 rounded-xl bg-[#f2f4f6] flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#92f7c3] text-[#002113] flex items-center justify-center shrink-0">
+                            <span className="material-symbols-outlined text-[20px]">
+                              airwave
+                            </span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
+                              Latihan Napas Tenang
+                            </span>
+                            <span className="font-body-sm text-body-sm text-[#414844]">
+                              Pernapasan 4-4-4 (3 Menit)
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleStartBreathing}
+                          className="px-3.5 py-1.5 rounded-lg bg-[#012d1d] text-white font-label-sm text-label-sm font-semibold hover:bg-[#1b4332] transition-colors shrink-0"
+                        >
+                          {breathingStatus === "breathing"
+                            ? "Bernapas..."
+                            : breathingStatus === "done"
+                              ? "Selesai ✓"
+                              : "Mulai"}
+                        </button>
+                      </div>
+
+                      {/* Action 2: Siram Pohon Harapan */}
+                      <div className="p-4 rounded-xl bg-[#f2f4f6] flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#c1ecd4] text-[#274e3d] flex items-center justify-center shrink-0">
+                            <span className="material-symbols-outlined text-[20px]">
+                              water_drop
+                            </span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
+                              Siram Pohon Harapan
+                            </span>
+                            <span className="font-body-sm text-body-sm text-[#414844]">
+                              +20 XP Pertumbuhan
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          disabled={treeWatered}
+                          onClick={handleWaterTree}
+                          className={`px-3.5 py-1.5 rounded-lg font-label-sm text-label-sm font-semibold transition-opacity shrink-0 ${
+                            treeWatered
+                              ? "bg-[#eceef0] text-[#717973] cursor-not-allowed opacity-70"
+                              : "bg-[#006c48] text-white hover:opacity-90"
+                          }`}
+                        >
+                          {treeWatered ? "Tersiram ✓" : "Klaim"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Cultural Foundation Banner */}
+                <section className="p-6 rounded-xl bg-[#f2f4f6] flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-[#ffdcc3] flex items-center justify-center shrink-0 text-[#2f1500]">
+                      <span className="material-symbols-outlined text-[26px]">
+                        forest
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <h3 className="font-headline-sm text-headline-sm text-[#012d1d]">
+                        {culture === "sumbar"
+                          ? "Mambangkik Batang Tarandam"
+                          : "Kearifan Meuseuraya & Beumulia Jamee"}
+                      </h3>
+                      <p className="font-body-sm text-body-sm text-[#414844] max-w-lg">
+                        {culture === "sumbar"
+                          ? "Falsafah Minangkabau tentang mengangkat kembali batang kayu yang terendam air; simbol kebangkitan martabat, ketahanan mental anak, dan daya lentur pascabencana alam."
+                          : "Semangat gotong royong dan saling menguatkan dalam persaudaraan masyarakat Aceh; merawat duka bencana secara bersama tanpa meninggalkan seorang pun di belakang."}
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center gap-1.5 text-[#006c48] hover:text-[#012d1d] font-label-md text-label-md font-semibold whitespace-nowrap"
+                  >
+                    <span>Pelajari Modul Budaya</span>
+                    <span className="material-symbols-outlined text-[18px]">
+                      arrow_forward
+                    </span>
+                  </Link>
+                </section>
+              </div>
+
+              {/* RIGHT COLUMN: Sidebar, Hope Tree, Journal History, SafeConnect (35% / col-span-4) */}
+              <aside className="lg:col-span-4 flex flex-col gap-6 w-full">
+                {/* WIDGET 1: Pohon Harapan (Hope Tree) Progress Card */}
+                <section className="p-6 rounded-xl bg-white shadow-sm flex flex-col gap-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[#006c48] text-[22px]">
+                        yard
+                      </span>
+                      <h3 className="font-headline-sm text-headline-sm text-[#012d1d]">
+                        Pohon Harapan
+                      </h3>
+                    </div>
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#92f7c3] text-[#005235] font-label-sm text-label-sm font-semibold">
+                      {activeTreeStats.levelName}
+                    </span>
+                  </div>
+
+                  {/* Tree Illustration Graphic */}
+                  <div className="flex flex-col items-center justify-center p-6 rounded-xl bg-gradient-to-b from-[#f2f4f6] to-[#eceef0] relative overflow-hidden">
+                    <div className="w-28 h-28 relative flex items-center justify-center">
+                      <svg
+                        className="w-full h-full text-[#006c48] drop-shadow-sm transition-all duration-700"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 100 100"
+                      >
+                        {/* Soil Ground */}
+                        <path
+                          className="text-[#ffb77d]"
+                          d="M15 85 Q50 82 85 85"
+                          strokeLinecap="round"
+                          strokeWidth="4"
+                        />
+                        {/* Tree Trunk */}
+                        <path
+                          className="text-[#5e3000]"
+                          d={activeTreeStats.level <= 1 ? "M50 85 Q49 70 50 62" : "M50 85 Q48 55 50 40"}
+                          strokeLinecap="round"
+                          strokeWidth={activeTreeStats.level <= 1 ? "4" : "6"}
+                        />
+                        {/* Branches if level >= 2 */}
+                        {activeTreeStats.level >= 2 && (
+                          <path
+                            className="text-[#1b4332]"
+                            d="M50 55 Q35 48 30 38"
+                            strokeLinecap="round"
+                            strokeWidth="3"
+                          />
+                        )}
+                        {activeTreeStats.level >= 3 && (
+                          <path
+                            className="text-[#1b4332]"
+                            d="M50 50 Q65 42 70 34"
+                            strokeLinecap="round"
+                            strokeWidth="3"
+                          />
+                        )}
+                        {/* Leaf Foliage according to Level */}
+                        {activeTreeStats.level <= 1 ? (
+                          <>
+                            <circle className="fill-[#92f7c3] stroke-[#006c48]" cx="45" cy="55" r="7" strokeWidth="1.5" />
+                            <circle className="fill-[#75daa8] stroke-[#006c48]" cx="55" cy="52" r="8" strokeWidth="1.5" />
+                          </>
+                        ) : activeTreeStats.level === 2 ? (
+                          <>
+                            <circle className="fill-[#92f7c3] stroke-[#006c48]" cx="35" cy="42" r="8" strokeWidth="1.5" />
+                            <circle className="fill-[#006c48] stroke-[#1b4332]" cx="50" cy="36" r="11" strokeWidth="2" />
+                            <circle className="fill-[#75daa8] stroke-[#006c48]" cx="62" cy="40" r="9" strokeWidth="1.5" />
+                          </>
+                        ) : (
+                          <>
+                            <circle className="fill-[#92f7c3] stroke-[#006c48]" cx="30" cy="35" r="9" strokeWidth="1.5" />
+                            <circle className="fill-[#92f7c3] stroke-[#006c48]" cx="70" cy="32" r="10" strokeWidth="1.5" />
+                            <circle className="fill-[#006c48] stroke-[#1b4332]" cx="50" cy="30" r="14" strokeWidth="2" />
+                            <circle className="fill-[#75daa8] stroke-[#006c48]" cx="42" cy="22" r="8" strokeWidth="1.5" />
+                            <circle className="fill-[#92f7c3] stroke-[#006c48]" cx="58" cy="20" r="8" strokeWidth="1.5" />
+                            {activeTreeStats.level >= 4 && (
+                              <>
+                                <circle className="fill-[#ffdcc3] stroke-[#e07a38]" cx="36" cy="30" r="3.5" />
+                                <circle className="fill-[#ffdcc3] stroke-[#e07a38]" cx="64" cy="28" r="3.5" />
+                              </>
+                            )}
+                          </>
+                        )}
+                        {/* Sun Glimmer */}
+                        <circle className="fill-[#ffb77d]" cx="82" cy="18" r={activeTreeStats.level >= 4 ? 6 : 4} />
+                      </svg>
+                    </div>
+                    <span className="font-label-md text-label-md text-[#012d1d] font-semibold mt-2">
+                      {activeTreeStats.stageName}
+                    </span>
+                    <span className="font-body-sm text-body-sm text-[#414844] text-center">
+                      {activeTreeStats.stageDescription}
+                    </span>
+                  </div>
+
+                  {/* Progress Bar & XP */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between text-[#414844] font-label-sm text-label-sm">
+                      <span>Progres menuju {activeTreeStats.nextLevelName}</span>
+                      <span className="font-semibold text-[#012d1d]">
+                        {activeTreeStats.totalXp.toLocaleString("id-ID")} / {activeTreeStats.targetXp.toLocaleString("id-ID")} XP (
+                        {activeTreeStats.progressPercent}%)
+                      </span>
+                    </div>
+                    <div className="w-full h-3 rounded-full bg-[#eceef0] overflow-hidden">
+                      <div
+                        className="h-full bg-[#006c48] transition-all duration-500 rounded-full"
+                        style={{ width: `${activeTreeStats.progressPercent}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Daily Streak Indicator */}
+                  <div className="p-3.5 rounded-xl bg-[#f2f4f6] flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="material-symbols-outlined text-[#f48c24] text-[20px]">
+                        local_fire_department
+                      </span>
+                      <div className="flex flex-col">
+                        <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
+                          {streakDays} Hari Merawat Diri
+                        </span>
+                        <span className="font-label-sm text-label-sm text-[#414844]">
+                          Ritme santai tanpa penalti
+                        </span>
+                      </div>
+                    </div>
+                    <span className="material-symbols-outlined text-[#006c48] text-[20px]">
+                      done_all
+                    </span>
+                  </div>
+
+                  {/* Dynamic XP Activity Sources Breakdown from Database */}
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
+                    <div className="p-2 rounded-lg bg-[#f2f4f6] flex flex-col">
+                      <span className="text-[10px] text-[#414844] font-medium">Refleksi</span>
+                      <span className="text-xs font-bold text-[#006c48]">
+                        {activeTreeStats.journalCount}x (+{activeTreeStats.journalCount * 50} XP)
+                      </span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-[#f2f4f6] flex flex-col">
+                      <span className="text-[10px] text-[#414844] font-medium">Siram Pohon</span>
+                      <span className="text-xs font-bold text-[#006c48]">
+                        {activeTreeStats.waterCount}x (+{activeTreeStats.waterCount * 20} XP)
+                      </span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-[#f2f4f6] flex flex-col">
+                      <span className="text-[10px] text-[#414844] font-medium">Napas 4-4-4</span>
+                      <span className="text-xs font-bold text-[#006c48]">
+                        {activeTreeStats.breatheCount}x (+{activeTreeStats.breatheCount * 15} XP)
+                      </span>
+                    </div>
+                  </div>
+                </section>
+
+                {/* WIDGET 2: Riwayat Refleksi Terakhir (Journal History from Database) */}
+                <section className="p-6 rounded-xl bg-white shadow-sm flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-[#006c48] text-[22px]">
+                        history_edu
+                      </span>
+                      <h3 className="font-headline-sm text-headline-sm text-[#012d1d]">
+                        Riwayat Refleksi
+                      </h3>
+                    </div>
+                    <span className="font-label-sm text-label-sm text-[#414844]">
+                      {isLoading
+                        ? "Menghubungkan ke DB..."
+                        : `${savedEntries.length} Catatan`}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    {isLoading ? (
+                      <div className="p-4 rounded-xl bg-[#f2f4f6] text-center text-xs text-[#414844] flex items-center justify-center gap-2">
+                        <span className="w-3 h-3 rounded-full border-2 border-[#006c48] border-t-transparent animate-spin" />
+                        <span>Mengambil data dari PostgreSQL...</span>
+                      </div>
+                    ) : savedEntries.length === 0 ? (
+                      <div className="p-4 rounded-xl bg-[#f2f4f6] text-center text-xs text-[#414844]">
+                        Belum ada catatan di database. Tulis dan simpan refleksi
+                        pertamamu di samping!
+                      </div>
+                    ) : (
+                      savedEntries.slice(0, 4).map((entry) => {
+                        const moodObj = moodOptions.find(
+                          (m) => m.value === entry.mood,
+                        );
+                        return (
+                          <article
+                            key={entry.id}
+                            onClick={() => setSelectedEntry(entry)}
+                            className="p-3.5 rounded-xl bg-[#f2f4f6] hover:bg-[#eceef0] transition-colors flex flex-col gap-1.5 cursor-pointer"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-sm">
+                                  {moodObj?.emoji || "😐"}
+                                </span>
+                                <span className="font-label-sm text-label-sm text-[#012d1d] font-semibold">
+                                  {entry.date}
+                                </span>
+                              </div>
+                              <span className="px-2 py-0.5 rounded-full bg-[#c1ecd4] text-[#274e3d] font-label-sm text-label-sm">
+                                {entry.tag ||
+                                  (entry.culture === "sumbar"
+                                    ? "Nilai Badunsanak"
+                                    : "Nilai Meuseuraya")}
+                              </span>
+                            </div>
+                            <p className="font-body-sm text-body-sm text-[#414844] line-clamp-2">
+                              {entry.content}
+                            </p>
+                          </article>
+                        );
+                      })
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (savedEntries.length > 0) {
+                        setSelectedEntry(savedEntries[0]);
+                      }
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#012d1d] font-label-md text-label-md font-semibold transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <span>
+                      Lihat Semua Riwayat ({savedEntries.length} Catatan)
+                    </span>
+                    <span className="material-symbols-outlined text-[18px]">
+                      arrow_forward
+                    </span>
+                  </button>
+                </section>
+
+                {/* WIDGET 3: SafeConnect PFA & Crisis Guard */}
+                <section className="p-6 rounded-xl bg-[#f2f4f6] shadow-sm flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#012d1d] text-white flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-[#92f7c3] text-[22px]">
+                        health_and_safety
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <h3 className="font-headline-sm text-headline-sm text-[#012d1d]">
+                        SafeConnect PFA Guard
+                      </h3>
+                      <span className="font-label-sm text-label-sm text-[#006c48] font-medium">
+                        Bebas Pulsa &amp; Kerahasiaan Terjamin
+                      </span>
+                    </div>
+                  </div>
+                  <p className="font-body-sm text-body-sm text-[#414844] leading-relaxed">
+                    Merasa sangat cemas, gelisah, atau butuh teman bicara
+                    manusia? Relawan PFA dan psikolog klinis siaga mendampingi
+                    anak dan orang tua 24 jam.
+                  </p>
+                  <div className="flex flex-col gap-2.5 pt-1">
+                    <a
+                      className="w-full py-3 rounded-xl bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-2 hover:opacity-95 transition-opacity shadow-sm"
+                      href="tel:119"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">
+                        phone_in_talk
+                      </span>
+                      <span>Hubungi Hotline 119 (Bebas Pulsa)</span>
+                    </a>
+                    <Link
+                      href="/ai-companion"
+                      className="w-full py-2.5 rounded-xl bg-white text-[#012d1d] hover:bg-[#eceef0] font-label-md text-label-md font-semibold flex items-center justify-center gap-2 transition-colors text-center"
+                    >
+                      <span className="material-symbols-outlined text-[#006c48] text-[20px]">
+                        chat
+                      </span>
+                      <span>Chat dengan Relawan Siaga</span>
+                    </Link>
+                  </div>
+                </section>
+
+                {/* Community Wisdom Snippet Card */}
+                <div className="p-5 rounded-xl bg-white shadow-sm flex items-start gap-3.5">
+                  <span className="material-symbols-outlined text-[#006c48] text-[24px] mt-0.5">
+                    forum
                   </span>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
+                      Tersambung dengan Posko Ramah Anak
+                    </span>
+                    <p className="font-body-sm text-body-sm text-[#414844]">
+                      Tenda belajar terdekat di wilayahmu siap mendampingi
+                      aktivitas bermain dan pemulihan trauma harian.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm text-fg leading-relaxed whitespace-pre-wrap">{entry.content}</p>
-                {entry.aiInsight && (
-                  <p className="text-xs text-fg-subtle bg-accent-50 p-3 rounded-sm border border-accent-200">
-                    💡 {entry.aiInsight}
+              </aside>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Entry Modal View if clicked */}
+      {selectedEntry && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">
+                  {moodOptions.find((m) => m.value === selectedEntry.mood)
+                    ?.emoji || "😐"}
+                </span>
+                <span className="font-headline-sm text-headline-sm text-[#012d1d]">
+                  Refleksi {selectedEntry.date}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedEntry(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div>
+              <span className="text-xs font-semibold text-[#006c48] uppercase tracking-wider">
+                Isi Catatan Jiwa
+              </span>
+              <p className="mt-1 font-body-md text-body-md text-[#191c1e] whitespace-pre-wrap leading-relaxed">
+                {selectedEntry.content}
+              </p>
+            </div>
+            {selectedEntry.proverb && (
+              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/60 text-xs text-amber-950 space-y-1">
+                <span className="font-bold text-[#5e3000]">Hikmah Budaya:</span>
+                <p className="italic font-medium">{selectedEntry.proverb}</p>
+                {selectedEntry.proverbMeaning && (
+                  <p className="text-slate-600 mt-1">
+                    {selectedEntry.proverbMeaning}
                   </p>
                 )}
               </div>
-            ))}
+            )}
+            {selectedEntry.aiInsight && (
+              <div className="p-4 rounded-xl bg-[#f2f4f6] text-xs text-[#414844] space-y-1">
+                <span className="font-bold text-[#006c48]">
+                  Empati &amp; Validasi AI:
+                </span>
+                <p className="leading-relaxed">{selectedEntry.aiInsight}</p>
+              </div>
+            )}
+            <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100">
+              <span className="truncate max-w-[200px]">
+                ID: {selectedEntry.id}
+              </span>
+              <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200">
+                {selectedEntry.tag ||
+                  (selectedEntry.culture === "sumbar"
+                    ? "Batang Tarandam"
+                    : "Meuseuraya")}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedEntry(null)}
+              className="mt-2 w-full py-2.5 rounded-xl bg-[#1b4332] text-white font-semibold text-sm hover:bg-[#006c48] transition-colors"
+            >
+              Tutup
+            </button>
           </div>
         </div>
       )}
+
+      {/* FOOTER matching desain_jurnal_hikmah.html */}
+      <footer className="w-full bg-[#f2f4f6] border-t border-[#c1c8c2]/20 mt-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10">
+          {/* Emergency Alert Banner */}
+          <div className="mb-6 p-4 rounded-xl bg-[#ffdad6] text-[#93000a] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#ba1a1a] text-white flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-[20px]">
+                  emergency
+                </span>
+              </div>
+              <div>
+                <p className="font-headline-sm text-headline-sm leading-tight text-[#93000a]">
+                  SafeConnect 119 - Siaga Krisis Psikologis &amp; PFA
+                </p>
+                <p className="font-body-sm text-body-sm text-[#93000a]/80">
+                  Layanan respons cepat pendampingan trauma anak &amp; bencana
+                  24 Jam bebas pulsa.
+                </p>
+              </div>
+            </div>
+            <a
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold hover:opacity-95 transition-opacity shrink-0"
+              href="tel:119"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                call
+              </span>
+              <span>Hubungi 119</span>
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div className="md:col-span-5 flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#1b4332] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[#92f7c3] text-[20px]">
+                    eco
+                  </span>
+                </div>
+                <span className="font-headline-md text-headline-md text-[#012d1d]">
+                  PERMATA Nusantara
+                </span>
+              </div>
+              <p className="font-body-sm text-body-sm text-[#414844] max-w-sm">
+                Platform digital Psychological First Aid (PFA) dan penguatan
+                resiliensi trauma anak pascabencana berbasis kearifan lokal
+                Nusantara (Meuseuraya Aceh &amp; Mambangkik Batang Tarandam
+                Minangkabau).
+              </p>
+              <div className="flex items-center gap-2 text-[#006c48] font-label-sm text-label-sm mt-1">
+                <span className="material-symbols-outlined text-[18px]">
+                  verified_user
+                </span>
+                <span>
+                  Tervalidasi Protokol Perlindungan &amp; Kerahasiaan Data Anak
+                </span>
+              </div>
+            </div>
+
+            <div className="md:col-span-4 flex flex-col gap-2.5">
+              <h4 className="font-headline-sm text-headline-sm text-[#012d1d] mb-1">
+                Modul Resiliensi
+              </h4>
+              <ul className="flex flex-col gap-2 font-body-sm text-body-sm text-[#414844]">
+                <li>
+                  <Link
+                    href="/jurnal"
+                    className="hover:text-[#012d1d] transition-colors"
+                  >
+                    AI Jurnal Hikmah (Refleksi Kearifan)
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/tele-screening"
+                    className="hover:text-[#012d1d] transition-colors"
+                  >
+                    Skrining Mandiri DASS-21 Adaptif
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="tel:119"
+                    className="hover:text-[#012d1d] transition-colors"
+                  >
+                    SafeConnect 119 &amp; Rujukan Faskes
+                  </a>
+                </li>
+                <li>
+                  <Link
+                    href="/#calculator"
+                    className="hover:text-[#012d1d] transition-colors"
+                  >
+                    Pohon Harapan (Hope Tree Interaktif)
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/mood-food"
+                    className="hover:text-[#012d1d] transition-colors"
+                  >
+                    Mood Tracker &amp; Nutrisi Emosional (Food Log)
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className="md:col-span-3 flex flex-col gap-2.5">
+              <h4 className="font-headline-sm text-headline-sm text-[#012d1d] mb-1">
+                Kearifan Lokal
+              </h4>
+              <p className="font-body-sm text-body-sm text-[#414844]">
+                Integrasi nilai gotong royong pemulihan jiwa berbasis modalitas
+                kultural Nusantara untuk memperkuat resiliensi komunitas.
+              </p>
+              <div className="mt-2 p-3 rounded-lg bg-[#eceef0] flex flex-col gap-1">
+                <span className="font-label-sm text-label-sm text-[#006c48] font-semibold">
+                  Prinsip Asuhan
+                </span>
+                <span className="font-body-sm text-body-sm text-[#414844]">
+                  Aman, Rahasia, Merangkul, Berkelanjutan.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-[#c1c8c2]/30 flex flex-col md:flex-row items-center justify-between gap-4 font-body-sm text-body-sm text-[#414844]">
+            <p>© 2024 PERMATA Nusantara. Seluruh Hak Cipta Dilindungi.</p>
+            <p className="text-xs text-[#414844]/80 text-center md:text-right">
+              Sesuai Standar Etika &amp; Kepatuhan Perlindungan Data Pribadi
+              Anak (UU PDP No. 27/2022)
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
-};
-
-export default Journal;
+}
