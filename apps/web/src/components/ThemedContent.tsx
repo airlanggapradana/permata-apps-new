@@ -57,6 +57,7 @@ export default function ThemedContent({
 }) {
   const nextPathname = usePathname();
   const [clientPath, setClientPath] = useState<string | null>(null);
+  const [pendingHash, setPendingHash] = useState<string | null>(null);
 
   useEffect(() => {
     if (nextPathname) {
@@ -105,17 +106,38 @@ export default function ThemedContent({
       const dest = normalizePath(href);
       if (!KNOWN_ROUTES.has(dest)) return;
 
+      const hashIndex = href.indexOf("#");
+      const hash = hashIndex >= 0 ? href.slice(hashIndex) : "";
+      const samePage = dest === normalizePath(window.location.pathname);
+
+      // Anchor di halaman yang sama: biarkan browser/Next yang scroll.
+      if (samePage && hash) return;
+
       e.preventDefault();
       e.stopPropagation();
 
-      if (dest !== normalizePath(window.location.pathname)) {
-        window.history.pushState(null, "", dest);
+      if (!samePage) {
+        window.history.pushState(null, "", dest + hash);
       }
       setClientPath(dest);
-      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+      if (hash) {
+        setPendingHash(hash);
+      } else {
+        window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+      }
     },
     []
   );
+
+  useEffect(() => {
+    if (!pendingHash) return;
+    const id = pendingHash.slice(1);
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView();
+      setPendingHash(null);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pendingHash, currentPath]);
 
   const renderPage = () => {
     switch (currentPath) {
@@ -154,7 +176,7 @@ export default function ThemedContent({
       onClickCapture={handleClickCapture}
       className="min-h-screen bg-[#F8FAF8] text-slate-800 font-sans selection:bg-brand-500 selection:text-white"
     >
-      {!["/", "/jurnal", "/journal", "/tele-screening", "/ai-companion"].includes(currentPath) && <Navbar />}
+      <Navbar currentPath={currentPath} />
       {renderPage()}
     </div>
   );

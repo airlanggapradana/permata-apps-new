@@ -343,9 +343,10 @@ export default function Journal() {
 
       // Prepend real created entry from DB
       if (data.entry) {
+        const newEntry: SavedJournalEntry = data.entry;
         setSavedEntries((prev) => [
-          data.entry,
-          ...prev.filter((e) => e.id !== data.entry.id),
+          newEntry,
+          ...prev.filter((e) => e.id !== newEntry.id),
         ]);
       }
 
@@ -391,112 +392,59 @@ export default function Journal() {
         </span>
       </div>
 
-      {/* BEGIN: Header matching landing page */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 transition-all shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4 relative">
-          <Link className="flex items-center gap-3 group shrink-0" href="/">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-brand-900/10 group-hover:scale-105 transition-transform">
-              <span className="text-lg">💎</span>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
-                  PERMATA
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 border border-brand-200 text-brand-800 tracking-wide uppercase">
-                  Nusantara
-                </span>
-              </div>
-              <span className="text-[10px] font-medium text-slate-400 tracking-wide">
-                Resiliensi Jiwa &amp; PFA Anak
-              </span>
-            </div>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-slate-600 shrink-0">
-            <Link
-              className="transition hover:text-brand-700 font-medium py-1"
-              href="/#programs"
-            >
-              Modul Resiliensi
-            </Link>
-            <Link
-              className="transition hover:text-brand-700 font-medium py-1"
-              href="/#calculator"
-            >
-              Pohon Harapan
-            </Link>
-            <Link
-              className="transition hover:text-brand-700 font-medium py-1"
-              href="/#game-showcase"
-            >
-              Game Mitigasi
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Geo-Culture Switcher */}
-            <div
-              className="flex items-center bg-slate-100 p-1 rounded-full text-xs font-semibold"
-              role="group"
-              aria-label="Pilihan Kearifan Budaya"
-            >
-              <button
-                id="btn-culture-aceh"
-                type="button"
-                onClick={() => setCulture("aceh")}
-                className={
-                  culture === "aceh"
-                    ? "geo-pill-active px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                    : "text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                }
-              >
-                <span>🌿</span>
-                <span>Aceh</span>
-              </button>
-              <button
-                id="btn-culture-sumbar"
-                type="button"
-                onClick={() => setCulture("sumbar")}
-                className={
-                  culture === "sumbar"
-                    ? "geo-pill-active px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                    : "text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                }
-              >
-                <span>🏛️</span>
-                <span>Sumbar</span>
-              </button>
-            </div>
-
-            <Link
-              className="bg-brand-900 hover:bg-brand-950 text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-md shadow-brand-900/10 hover:shadow-lg flex items-center gap-2 hover:-translate-y-0.5 shrink-0"
-              href="/dashboard"
-            >
-              <span>Akses Dashboard</span>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </header>
-      {/* END: Header */}
 
       {/* MAIN CONTENT AREA */}
       <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
         <div className="flex flex-col w-full">
-          <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full flex flex-col gap-8 md:gap-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full flex flex-col gap-6 md:gap-8">
+            {/* Breadcrumb & Protocol Badges */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+              <nav className="flex items-center gap-2 font-label-md text-label-md text-[#414844]">
+                <Link
+                  className="hover:text-[#012d1d] transition-colors flex items-center gap-1"
+                  href="/"
+                >
+                  <span className="material-symbols-outlined text-base">
+                    cottage
+                  </span>
+                  <span>Beranda</span>
+                </Link>
+                <span className="text-[#c1c8c2]">/</span>
+                <Link
+                  className="hover:text-[#012d1d] transition-colors"
+                  href="/#programs"
+                >
+                  Modul Resiliensi
+                </Link>
+                <span className="text-[#c1c8c2]">/</span>
+                <span className="text-[#012d1d] font-semibold">
+                  AI Jurnal Hikmah (Refleksi Jiwa)
+                </span>
+              </nav>
+
+              {/* Protocol badges */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e6e8ea] text-[#012d1d] font-label-sm text-label-sm">
+                  <span className="material-symbols-outlined text-[16px] text-[#006c48]">
+                    psychology
+                  </span>
+                  <span>Refleksi Jiwa &amp; PFA</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eceef0] text-[#414844] font-label-sm text-label-sm">
+                  <span className="material-symbols-outlined text-[16px] text-[#006c48]">
+                    lock
+                  </span>
+                  <span>Sensor PII Aktif (Anonim)</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#92f7c3]/40 text-[#00734d] font-label-sm text-label-sm">
+                  <span className="material-symbols-outlined text-[16px]">
+                    support_agent
+                  </span>
+                  <span>SafeConnect 119 Siaga</span>
+                </span>
+              </div>
+            </div>
+
             {/* Two-Column Interactive Workspace */}
             <div className="grid grid-cols-1 lg:grid-cols-12 items-start gap-6">
               {/* LEFT COLUMN: Main Journaling Canvas & AI Wisdom Insights (65% / col-span-8) */}
@@ -1281,12 +1229,15 @@ export default function Journal() {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             <div className="md:col-span-5 flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#1b4332] flex items-center justify-center">
-                  <span className="material-symbols-outlined text-[#92f7c3] text-[20px]">
-                    eco
-                  </span>
-                </div>
+              <div className="flex items-center gap-2.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/permata-logo.webp"
+                  alt="Logo PERMATA"
+                  width={36}
+                  height={36}
+                  className="w-9 h-9 object-contain shrink-0"
+                />
                 <span className="font-headline-md text-headline-md text-[#012d1d]">
                   PERMATA Nusantara
                 </span>

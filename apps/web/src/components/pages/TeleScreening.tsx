@@ -333,100 +333,6 @@ export default function TeleScreening() {
         </div>
       )}
 
-      {/* HEADER: matching landing page & journal */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm transition-all">
-        <div className="h-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-4">
-          {/* Brand on the left */}
-          <Link
-            className="flex items-center gap-3 shrink-0 decoration-transparent group"
-            href="/"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1b4332] to-[#006c48] flex items-center justify-center shadow-sm text-white group-hover:scale-105 transition-transform">
-              <span className="material-symbols-outlined text-[24px]">eco</span>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="font-headline-sm text-headline-sm font-bold text-slate-900 tracking-tight leading-none">
-                  PERMATA
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-wider uppercase border border-emerald-200/60">
-                  Nusantara
-                </span>
-              </div>
-              <span className="font-label-sm text-label-sm text-slate-500 font-medium mt-1">
-                Resiliensi Jiwa &amp; PFA Anak
-              </span>
-            </div>
-          </Link>
-
-          {/* Clean middle menu */}
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
-              href="/#programs"
-            >
-              Modul Resiliensi
-            </Link>
-            <Link
-              className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
-              href="/journal"
-            >
-              Pohon Harapan
-            </Link>
-            <Link
-              className="text-sm font-medium text-slate-600 hover:text-emerald-700 transition-colors"
-              href="/#game-showcase"
-            >
-              Game Mitigasi
-            </Link>
-          </nav>
-
-          {/* Right Controls: Culture Selector & Akses Dashboard */}
-          <div className="flex items-center gap-3">
-            {/* Geo-Culture Switcher */}
-            <div
-              className="flex items-center bg-slate-100 p-1 rounded-full text-xs font-semibold"
-              role="group"
-              aria-label="Pilihan Kearifan Budaya"
-            >
-              <button
-                type="button"
-                onClick={() => setCulture("aceh")}
-                className={
-                  culture === "aceh"
-                    ? "geo-pill-active px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                    : "text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                }
-              >
-                <span>🌿</span>
-                <span>Aceh</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setCulture("sumbar")}
-                className={
-                  culture === "sumbar"
-                    ? "geo-pill-active px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                    : "text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                }
-              >
-                <span>🏛️</span>
-                <span>Sumbar</span>
-              </button>
-            </div>
-
-            <Link
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1b4332] hover:bg-[#006c48] text-white font-label-md text-sm font-semibold transition-all shadow-sm shrink-0"
-              href="/dashboard"
-            >
-              <span>Akses Dashboard</span>
-              <span className="material-symbols-outlined text-[18px]">
-                arrow_forward
-              </span>
-            </Link>
-          </div>
-        </div>
-      </header>
 
       {/* MAIN CONTAINER */}
       <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
@@ -1456,12 +1362,15 @@ export default function TeleScreening() {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
             <div className="md:col-span-5 flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#1b4332] flex items-center justify-center text-[#92f7c3]">
-                  <span className="material-symbols-outlined text-[20px]">
-                    eco
-                  </span>
-                </div>
+              <div className="flex items-center gap-2.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/permata-logo.webp"
+                  alt="Logo PERMATA"
+                  width={36}
+                  height={36}
+                  className="w-9 h-9 object-contain shrink-0"
+                />
                 <span className="font-headline-md text-headline-md text-[#012d1d] font-bold">
                   PERMATA Nusantara
                 </span>

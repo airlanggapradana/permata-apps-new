@@ -1,79 +1,187 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { Home, LayoutDashboard, BookOpen } from "lucide-react";
 import { useCulture } from "@/context/CultureContext";
-import { usePathname } from "next/navigation";
 
-export default function Navbar() {
+/*
+ * Navbar tunggal untuk seluruh halaman, mengikuti header landing page.
+ * Tautan memakai "/#id" agar tujuannya tetap valid dari halaman mana pun;
+ * ThemedContent meneruskan hash tersebut ke scroll setelah halaman berganti.
+ */
+const NAV_LINKS = [
+  { href: "/#programs", label: "Modul Resiliensi" },
+  { href: "/#calculator", label: "Pohon Harapan" },
+  { href: "/#game-showcase", label: "Game Mitigasi" },
+];
+
+const CULTURES = [
+  { key: "aceh", label: "Aceh" },
+  { key: "sumbar", label: "Sumbar" },
+] as const;
+
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700";
+
+function CultureSwitcher({ className = "" }: { className?: string }) {
   const { culture, setCulture } = useCulture();
-  const pathname = usePathname();
-
-  const navLinks = [
-    { href: "/", label: "Beranda", icon: <Home size={16} /> },
-    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={16} /> },
-    { href: "/jurnal", label: "Jurnal", icon: <BookOpen size={16} /> },
-  ];
 
   return (
-    <nav className="sticky top-0 z-50 h-16 bg-surface/80 backdrop-blur-md border-b border-line">
-      <div className="max-w-7xl mx-auto px-6 md:px-8 h-full flex justify-between items-center gap-6">
-        {/* Wordmark */}
+    <div
+      className={`flex items-center bg-slate-100 p-1 rounded-full text-xs font-semibold ${className}`}
+      role="group"
+      aria-label="Pilihan Kearifan Budaya"
+    >
+      {CULTURES.map((c) => (
+        <button
+          key={c.key}
+          type="button"
+          onClick={() => setCulture(c.key)}
+          aria-pressed={culture === c.key}
+          className={`min-h-11 min-w-11 px-4 rounded-full transition-colors duration-200 ${focusRing} ${
+            culture === c.key
+              ? "bg-brand-800 text-white"
+              : "text-slate-700 hover:text-slate-900"
+          }`}
+        >
+          {c.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export default function Navbar({
+  currentPath = "/",
+}: {
+  currentPath?: string;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMenuOpen(false);
+  }, [currentPath]);
+
+  const closeMenu = () => setMenuOpen(false);
+
+  return (
+    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
         <Link
           href="/"
-          prefetch={false}
-          className="text-lg font-semibold tracking-[0.08em] text-fg hover:text-fg-brand transition-colors duration-150"
+          onClick={closeMenu}
+          className={`flex items-center gap-3 shrink-0 rounded-sm ${focusRing}`}
         >
-          PERMATA
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/permata-logo.webp"
+            alt="Logo PERMATA"
+            width={40}
+            height={40}
+            className="w-10 h-10 object-contain shrink-0"
+          />
+          <div className="flex flex-col">
+            <span className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 leading-none">
+              PERMATA
+            </span>
+            <span className="text-[11px] font-medium text-slate-600 mt-1">
+              Resiliensi Jiwa &amp; PFA Anak
+            </span>
+          </div>
         </Link>
 
-        {/* Nav links */}
-        <div className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => {
-            const isActive =
-              link.href === "/"
-                ? pathname === "/"
-                : pathname?.startsWith(link.href);
-            return (
+        <nav
+          aria-label="Navigasi utama"
+          className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-700"
+        >
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`py-2 rounded-sm transition-colors hover:text-brand-700 ${focusRing}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden lg:flex items-center gap-3 shrink-0">
+          <CultureSwitcher />
+          <Link
+            href="/dashboard"
+            aria-current={currentPath === "/dashboard" ? "page" : undefined}
+            className={`inline-flex items-center min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-5 rounded-full transition-colors duration-200 ${focusRing}`}
+          >
+            Akses Dashboard
+          </Link>
+        </div>
+
+        <button
+          type="button"
+          className={`lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-md border border-slate-300 text-slate-800 hover:bg-slate-100 ${focusRing}`}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
+          aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            {menuOpen ? (
+              <path d="M6 6l12 12M18 6L6 18" />
+            ) : (
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            )}
+          </svg>
+        </button>
+      </div>
+
+      {menuOpen && (
+        <div
+          id="mobile-menu"
+          className="lg:hidden border-t border-slate-200 bg-white px-4 sm:px-6 py-4 flex flex-col gap-1"
+        >
+          <nav aria-label="Navigasi utama (seluler)" className="flex flex-col">
+            {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                prefetch={false}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150 ${
-                  isActive
-                    ? "bg-tint text-fg-brand"
-                    : "text-fg-muted hover:text-fg hover:bg-sunken"
-                }`}
+                onClick={closeMenu}
+                className={`flex items-center min-h-11 text-sm font-medium text-slate-800 hover:text-brand-700 rounded-sm ${focusRing}`}
               >
-                {link.icon}
                 {link.label}
               </Link>
-            );
-          })}
-        </div>
-
-        {/* Segmented control pemilih budaya */}
-        <div
-          className="flex items-center bg-sunken rounded-full p-1"
-          role="group"
-          aria-label="Konteks budaya"
-        >
-          {(["aceh", "sumbar"] as const).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCulture(c)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
-                culture === c
-                  ? "bg-action text-white shadow-xs"
-                  : "text-fg-muted hover:text-fg"
-              }`}
-              aria-pressed={culture === c}
+            ))}
+          </nav>
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 mt-2 border-t border-slate-200">
+            <CultureSwitcher />
+            <Link
+              href="/dashboard"
+              onClick={closeMenu}
+              aria-current={currentPath === "/dashboard" ? "page" : undefined}
+              className={`inline-flex items-center min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-5 rounded-full transition-colors duration-200 ${focusRing}`}
             >
-              {c === "aceh" ? "Aceh" : "Sumbar"}
-            </button>
-          ))}
+              Akses Dashboard
+            </Link>
+          </div>
         </div>
-      </div>
-    </nav>
+      )}
+    </header>
   );
 }

@@ -96,107 +96,6 @@ export default function LandingPage() {
 
   return (
     <div className="w-full bg-[#F8FAF8] text-slate-800 selection:bg-brand-500 selection:text-white">
-      {/* BEGIN: MainHeader */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/70 transition-all shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4 relative">
-          <Link className="flex items-center gap-3 group shrink-0" href="#home">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-brand-900/10 group-hover:scale-105 transition-transform">
-              <span className="text-lg">💎</span>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
-                  PERMATA
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-50 border border-brand-200 text-brand-800 tracking-wide uppercase">
-                  Nusantara
-                </span>
-              </div>
-              <span className="text-[10px] font-medium text-slate-400 tracking-wide">
-                Resiliensi Jiwa &amp; PFA Anak
-              </span>
-            </div>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-slate-600 shrink-0">
-            <a
-              className="transition hover:text-brand-700 font-medium py-1"
-              href="#programs"
-            >
-              Modul Resiliensi
-            </a>
-            <a
-              className="transition hover:text-brand-700 font-medium py-1"
-              href="#calculator"
-            >
-              Pohon Harapan
-            </a>
-            <a
-              className="transition hover:text-brand-700 font-medium py-1"
-              href="#game-showcase"
-            >
-              Game Mitigasi
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Geo-Culture Switcher */}
-            <div
-              className="flex items-center bg-slate-100 p-1 rounded-full text-xs font-semibold"
-              role="group"
-              aria-label="Pilihan Kearifan Budaya"
-            >
-              <button
-                id="btn-culture-aceh"
-                type="button"
-                onClick={() => setCulture("aceh")}
-                className={
-                  culture === "aceh"
-                    ? "geo-pill-active px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                    : "text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                }
-              >
-                <span>🌿</span>
-                <span>Aceh</span>
-              </button>
-              <button
-                id="btn-culture-sumbar"
-                type="button"
-                onClick={() => setCulture("sumbar")}
-                className={
-                  culture === "sumbar"
-                    ? "geo-pill-active px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                    : "text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-full transition-all duration-300 flex items-center gap-1.5"
-                }
-              >
-                <span>🏛️</span>
-                <span>Sumbar</span>
-              </button>
-            </div>
-
-            <Link
-              className="bg-brand-900 hover:bg-brand-950 text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-all duration-200 shadow-md shadow-brand-900/10 hover:shadow-lg flex items-center gap-2 hover:-translate-y-0.5 shrink-0"
-              href="/dashboard"
-            >
-              <span>Akses Dashboard</span>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </header>
-      {/* END: MainHeader */}
 
       {/* BEGIN: HeroSection with Rich Mockup & Floating Badges */}
       <section
@@ -1516,9 +1415,14 @@ export default function LandingPage() {
             {/* Brand & Mission Info */}
             <div className="md:col-span-2 space-y-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-                  💎
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/permata-logo.webp"
+                  alt="Logo PERMATA"
+                  width={36}
+                  height={36}
+                  className="w-9 h-9 object-contain shrink-0"
+                />
                 <span className="text-xl font-extrabold text-slate-900">
                   PERMATA <span className="text-brand-700">Nusantara</span>
                 </span>

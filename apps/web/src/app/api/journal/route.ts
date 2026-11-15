@@ -204,6 +204,12 @@ export async function GET() {
     `) as { count: number }[];
     const screeningCount = screeningCountRes[0]?.count || 0;
 
+    // Query total mood food analyses from AuditLog
+    const moodFoodCountRes = (await sql`
+      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'MOOD_FOOD_ANALYSIS';
+    `) as { count: number }[];
+    const moodFoodCount = moodFoodCountRes[0]?.count || 0;
+
     // Check if tree was watered today
     const wateredTodayRes = (await sql`
       SELECT COUNT(*)::int AS count 
@@ -219,6 +225,7 @@ export async function GET() {
       waterCount,
       breatheCount,
       screeningCount,
+      moodFoodCount,
       wateredToday,
     });
 

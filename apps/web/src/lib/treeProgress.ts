@@ -16,6 +16,7 @@ export interface TreeStats extends TreeLevelInfo {
   waterCount: number;
   breatheCount: number;
   screeningCount?: number;
+  moodFoodCount?: number;
   wateredToday: boolean;
 }
 
@@ -77,9 +78,10 @@ export function calculateTreeStats(params: {
   waterCount: number;
   breatheCount: number;
   screeningCount?: number;
+  moodFoodCount?: number;
   wateredToday: boolean;
 }): TreeStats {
-  const { journalCount, waterCount, breatheCount, screeningCount = 0, wateredToday } = params;
+  const { journalCount, waterCount, breatheCount, screeningCount = 0, moodFoodCount = 0, wateredToday } = params;
 
   // Base XP: 150 (initial sprout starter)
   const baseXp = 150;
@@ -87,8 +89,9 @@ export function calculateTreeStats(params: {
   const waterXp = waterCount * 20;
   const breatheXp = breatheCount * 15;
   const screeningXp = screeningCount * 100;
+  const moodFoodXp = moodFoodCount * 40;
 
-  const totalXp = baseXp + journalXp + waterXp + breatheXp + screeningXp;
+  const totalXp = baseXp + journalXp + waterXp + breatheXp + screeningXp + moodFoodXp;
 
   // Find level tier
   let levelInfo = TREE_LEVELS[0];
@@ -113,6 +116,7 @@ export function calculateTreeStats(params: {
     waterCount,
     breatheCount,
     screeningCount,
+    moodFoodCount,
     wateredToday,
   };
 }
