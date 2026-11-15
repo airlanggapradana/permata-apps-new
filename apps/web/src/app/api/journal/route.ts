@@ -198,6 +198,12 @@ export async function GET() {
     `) as { count: number }[];
     const breatheCount = breatheCountRes[0]?.count || 0;
 
+    // Query total tele-screening assessments from AuditLog
+    const screeningCountRes = (await sql`
+      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'TELESCREENING_DASS21';
+    `) as { count: number }[];
+    const screeningCount = screeningCountRes[0]?.count || 0;
+
     // Check if tree was watered today
     const wateredTodayRes = (await sql`
       SELECT COUNT(*)::int AS count 
@@ -212,6 +218,7 @@ export async function GET() {
       journalCount: entries.length,
       waterCount,
       breatheCount,
+      screeningCount,
       wateredToday,
     });
 
