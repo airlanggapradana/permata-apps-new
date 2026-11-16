@@ -1,77 +1,96 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 @import "tailwindcss";
 
-/* ---------- 1. PRIMITIVE: netral (sama di semua budaya) ---------- */
+/* ---------- 1. PRIMITIVE: Hikmah Resilience System Neutrals & Accents ---------- */
 :root {
-  --neutral-0:   #FFFFFF;
-  --neutral-25:  #FAFAF9;
-  --neutral-50:  #F5F5F4;
-  --neutral-100: #E7E5E4;
-  --neutral-200: #D6D3D1;
-  --neutral-300: #A8A29E;
-  --neutral-400: #8F8983;
-  --neutral-500: #736D68;
-  --neutral-600: #57534E;
-  --neutral-700: #44403C;
-  --neutral-900: #1C1917;
+  --neutral-0:   #ffffff;
+  --neutral-25:  #f7f9fb;
+  --neutral-50:  #f2f4f6;
+  --neutral-100: #eceef0;
+  --neutral-150: #e6e8ea;
+  --neutral-200: #e0e3e5;
+  --neutral-250: #d8dadc;
+  --neutral-300: #c1c8c2;
+  --neutral-400: #717973;
+  --neutral-500: #5b645f;
+  --neutral-600: #414844;
+  --neutral-700: #334155;
+  --neutral-900: #191c1e;
 
-  --success-600: #1E7A53;
-  --warning-600: #8A5A0B;
-  --danger-600:  #B42318;
-  --info-600:    #1D5FBF;
+  --success-600: #006c48;
+  --warning-600: #92400e;
+  --danger-600:  #ba1a1a;
+  --info-600:    #1d5fbf;
 
-  --accent-text: #8A6D1A;
-  --accent-50:   #FBF7EA;
-  --accent-200:  #EBDDA6;
+  --accent-text:   #92400e;
+  --accent-50:     #fef3c7;
+  --accent-200:    #fde68a;
+  --accent-border: #f59e0b;
 }
 
-/* ---------- 2. BUDAYA ---------- */
+/* ---------- 2. BUDAYA (Aceh = Hikmah Resilience Default, Sumbar = Rumah Gadang) ---------- */
 :root,
 [data-culture="aceh"] {
-  --brand-50:  #F1F7F4;  --brand-100: #DDEDE4;  --brand-200: #BADBC9;
-  --brand-300: #8FC3A8;  --brand-400: #5FA583;  --brand-500: #3E8765;
-  --brand-600: #2C6B4F;  --brand-700: #22563F;  --brand-800: #1B4332;
-  --brand-900: #112B20;
-  --accent-500: #D4AF37;
-  --canvas:     #F7FAF8;
+  --brand-50:  #e8f5e9;
+  --brand-100: #c1ecd4;
+  --brand-200: #a5d0b9;
+  --brand-300: #92f7c3;
+  --brand-400: #75daa8;
+  --brand-500: #52b788;
+  --brand-600: #006c48;
+  --brand-700: #1b4332;
+  --brand-800: #012d1d;
+  --brand-900: #002114;
+  --accent-500: #d97706;
+  --canvas:     #f7f9fb;
+  --card-border: #e2e8f0;
+  --shadow-tint: 27 67 50;
 }
+
 [data-culture="sumbar"] {
-  --brand-50:  #FBF3F1;  --brand-100: #F6E2DE;  --brand-200: #EBC1B9;
-  --brand-300: #DC9A8E;  --brand-400: #C86A5B;  --brand-500: #AE4234;
-  --brand-600: #9C2A22;  --brand-700: #7B0000;
-  --brand-800: #5C0000;  --brand-900: #3D0000;
-  --accent-500: #FFD700;
-  --canvas:     #FCF8F6;
+  --brand-50:  #fbf3f1;
+  --brand-100: #f6e2de;
+  --brand-200: #ebc1b9;
+  --brand-300: #dc9a8e;
+  --brand-400: #c86a5b;
+  --brand-500: #ae4234;
+  --brand-600: #9c2a22;
+  --brand-700: #7b0000;
+  --brand-800: #5c0000;
+  --brand-900: #3d0000;
+  --accent-500: #d97706;
+  --canvas:     #fcf8f6;
+  --card-border: #e2e8f0;
+  --shadow-tint: 123 0 0;
 }
 
 /* ---------- 3. SEMANTIC ---------- */
 :root {
-  --canvas-base:     var(--canvas);
-  --surface:         var(--neutral-0);
-  --surface-sunken:  var(--neutral-50);
-  --surface-brand:   var(--brand-50);
-  --surface-emphasis: var(--brand-800);
+  --canvas-base:      var(--canvas);
+  --surface:          var(--neutral-0);
+  --surface-sunken:   var(--neutral-50);
+  --surface-brand:    var(--brand-50);
+  --surface-emphasis: var(--brand-700);
 
-  --text:            var(--neutral-900);
-  --text-secondary:  var(--neutral-600);
-  --text-tertiary:   var(--neutral-500);
-  --text-on-brand:   var(--neutral-0);
-  --text-brand:      var(--brand-700);
-  --text-accent:     var(--accent-text);
+  --text:             var(--neutral-900);
+  --text-secondary:   var(--neutral-600);
+  --text-tertiary:    var(--neutral-500);
+  --text-on-brand:    var(--neutral-0);
+  --text-brand:       var(--brand-700);
+  --text-accent:      var(--accent-text);
 
-  --border:          var(--neutral-100);
-  --border-strong:   var(--neutral-200);
-  --border-input:    var(--neutral-400);
+  --border:           var(--card-border);
+  --border-strong:    var(--neutral-300);
+  --border-input:     var(--neutral-400);
 
-  --action:          var(--brand-700);
-  --action-hover:    var(--brand-800);
-  --focus-ring:      var(--brand-500);
+  --action:           var(--brand-700);
+  --action-hover:     var(--brand-800);
+  --focus-ring:       var(--brand-500);
 
   color-scheme: light;
 }
 
-/* ---------- 4. Tailwind v4 theme ---------- */
+/* ---------- 4. Tailwind v4 Theme (DESIGN_SYSTEM_PERMATA.md) ---------- */
 @theme inline {
   --color-canvas: var(--canvas-base);
   --color-surface: var(--surface);
@@ -89,24 +108,24 @@
   --color-action: var(--action);
   --color-action-hover: var(--action-hover);
 
-  --color-brand-50: #F0FDF4;
-  --color-brand-100: #DCFCE7;
-  --color-brand-200: #BBF7D0;
-  --color-brand-300: #86EFAC;
-  --color-brand-400: #4ADE80;
-  --color-brand-500: #10B981;
-  --color-brand-600: #059669;
-  --color-brand-700: #047857;
-  --color-brand-800: #1B4332;
-  --color-brand-900: #0F291E;
-  --color-brand-950: #081711;
+  --color-brand-50:  var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: #002114;
 
-  --color-accent-gold: #D97706;
-  --color-accent-goldLight: #FEF3C7;
-  --color-accent-maroon: #881337;
-  --color-accent-maroonLight: #FFE4E6;
-  --color-accent-mint: #E6F8F0;
-  --color-accent-sage: #F4F9F5;
+  --color-accent-gold: #d97706;
+  --color-accent-goldLight: #fef3c7;
+  --color-accent-maroon: #7b0000;
+  --color-accent-maroonLight: #fbf3f1;
+  --color-accent-mint: #e8f5e9;
+  --color-accent-sage: #f7f9fb;
 
   --color-accent: var(--accent-500);
   --color-accent-text: var(--accent-text);
@@ -123,7 +142,17 @@
   --color-neutral-400: var(--neutral-400);
   --color-neutral-500: var(--neutral-500);
 
-  /* Jurnal Hikmah & Material Design Tokens matching desain_jurnal_hikmah.html */
+  /* Hikmah Resilience System Material Tokens */
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-dim: #d8dadc;
+  --color-surface-variant: #e0e3e5;
+  --color-surface-tint: #3f6653;
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+  --color-inverse-primary: #a5d0b9;
+
   --color-primary: #012d1d;
   --color-primary-container: #1b4332;
   --color-primary-fixed: #c1ecd4;
@@ -140,6 +169,7 @@
   --color-on-secondary: #ffffff;
   --color-on-secondary-fixed: #002113;
   --color-on-secondary-fixed-variant: #005235;
+  --color-on-secondary-container: #00734d;
 
   --color-tertiary: #3e1e00;
   --color-tertiary-container: #5e3000;
@@ -165,109 +195,143 @@
   --color-on-error: #ffffff;
   --color-on-error-container: #93000a;
 
+  /* Spacing tokens from DESIGN_SYSTEM_PERMATA.md */
   --spacing-space-xs: 0.25rem;
   --spacing-space-sm: 0.5rem;
   --spacing-space-md: 1rem;
   --spacing-space-lg: 1.5rem;
   --spacing-space-xl: 2.5rem;
+  --spacing-gutter: 1rem;
+  --spacing-gutter-tablet: 1.5rem;
+  --spacing-gutter-desktop: 2rem;
+  --spacing-margin: 1rem;
+  --spacing-margin-tablet: 2rem;
+  --spacing-margin-desktop: 4rem;
 
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-serif: var(--font-newsreader, ui-serif, Georgia, serif);
+  /* Typography: Inter for body & prompts, Plus Jakarta Sans for display & headlines */
+  --font-sans: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-jakarta), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: ui-serif, Georgia, serif;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  /* Border Radius tokens from DESIGN_SYSTEM_PERMATA.md */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* Diffuse Emerald Ambient Shadows */
+  --shadow-xs: 0 2px 12px rgba(27, 67, 50, 0.04);
+  --shadow-sm: 0 4px 16px rgba(27, 67, 50, 0.05);
+  --shadow-md: 0 8px 24px rgba(27, 67, 50, 0.06);
+  --shadow-lg: 0 12px 32px rgba(27, 67, 50, 0.08);
 }
 
 body {
   background: var(--canvas-base);
   color: var(--text);
   font-family: var(--font-sans);
+  line-height: 1.625;
   -webkit-font-smoothing: antialiased;
   transition: background-color 400ms cubic-bezier(.2,0,0,1), color 400ms cubic-bezier(.2,0,0,1);
 }
 
-/* Material Design Typography Utilities */
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+/* Hikmah Resilience Typography Scale */
 .font-headline-xl, .text-headline-xl {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-display);
   font-size: 40px;
   line-height: 48px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
+.font-headline-xl-mobile, .text-headline-xl-mobile {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 38px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
 .font-headline-lg, .text-headline-lg {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-display);
   font-size: 32px;
   line-height: 40px;
   font-weight: 600;
   letter-spacing: -0.015em;
 }
+.font-headline-lg-mobile, .text-headline-lg-mobile {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+}
 .font-headline-md, .text-headline-md {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-display);
   font-size: 24px;
   line-height: 32px;
   font-weight: 600;
 }
 .font-headline-sm, .text-headline-sm {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-display);
   font-size: 20px;
   line-height: 28px;
   font-weight: 600;
 }
 .font-body-lg, .text-body-lg {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 18px;
   line-height: 28px;
   font-weight: 400;
 }
 .font-body-md, .text-body-md {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   line-height: 26px;
   font-weight: 400;
 }
 .font-body-sm, .text-body-sm {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   line-height: 22px;
   font-weight: 400;
 }
 .font-label-md, .text-label-md {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   line-height: 20px;
   font-weight: 500;
   letter-spacing: 0.01em;
 }
 .font-label-sm, .text-label-sm {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   line-height: 16px;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
-/* Custom Utilities for PERMATA Landing Page matching desain.html */
+/* Custom Utilities aligned with DESIGN_SYSTEM_PERMATA.md */
 .hero-glow-finora {
-  background: radial-gradient(circle at 65% 25%, rgba(16, 185, 129, 0.16) 0%, rgba(220, 252, 231, 0.08) 45%, rgba(255, 255, 255, 0) 75%);
+  background: radial-gradient(circle at 65% 25%, rgba(82, 183, 136, 0.16) 0%, rgba(232, 245, 233, 0.08) 45%, rgba(255, 255, 255, 0) 75%);
 }
 .glass-card {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
 }
 .card-shadow-finora {
-  box-shadow: 0 10px 30px -5px rgba(27, 67, 50, 0.06), 0 4px 12px -2px rgba(27, 67, 50, 0.03);
+  box-shadow: 0 8px 24px rgba(27, 67, 50, 0.05), 0 2px 12px rgba(27, 67, 50, 0.03);
 }
 .card-shadow-hover:hover {
-  box-shadow: 0 20px 40px -10px rgba(27, 67, 50, 0.14), 0 8px 16px -4px rgba(27, 67, 50, 0.06);
+  box-shadow: 0 12px 32px rgba(27, 67, 50, 0.08), 0 0 0 3px rgba(82, 183, 136, 0.25);
 }
 .geo-pill-active {
-  background: #1B4332;
-  color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.25);
+  background: var(--action);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2);
 }
 .text-balance {
   text-wrap: balance;

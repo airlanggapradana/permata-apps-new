@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { LogOut, User } from "lucide-react";
 import { useCulture } from "@/context/CultureContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -30,7 +31,7 @@ function CultureSwitcher({ className = "" }: { className?: string }) {
 
   return (
     <div
-      className={`flex items-center bg-slate-100 p-1 rounded-full text-xs font-semibold ${className}`}
+      className={`flex items-center bg-sunken border border-line p-1 rounded-full text-xs font-semibold ${className}`}
       role="group"
       aria-label="Pilihan Kearifan Budaya"
     >
@@ -42,8 +43,8 @@ function CultureSwitcher({ className = "" }: { className?: string }) {
           aria-pressed={culture === c.key}
           className={`min-h-11 min-w-11 px-4 rounded-full transition-colors duration-200 ${focusRing} ${
             culture === c.key
-              ? "bg-brand-800 text-white"
-              : "text-slate-700 hover:text-slate-900"
+              ? "bg-action text-white"
+              : "text-fg-muted hover:text-fg"
           }`}
         >
           {c.label}
@@ -78,7 +79,7 @@ export default function Navbar({
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <header className="sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-line shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
         <Link
           href="/"
@@ -94,10 +95,10 @@ export default function Navbar({
             className="w-10 h-10 object-contain shrink-0"
           />
           <div className="flex flex-col">
-            <span className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 leading-none">
+            <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-fg leading-none">
               PERMATA
             </span>
-            <span className="text-[11px] font-medium text-slate-600 mt-1">
+            <span className="text-xs font-medium text-fg-muted mt-1">
               Resiliensi Jiwa &amp; PFA Anak
             </span>
           </div>
@@ -105,7 +106,7 @@ export default function Navbar({
 
         <nav
           aria-label="Navigasi utama"
-          className="hidden lg:flex items-center gap-4 text-sm font-semibold text-slate-700"
+          className="hidden lg:flex items-center gap-4 text-sm font-semibold text-fg-muted"
         >
           {NAV_LINKS.map((link) => {
             const isActive = currentPath === link.href;
@@ -117,7 +118,7 @@ export default function Navbar({
                 className={`px-3 py-2 rounded-md transition-colors ${focusRing} ${
                   isActive
                     ? "bg-tint text-fg-brand"
-                    : "hover:text-brand-700"
+                    : "hover:text-fg-brand"
                 }`}
               >
                 {link.label}
@@ -129,22 +130,26 @@ export default function Navbar({
         <div className="hidden lg:flex items-center gap-2.5 shrink-0">
           <CultureSwitcher />
           {!authLoading && user ? (
-            <>
+            <div className="flex items-center gap-2 pl-2 border-l border-line">
               <Link
                 href="/dashboard"
                 aria-current={currentPath === "/dashboard" ? "page" : undefined}
-                className={`inline-flex items-center min-h-11 bg-action hover:bg-action-hover text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+                className={`inline-flex items-center gap-2 min-h-11 bg-emphasis hover:bg-action-hover text-white text-sm font-semibold pl-2 pr-4 rounded-full transition-colors duration-200 shadow-xs ${focusRing}`}
               >
-                {user.childName}
+                <span className="w-7 h-7 rounded-full bg-action flex items-center justify-center text-white shrink-0">
+                  <User size={15} strokeWidth={1.75} aria-hidden="true" />
+                </span>
+                <span>{user.childName}</span>
               </Link>
               <button
                 type="button"
                 onClick={logout}
-                className={`inline-flex items-center min-h-11 px-3.5 rounded-full border border-line-strong bg-surface hover:bg-sunken text-fg text-xs font-semibold transition-colors ${focusRing}`}
+                className={`inline-flex items-center gap-1.5 min-h-11 px-3.5 rounded-full border border-line-strong bg-surface hover:bg-sunken text-fg-muted hover:text-danger text-xs font-semibold transition-colors ${focusRing}`}
               >
-                Keluar
+                <LogOut size={15} strokeWidth={1.75} aria-hidden="true" />
+                <span>Keluar</span>
               </button>
-            </>
+            </div>
           ) : (
             <>
               <Link
@@ -157,7 +162,7 @@ export default function Navbar({
               <Link
                 href="/dashboard"
                 aria-current={currentPath === "/dashboard" ? "page" : undefined}
-                className={`inline-flex items-center min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+                className={`inline-flex items-center min-h-11 bg-action hover:bg-action-hover text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
               >
                 Dashboard
               </Link>
@@ -167,7 +172,7 @@ export default function Navbar({
 
         <button
           type="button"
-          className={`lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-md border border-slate-300 text-slate-800 hover:bg-slate-100 ${focusRing}`}
+          className={`lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-md border border-line-strong text-fg hover:bg-sunken ${focusRing}`}
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
           aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
@@ -194,7 +199,7 @@ export default function Navbar({
       {menuOpen && (
         <div
           id="mobile-menu"
-          className="lg:hidden border-t border-slate-200 bg-white px-4 sm:px-6 py-4 flex flex-col gap-1"
+          className="lg:hidden border-t border-line bg-surface px-4 sm:px-6 py-4 flex flex-col gap-1"
         >
           <nav aria-label="Navigasi utama (seluler)" className="flex flex-col">
             {NAV_LINKS.map((link) => {
@@ -208,7 +213,7 @@ export default function Navbar({
                   className={`flex items-center min-h-11 px-3 text-sm font-medium rounded-md ${focusRing} ${
                     isActive
                       ? "bg-tint text-fg-brand font-semibold"
-                      : "text-slate-800 hover:text-brand-700"
+                      : "text-fg hover:text-fg-brand"
                   }`}
                 >
                   {link.label}
@@ -216,7 +221,7 @@ export default function Navbar({
               );
             })}
           </nav>
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 mt-2 border-t border-slate-200">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 mt-2 border-t border-line">
             <CultureSwitcher />
             <div className="flex flex-wrap items-center gap-2">
               {!authLoading && user ? (
@@ -254,7 +259,7 @@ export default function Navbar({
                     href="/dashboard"
                     onClick={closeMenu}
                     aria-current={currentPath === "/dashboard" ? "page" : undefined}
-                    className={`inline-flex items-center min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+                    className={`inline-flex items-center min-h-11 bg-action hover:bg-action-hover text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
                   >
                     Dashboard
                   </Link>

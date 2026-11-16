@@ -95,7 +95,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="w-full bg-[#F8FAF8] text-slate-800 selection:bg-brand-500 selection:text-white">
+    <div className="w-full bg-canvas text-fg selection:bg-action selection:text-white">
 
       {/* BEGIN: HeroSection with Rich Mockup & Floating Badges */}
       <section

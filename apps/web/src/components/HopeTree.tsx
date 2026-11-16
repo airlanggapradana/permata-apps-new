@@ -23,7 +23,7 @@ const HopeTree = ({ level }: HopeTreeProps) => {
             scale: [1, 1.02, 1],
           }}
           transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-          className="text-brand-600"
+          className="text-fg-brand"
         >
           <TreePine size={size} strokeWidth={1.5} />
         </motion.div>
@@ -34,7 +34,7 @@ const HopeTree = ({ level }: HopeTreeProps) => {
             <div
               key={i}
               className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                i < level ? "bg-brand-500" : "bg-neutral-100"
+                i < level ? "bg-[var(--brand-500)]" : "bg-surface-container-high"
               }`}
             />
           ))}

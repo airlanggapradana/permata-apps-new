@@ -990,7 +990,7 @@ export default function Journal() {
                   </div>
 
                   {/* Dynamic XP Activity Sources Breakdown from Database */}
-                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-line text-center">
                     <div className="p-2 rounded-lg bg-[#f2f4f6] flex flex-col">
                       <span className="text-[10px] text-[#414844] font-medium">Refleksi</span>
                       <span className="text-xs font-bold text-[#006c48]">
@@ -1163,8 +1163,8 @@ export default function Journal() {
       {/* Entry Modal View if clicked */}
       {selectedEntry && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="bg-surface rounded-xl max-w-lg w-full p-6 shadow-lg border border-line flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-line">
               <div className="flex items-center gap-2">
                 <span className="text-xl">
                   {moodOptions.find((m) => m.value === selectedEntry.mood)
@@ -1177,7 +1177,7 @@ export default function Journal() {
               <button
                 type="button"
                 onClick={() => setSelectedEntry(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
+                className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-fg-muted hover:text-fg transition-colors"
               >
                 ✕
               </button>
@@ -1191,25 +1191,25 @@ export default function Journal() {
               </p>
             </div>
             {selectedEntry.proverb && (
-              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/60 text-xs text-amber-950 space-y-1">
-                <span className="font-bold text-[#5e3000]">Hikmah Budaya:</span>
+              <div className="p-3.5 rounded-lg bg-accent-50 border border-accent-200 text-xs text-fg space-y-1">
+                <span className="font-bold text-fg-accent">Hikmah Budaya:</span>
                 <p className="italic font-medium">{selectedEntry.proverb}</p>
                 {selectedEntry.proverbMeaning && (
-                  <p className="text-slate-600 mt-1">
+                  <p className="text-fg-muted mt-1">
                     {selectedEntry.proverbMeaning}
                   </p>
                 )}
               </div>
             )}
             {selectedEntry.aiInsight && (
-              <div className="p-4 rounded-xl bg-[#f2f4f6] text-xs text-[#414844] space-y-1">
+              <div className="p-4 rounded-lg bg-[#f2f4f6] text-xs text-[#414844] space-y-1">
                 <span className="font-bold text-[#006c48]">
                   Empati &amp; Validasi AI:
                 </span>
                 <p className="leading-relaxed">{selectedEntry.aiInsight}</p>
               </div>
             )}
-            <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between text-xs text-fg-subtle pt-2 border-t border-line">
               <span className="truncate max-w-[200px]">
                 ID: {selectedEntry.id}
               </span>
