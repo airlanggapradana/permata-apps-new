@@ -1,0 +1,364 @@
+.pm-tree {
+  --p: 0;
+  --pm-track: rgba(110, 135, 122, 0.42);
+  --pm-track-ring: rgba(255, 255, 255, 0.28);
+  --pm-leaf-off: rgba(110, 135, 122, 0.9);
+  --pm-leaf-on: #2f9e6f;
+  position: fixed;
+  z-index: 60;
+  right: 0.5rem;
+  top: 50%;
+  width: 3.25rem;
+  height: min(56svh, 34rem);
+  min-height: 16rem;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms ease 200ms;
+}
+
+.pm-tree[data-show="true"] {
+  opacity: 1;
+}
+
+.pm-tree::before {
+  display: none;
+}
+
+.pm-stem {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 999px;
+  background: var(--pm-track);
+  box-shadow: 0 0 0 1px var(--pm-track-ring);
+}
+
+.pm-fill {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 4px;
+  height: calc(var(--p) * 100%);
+  margin-left: -2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #2f7a5a, #6fd0a0);
+  box-shadow: 0 0 10px rgba(111, 208, 160, 0.65);
+}
+
+.pm-hit {
+  position: absolute;
+  top: -12px;
+  bottom: -12px;
+  left: 50%;
+  width: 1.75rem;
+  margin-left: -0.875rem;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+}
+
+.pm-hit:active {
+  cursor: grabbing;
+}
+
+.pm-tip {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--p) * 100%);
+  width: 1.625rem;
+  height: 1.625rem;
+  margin: -0.8125rem 0 0 -0.8125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  pointer-events: none;
+  background: #fff;
+  color: #2f7a5a;
+  border: 2px solid #2f7a5a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  transition:
+    transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 300ms;
+}
+
+.pm-tip::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 1px solid rgba(111, 208, 160, 0.7);
+  animation: pm-tip-pulse 3.2s ease-in-out infinite;
+}
+
+.pm-tip[data-bloom="true"] {
+  transform: scale(1.45);
+  background: #6fd0a0;
+  color: #0f3d2b;
+}
+
+@keyframes pm-tip-pulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.7;
+  }
+}
+
+.pm-node {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--f) * 100%);
+  height: 0;
+  pointer-events: none;
+}
+
+.pm-leafbtn {
+  position: absolute;
+  top: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: -0.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--pm-leaf-off);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.pm-r {
+  left: 50%;
+  margin-left: 2px;
+}
+
+.pm-l {
+  right: 50%;
+  margin-right: 2px;
+}
+
+.pm-leaf {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0.7;
+  transform: scale(0.5);
+  transform-origin: 12% 88%;
+  transition:
+    transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 300ms;
+}
+
+.pm-leaf svg {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.pm-l .pm-leaf {
+  justify-content: flex-end;
+  transform-origin: 88% 88%;
+}
+
+.pm-l .pm-leaf svg {
+  transform: scaleX(-1);
+}
+
+.pm-leafbtn[data-on="true"] {
+  color: var(--pm-leaf-on);
+}
+
+.pm-leafbtn[data-on="true"] .pm-leaf {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.pm-leafbtn[data-on="true"] svg {
+  fill: rgba(95, 200, 150, 0.35);
+  filter: drop-shadow(0 0 4px rgba(95, 200, 150, 0.55));
+}
+
+.pm-leafbtn:hover .pm-leaf {
+  transform: scale(1.18);
+}
+
+.pm-leafbtn:focus-visible {
+  outline: 2px solid #2f7a5a;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.pm-label {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 0.625rem);
+  transform: translate(6px, -50%);
+  opacity: 0;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  color: #fff;
+  background: rgba(15, 45, 33, 0.92);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  transition:
+    opacity 200ms,
+    transform 200ms;
+}
+
+.pm-node:hover .pm-label,
+.pm-node:focus-within .pm-label {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+@media (min-width: 1024px) {
+  html {
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* HP & tablet: batang horizontal di bawah layar */
+@media (max-width: 1023px) {
+  .pm-tree {
+    --pm-track: rgba(255, 255, 255, 0.28);
+    --pm-track-ring: transparent;
+    --pm-leaf-off: rgba(255, 255, 255, 0.55);
+    --pm-leaf-on: #7ee2b0;
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+    width: min(78vw, 24rem);
+    height: 3.25rem;
+    min-height: 0;
+    transform: translateX(-50%);
+  }
+
+  .pm-tree::before {
+    display: block;
+    content: "";
+    position: absolute;
+    inset: 0 -1.25rem;
+    z-index: -1;
+    border-radius: 999px;
+    pointer-events: none;
+    background: rgba(15, 45, 33, 0.8);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow:
+      0 6px 20px rgba(0, 0, 0, 0.28),
+      0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+
+  .pm-stem {
+    left: 0;
+    right: 0;
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    height: 4px;
+    margin: -2px 0 0;
+  }
+
+  .pm-fill {
+    left: 0;
+    top: 50%;
+    width: calc(var(--p) * 100%);
+    height: 4px;
+    margin: -2px 0 0;
+    background: linear-gradient(90deg, #2f7a5a, #6fd0a0);
+  }
+
+  .pm-hit {
+    left: -12px;
+    right: -12px;
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    height: 2.5rem;
+    margin: -1.25rem 0 0;
+  }
+
+  .pm-tip {
+    top: 50%;
+    left: calc(var(--p) * 100%);
+  }
+
+  .pm-node {
+    top: 0;
+    bottom: 0;
+    left: calc(var(--f) * 100%);
+    right: auto;
+    width: 0;
+    height: auto;
+  }
+
+  .pm-leafbtn {
+    margin-top: 0;
+  }
+
+  .pm-r {
+    left: 0;
+    right: auto;
+    top: auto;
+    bottom: 50%;
+    margin: 0 0 2px -2px;
+  }
+
+  .pm-l {
+    left: 0;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    margin: 2px 0 0 -2px;
+  }
+
+  .pm-r .pm-leaf {
+    justify-content: flex-start;
+    align-items: flex-end;
+    transform-origin: 12% 88%;
+  }
+
+  .pm-l .pm-leaf {
+    justify-content: flex-start;
+    align-items: flex-start;
+    transform-origin: 12% 12%;
+  }
+
+  .pm-l .pm-leaf svg {
+    transform: scaleY(-1);
+  }
+
+  .pm-label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-tip::after {
+    animation: none;
+    opacity: 0;
+  }
+  .pm-tip,
+  .pm-leaf,
+  .pm-label {
+    transition: none;
+  }
+}
+
