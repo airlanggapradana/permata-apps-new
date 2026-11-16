@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
+import { useAuth } from "@/context/AuthContext";
 
 /*
  * Navbar tunggal untuk seluruh halaman, mengikuti header landing page.
@@ -10,9 +11,10 @@ import { useCulture } from "@/context/CultureContext";
  * ThemedContent meneruskan hash tersebut ke scroll setelah halaman berganti.
  */
 const NAV_LINKS = [
-  { href: "/#programs", label: "Modul Resiliensi" },
+  { href: "/#programs", label: "Modul" },
   { href: "/#calculator", label: "Pohon Harapan" },
-  { href: "/#game-showcase", label: "Game Mitigasi" },
+  { href: "/safety-passport", label: "Safety Passport" },
+  { href: "/offline-survival", label: "Siaga Offline" },
 ];
 
 const CULTURES = [
@@ -57,6 +59,7 @@ export default function Navbar({
   currentPath?: string;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, isLoading: authLoading, logout } = useAuth();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -102,28 +105,64 @@ export default function Navbar({
 
         <nav
           aria-label="Navigasi utama"
-          className="hidden lg:flex items-center gap-6 text-sm font-semibold text-slate-700"
+          className="hidden lg:flex items-center gap-4 text-sm font-semibold text-slate-700"
         >
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`py-2 rounded-sm transition-colors hover:text-brand-700 ${focusRing}`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const isActive = currentPath === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`px-3 py-2 rounded-md transition-colors ${focusRing} ${
+                  isActive
+                    ? "bg-tint text-fg-brand"
+                    : "hover:text-brand-700"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="hidden lg:flex items-center gap-3 shrink-0">
+        <div className="hidden lg:flex items-center gap-2.5 shrink-0">
           <CultureSwitcher />
-          <Link
-            href="/dashboard"
-            aria-current={currentPath === "/dashboard" ? "page" : undefined}
-            className={`inline-flex items-center min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-5 rounded-full transition-colors duration-200 ${focusRing}`}
-          >
-            Akses Dashboard
-          </Link>
+          {!authLoading && user ? (
+            <>
+              <Link
+                href="/dashboard"
+                aria-current={currentPath === "/dashboard" ? "page" : undefined}
+                className={`inline-flex items-center min-h-11 bg-action hover:bg-action-hover text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+              >
+                {user.childName}
+              </Link>
+              <button
+                type="button"
+                onClick={logout}
+                className={`inline-flex items-center min-h-11 px-3.5 rounded-full border border-line-strong bg-surface hover:bg-sunken text-fg text-xs font-semibold transition-colors ${focusRing}`}
+              >
+                Keluar
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                aria-current={currentPath === "/login" ? "page" : undefined}
+                className={`inline-flex items-center min-h-11 px-4 rounded-full border border-line-strong bg-surface hover:bg-sunken text-fg text-sm font-semibold transition-colors ${focusRing}`}
+              >
+                Masuk
+              </Link>
+              <Link
+                href="/dashboard"
+                aria-current={currentPath === "/dashboard" ? "page" : undefined}
+                className={`inline-flex items-center min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+              >
+                Dashboard
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -158,27 +197,70 @@ export default function Navbar({
           className="lg:hidden border-t border-slate-200 bg-white px-4 sm:px-6 py-4 flex flex-col gap-1"
         >
           <nav aria-label="Navigasi utama (seluler)" className="flex flex-col">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={closeMenu}
-                className={`flex items-center min-h-11 text-sm font-medium text-slate-800 hover:text-brand-700 rounded-sm ${focusRing}`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = currentPath === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMenu}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`flex items-center min-h-11 px-3 text-sm font-medium rounded-md ${focusRing} ${
+                    isActive
+                      ? "bg-tint text-fg-brand font-semibold"
+                      : "text-slate-800 hover:text-brand-700"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
           <div className="flex flex-wrap items-center justify-between gap-3 pt-3 mt-2 border-t border-slate-200">
             <CultureSwitcher />
-            <Link
-              href="/dashboard"
-              onClick={closeMenu}
-              aria-current={currentPath === "/dashboard" ? "page" : undefined}
-              className={`inline-flex items-center min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-5 rounded-full transition-colors duration-200 ${focusRing}`}
-            >
-              Akses Dashboard
-            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              {!authLoading && user ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={closeMenu}
+                    aria-current={currentPath === "/dashboard" ? "page" : undefined}
+                    className={`inline-flex items-center min-h-11 bg-action hover:bg-action-hover text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+                  >
+                    Dashboard ({user.childName})
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeMenu();
+                      logout();
+                    }}
+                    className={`inline-flex items-center min-h-11 px-4 rounded-full border border-line-strong bg-surface hover:bg-sunken text-fg text-sm font-medium ${focusRing}`}
+                  >
+                    Keluar
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={closeMenu}
+                    aria-current={currentPath === "/login" ? "page" : undefined}
+                    className={`inline-flex items-center min-h-11 px-4 rounded-full border border-line-strong bg-surface hover:bg-sunken text-fg text-sm font-semibold ${focusRing}`}
+                  >
+                    Masuk
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    onClick={closeMenu}
+                    aria-current={currentPath === "/dashboard" ? "page" : undefined}
+                    className={`inline-flex items-center min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+                  >
+                    Dashboard
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

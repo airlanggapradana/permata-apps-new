@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { CultureProvider } from "@/context/CultureContext";
+import { AuthProvider } from "@/context/AuthContext";
 import ThemedContent from "@/components/ThemedContent";
 
 export const metadata: Metadata = {
   title: "PERMATA Nusantara | Ekosistem Resiliensi & PFA Ramah Anak Pascabencana",
   description:
     "Mendampingi kesiapsiagaan darurat, Psychological First Aid (PFA), dan pertumbuhan pascatrauma (Post-Traumatic Growth) melalui kearifan lokal Aceh dan Minangkabau yang berakar kasih.",
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({
@@ -22,7 +24,9 @@ export default function RootLayout({
       </head>
       <body className="bg-[#F8FAF8] text-slate-800 antialiased selection:bg-brand-500 selection:text-white" suppressHydrationWarning>
         <CultureProvider>
-          <ThemedContent>{children}</ThemedContent>
+          <AuthProvider>
+            <ThemedContent>{children}</ThemedContent>
+          </AuthProvider>
         </CultureProvider>
       </body>
     </html>

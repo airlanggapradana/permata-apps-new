@@ -1,32 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { calculateTreeStats } from "@/lib/treeProgress";
+import { getSessionUser, getUserTreeStats } from "@/lib/auth";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 const DEFAULT_FOOD_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDTfbQkm81C_p2FO2nGrM9p2g5Gv0P5Kq0VP_qepgn_EHWekAGKnzK7NNduL_qfG8o-CXNsg5Irr3c-7eYhS5HjefMJghhMk-IBaxe9Qlw3SfNaiVrAj2QR3M1CTW85O2GrS-sLjs9Wcu3G9AFCbr6lNpjzVhNMXSJZ7GnyGBgYTDGWsnDzmdvtmyJICraFDGAlQ8QGR7IuC-PDzEXaEvfQJnte8OphS-HH5uYQGPg";
-
-// Ensure demo user and child profile exist for DB audit logging
-async function ensureDefaultProfile() {
-  const sql = getDb();
-  await sql`
-    INSERT INTO "User" ("id", "isVerified", "isActive", "createdAt", "updatedAt")
-    VALUES ('user-permata-demo', true, true, NOW(), NOW())
-    ON CONFLICT ("id") DO NOTHING;
-  `;
-  await sql`
-    INSERT INTO "ChildProfile" (
-      "id", "createdByUserId", "fullName", "displayName", "nickname", "isActive", "createdAt", "updatedAt"
-    )
-    VALUES (
-      'child-permata-demo', 'user-permata-demo', 'Cut Rayyan Al-Farizi', 'Rayyan', 'Rayyan', true, NOW(), NOW()
-    )
-    ON CONFLICT ("id") DO NOTHING;
-  `;
-}
 
 // Fallback cultural food analyses
 function getFallbackFoodAnalysis(mood: string, symptoms: string[], culture: string) {
@@ -201,53 +182,25 @@ function getFallbackFoodAnalysis(mood: string, symptoms: string[], culture: stri
   };
 }
 
-// Calculate dynamic tree stats helper
-async function fetchCurrentTreeStats() {
-  const sql = getDb();
-  const entriesCount = (await sql`
-    SELECT COUNT(*)::int AS count FROM "RecoveryJournalEntry" WHERE "deletedAt" IS NULL;
-  `) as { count: number }[];
-
-  const waterCount = (await sql`
-    SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'WATER_HOPE_TREE';
-  `) as { count: number }[];
-
-  const breatheCountRes = (await sql`
-    SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'BREATHING_EXERCISE';
-  `) as { count: number }[];
-
-  const screeningCountRes = (await sql`
-    SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'TELESCREENING_DASS21';
-  `) as { count: number }[];
-
-  const moodFoodCountRes = (await sql`
-    SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'MOOD_FOOD_ANALYSIS';
-  `) as { count: number }[];
-
-  const wateredTodayRes = (await sql`
-    SELECT COUNT(*)::int AS count 
-    FROM "AuditLog" 
-    WHERE "action" = 'WATER_HOPE_TREE' 
-      AND "createdAt" >= CURRENT_DATE;
-  `) as { count: number }[];
-
-  return calculateTreeStats({
-    journalCount: entriesCount[0]?.count || 0,
-    waterCount: waterCount[0]?.count || 0,
-    breatheCount: breatheCountRes[0]?.count || 0,
-    screeningCount: screeningCountRes[0]?.count || 0,
-    moodFoodCount: moodFoodCountRes[0]?.count || 0,
-    wateredToday: (wateredTodayRes[0]?.count || 0) > 0,
-  });
-}
-
-// GET: Fetch dynamic Mood Food entries, latest diagnosis, and tree stats from database
+// GET: Fetch dynamic Mood Food entries, latest diagnosis, and tree stats from database for authenticated user
 export async function GET() {
   try {
-    const sql = getDb();
-    await ensureDefaultProfile();
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          error:
+            "Silakan masuk ke akun Anda untuk melihat riwayat analisis Mood + Food pribadi.",
+        },
+        { status: 401 }
+      );
+    }
 
-    // Query all mood food analysis records from PostgreSQL
+    const sql = getDb();
+
+    // Query mood food analysis records scoped to authenticated user & child
     interface AuditRow {
       id: string;
       actorId: string;
@@ -260,6 +213,8 @@ export async function GET() {
       SELECT "id", "actorId", "action", "metadata", "createdAt"
       FROM "AuditLog"
       WHERE "action" = 'MOOD_FOOD_ANALYSIS'
+        AND "actorId" = ${session.userId}
+        AND "resourceId" = ${session.childId}
       ORDER BY "createdAt" DESC
       LIMIT 20;
     `) as AuditRow[];
@@ -291,7 +246,7 @@ export async function GET() {
     });
 
     const latest = history[0] || null;
-    const treeStats = await fetchCurrentTreeStats();
+    const treeStats = await getUserTreeStats(session.userId, session.childId);
 
     // Calculate aggregated stats from database
     const scores = history.map((h) => h.gutBrainScore);
@@ -323,6 +278,19 @@ export async function GET() {
 // POST: Process new food image, analyze with Gemini AI, and persist to PostgreSQL
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          reply: "Silakan masuk ke akun Anda untuk menyimpan analisis Mood + Food dan progres Pohon Harapan pribadi.",
+          error: "Autentikasi diperlukan untuk menyimpan analisis Mood + Food.",
+        },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const {
       mood = "marah",
@@ -410,12 +378,11 @@ Berikan output HANYA dalam format JSON valid tanpa tanda markdown (tanpa \`\`\`j
       }
     }
 
-    // Award +40 XP & Persist to PostgreSQL Database
+    // Award +40 XP & Persist to PostgreSQL Database scoped to authenticated user
     let treeStats = null;
     let savedRecord = null;
     try {
       const sql = getDb();
-      await ensureDefaultProfile();
 
       const logId = `audit-moodfood-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       const previewUrl = file?.base64
@@ -442,6 +409,7 @@ Berikan output HANYA dalam format JSON valid tanpa tanda markdown (tanpa \`\`\`j
         INSERT INTO "AuditLog" (
           "id",
           "actorId",
+          "userId",
           "action",
           "resourceType",
           "resourceId",
@@ -450,10 +418,11 @@ Berikan output HANYA dalam format JSON valid tanpa tanda markdown (tanpa \`\`\`j
         )
         VALUES (
           ${logId},
-          'user-permata-demo',
+          ${session.userId},
+          ${session.userId},
           'MOOD_FOOD_ANALYSIS',
           'FoodEmotionRecord',
-          'child-permata-demo',
+          ${session.childId},
           ${JSON.stringify(metadata)},
           NOW()
         );
@@ -465,7 +434,7 @@ Berikan output HANYA dalam format JSON valid tanpa tanda markdown (tanpa \`\`\`j
         INSERT INTO "EmotionCheckIn" ("id", "childId", "emotion", "intensity", "context", "checkedInAt")
         VALUES (
           ${checkInId},
-          'child-permata-demo',
+          ${session.childId},
           ${mood},
           ${mood === "sedih" ? 2 : mood === "marah" ? 1 : 5},
           ${'Mood Food: ' + finalAnalysis.detectedFood},
@@ -482,7 +451,7 @@ Berikan output HANYA dalam format JSON valid tanpa tanda markdown (tanpa \`\`\`j
         )
         VALUES (
           ${journalId},
-          'child-permata-demo',
+          ${session.childId},
           ${'Nutrisi Emosi: ' + finalAnalysis.detectedFood},
           ${finalAnalysis.headline + '\n\n' + finalAnalysis.explanation + '\n\nKomposisi: ' + finalAnalysis.components + (notes ? '\n\nCatatan: ' + notes : '')},
           ${mood === "sedih" ? 2 : mood === "marah" ? 1 : 5},
@@ -495,7 +464,7 @@ Berikan output HANYA dalam format JSON valid tanpa tanda markdown (tanpa \`\`\`j
         ON CONFLICT DO NOTHING;
       `;
 
-      treeStats = await fetchCurrentTreeStats();
+      treeStats = await getUserTreeStats(session.userId, session.childId);
 
       savedRecord = {
         id: logId,

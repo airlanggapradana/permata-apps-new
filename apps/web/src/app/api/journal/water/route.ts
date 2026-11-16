@@ -1,42 +1,38 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { calculateTreeStats } from "@/lib/treeProgress";
+import { getSessionUser, getUserTreeStats } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          error: "Silakan masuk ke akun Anda untuk menyiram Pohon Harapan pribadi.",
+        },
+        { status: 401 }
+      );
+    }
+
     const sql = getDb();
 
-    // Check if already watered today
+    // Check if already watered today for this specific user/child
     const wateredTodayRes = (await sql`
       SELECT COUNT(*)::int AS count 
       FROM "AuditLog" 
-      WHERE "action" = 'WATER_HOPE_TREE' 
+      WHERE "actorId" = ${session.userId}
+        AND "resourceId" = ${session.childId}
+        AND "action" = 'WATER_HOPE_TREE' 
         AND "createdAt" >= CURRENT_DATE;
     `) as { count: number }[];
     const alreadyWateredToday = (wateredTodayRes[0]?.count || 0) > 0;
 
     if (alreadyWateredToday) {
-      // Query current stats
-      const entriesCount = (await sql`
-        SELECT COUNT(*)::int AS count FROM "RecoveryJournalEntry" WHERE "deletedAt" IS NULL;
-      `) as { count: number }[];
-
-      const waterCount = (await sql`
-        SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'WATER_HOPE_TREE';
-      `) as { count: number }[];
-
-      const breatheCountRes = (await sql`
-        SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'BREATHING_EXERCISE';
-      `) as { count: number }[];
-
-      const treeStats = calculateTreeStats({
-        journalCount: entriesCount[0]?.count || 0,
-        waterCount: waterCount[0]?.count || 0,
-        breatheCount: breatheCountRes[0]?.count || 0,
-        wateredToday: true,
-      });
+      const treeStats = await getUserTreeStats(session.userId, session.childId);
 
       return NextResponse.json({
         success: true,
@@ -47,12 +43,13 @@ export async function POST() {
       });
     }
 
-    // Log the water action in AuditLog table
+    // Log the water action in AuditLog table scoped to user & child
     const logId = `audit-water-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     await sql`
       INSERT INTO "AuditLog" (
         "id",
         "actorId",
+        "userId",
         "action",
         "resourceType",
         "resourceId",
@@ -61,45 +58,24 @@ export async function POST() {
       )
       VALUES (
         ${logId},
-        'user-permata-demo',
+        ${session.userId},
+        ${session.userId},
         'WATER_HOPE_TREE',
         'HopeTree',
-        'child-permata-demo',
+        ${session.childId},
         ${JSON.stringify({ xp: 20, reason: "Daily hope tree hydration" })},
         NOW()
       );
     `;
 
-    // Query total counts
-    const entriesCount = (await sql`
-      SELECT COUNT(*)::int AS count FROM "RecoveryJournalEntry" WHERE "deletedAt" IS NULL;
-    `) as { count: number }[];
-
-    const waterCount = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'WATER_HOPE_TREE';
-    `) as { count: number }[];
-
-    const breatheCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'BREATHING_EXERCISE';
-    `) as { count: number }[];
-
-    const totalEntries = entriesCount[0]?.count || 0;
-    const totalWaterings = waterCount[0]?.count || 1;
-    const totalBreathing = breatheCountRes[0]?.count || 0;
-
-    const treeStats = calculateTreeStats({
-      journalCount: totalEntries,
-      waterCount: totalWaterings,
-      breatheCount: totalBreathing,
-      wateredToday: true,
-    });
+    const treeStats = await getUserTreeStats(session.userId, session.childId);
 
     return NextResponse.json({
       success: true,
       message: "Pohon Harapan disiram! +20 XP kesuburan jiwa.",
       treeStats,
       treeXp: treeStats.totalXp,
-      waterCount: totalWaterings,
+      waterCount: treeStats.waterCount,
     });
   } catch (error) {
     console.error("POST /api/journal/water error:", error);

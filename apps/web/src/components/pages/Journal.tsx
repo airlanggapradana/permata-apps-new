@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
+import { useAuth } from "@/context/AuthContext";
 import { TreeStats, calculateTreeStats } from "@/lib/treeProgress";
 
 export interface SavedJournalEntry {
@@ -19,6 +20,7 @@ export interface SavedJournalEntry {
 
 export default function Journal() {
   const { culture, setCulture } = useCulture();
+  const { user, isLoading: authLoading } = useAuth();
 
   // Form states matching desain_jurnal_hikmah.html
   const [msg, setMsg] = useState("");
@@ -62,10 +64,23 @@ export default function Journal() {
       wateredToday: treeWatered,
     });
 
-  // Fetch real data from PostgreSQL on component mount
+  // Fetch real data from PostgreSQL scoped to authenticated user
   useEffect(() => {
     let isMounted = true;
     async function fetchJournalData() {
+      if (!user) {
+        if (isMounted) {
+          setSavedEntries([]);
+          setTreeStats(null);
+          setTreeXp(150);
+          setStreakDays(0);
+          setTreeWatered(false);
+          setDbConnected(false);
+          setIsLoading(false);
+        }
+        return;
+      }
+      setIsLoading(true);
       try {
         const res = await fetch("/api/journal");
         const rawText = await res.text();
@@ -109,11 +124,13 @@ export default function Journal() {
         if (isMounted) setIsLoading(false);
       }
     }
-    fetchJournalData();
+    if (!authLoading) {
+      fetchJournalData();
+    }
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [user, authLoading]);
 
   // Custom AI Reflection state
   const [customInsight, setCustomInsight] = useState<{
@@ -444,6 +461,25 @@ export default function Journal() {
                 </span>
               </div>
             </div>
+
+            {!authLoading && !user && (
+              <div className="mb-6 bg-surface border border-line border-l-4 border-l-warning rounded-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-fg">
+                    Masuk ke akun Anda untuk menyimpan Jurnal Hikmah dan Pohon Harapan pribadi
+                  </p>
+                  <p className="text-xs text-fg-muted">
+                    Setiap pengguna memiliki catatan jurnal dan perkembangan Pohon Harapan tersendiri yang tidak tercampur dengan pengguna lain.
+                  </p>
+                </div>
+                <Link
+                  href="/login?next=/jurnal"
+                  className="inline-flex items-center justify-center min-h-11 px-5 rounded-md bg-action hover:bg-action-hover text-white text-sm font-medium shrink-0 transition-colors"
+                >
+                  Masuk Akun
+                </Link>
+              </div>
+            )}
 
             {/* Two-Column Interactive Workspace */}
             <div className="grid grid-cols-1 lg:grid-cols-12 items-start gap-6">

@@ -1,31 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { calculateTreeStats } from "@/lib/treeProgress";
+import { getSessionUser, getUserTreeStats } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-// Ensure demo user & child profile exists in database
-async function ensureDefaultProfile() {
-  const sql = getDb();
-  await sql`
-    INSERT INTO "User" ("id", "isVerified", "isActive", "createdAt", "updatedAt")
-    VALUES ('user-permata-demo', true, true, NOW(), NOW())
-    ON CONFLICT ("id") DO NOTHING;
-  `;
-  await sql`
-    INSERT INTO "ChildProfile" (
-      "id", "createdByUserId", "fullName", "displayName", "nickname", "isActive", "createdAt", "updatedAt"
-    )
-    VALUES (
-      'child-permata-demo', 'user-permata-demo', 'Cut Rayyan Al-Farizi', 'Rayyan', 'Rayyan', true, NOW(), NOW()
-    )
-    ON CONFLICT ("id") DO NOTHING;
-  `;
-}
-
-// POST: Save DASS-21 tele-screening assessment submission
+// POST: Save DASS-21 tele-screening assessment submission for authenticated user
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          error:
+            "Silakan masuk ke akun Anda untuk menyimpan hasil skrining dan XP Pohon Harapan.",
+        },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const {
       depression = 0,
@@ -39,7 +33,6 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const sql = getDb();
-    await ensureDefaultProfile();
 
     const logId = `audit-screening-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     const metadata = {
@@ -55,11 +48,12 @@ export async function POST(req: NextRequest) {
       timestamp: new Date().toISOString(),
     };
 
-    // Log the screening in AuditLog
+    // Log the screening in AuditLog scoped to user & child
     await sql`
       INSERT INTO "AuditLog" (
         "id",
         "actorId",
+        "userId",
         "action",
         "resourceType",
         "resourceId",
@@ -68,47 +62,17 @@ export async function POST(req: NextRequest) {
       )
       VALUES (
         ${logId},
-        'user-permata-demo',
+        ${session.userId},
+        ${session.userId},
         'TELESCREENING_DASS21',
         'AssessmentSubmission',
-        'child-permata-demo',
+        ${session.childId},
         ${JSON.stringify(metadata)},
         NOW()
       );
     `;
 
-    // Query updated counts for tree stats
-    const entriesCount = (await sql`
-      SELECT COUNT(*)::int AS count FROM "RecoveryJournalEntry" WHERE "deletedAt" IS NULL;
-    `) as { count: number }[];
-
-    const waterCount = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'WATER_HOPE_TREE';
-    `) as { count: number }[];
-
-    const breatheCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'BREATHING_EXERCISE';
-    `) as { count: number }[];
-
-    const screeningCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'TELESCREENING_DASS21';
-    `) as { count: number }[];
-
-    const wateredTodayRes = (await sql`
-      SELECT COUNT(*)::int AS count 
-      FROM "AuditLog" 
-      WHERE "action" = 'WATER_HOPE_TREE' 
-        AND "createdAt" >= CURRENT_DATE;
-    `) as { count: number }[];
-    const wateredToday = (wateredTodayRes[0]?.count || 0) > 0;
-
-    const treeStats = calculateTreeStats({
-      journalCount: entriesCount[0]?.count || 0,
-      waterCount: waterCount[0]?.count || 0,
-      breatheCount: breatheCountRes[0]?.count || 0,
-      screeningCount: screeningCountRes[0]?.count || 1,
-      wateredToday,
-    });
+    const treeStats = await getUserTreeStats(session.userId, session.childId);
 
     return NextResponse.json({
       success: true,
@@ -129,20 +93,32 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET: Retrieve latest screening results if available
+// GET: Retrieve latest screening results for authenticated user
 export async function GET() {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          error: "Silakan masuk ke akun Anda untuk melihat riwayat skrining.",
+        },
+        { status: 401 }
+      );
+    }
+
     const sql = getDb();
-    await ensureDefaultProfile();
 
     const logs = (await sql`
       SELECT "id", "metadata", "createdAt"
       FROM "AuditLog"
       WHERE "action" = 'TELESCREENING_DASS21'
-        AND "resourceId" = 'child-permata-demo'
+        AND "actorId" = ${session.userId}
+        AND "resourceId" = ${session.childId}
       ORDER BY "createdAt" DESC
       LIMIT 1;
-    `) as { id: string; metadata: any; createdAt: string | Date }[];
+    `) as { id: string; metadata: unknown; createdAt: string | Date }[];
 
     if (!logs.length) {
       return NextResponse.json({
@@ -152,7 +128,10 @@ export async function GET() {
     }
 
     const latest = logs[0];
-    const metadata = typeof latest.metadata === "string" ? JSON.parse(latest.metadata) : latest.metadata;
+    const metadata =
+      typeof latest.metadata === "string"
+        ? JSON.parse(latest.metadata)
+        : (latest.metadata as Record<string, unknown>);
 
     return NextResponse.json({
       success: true,

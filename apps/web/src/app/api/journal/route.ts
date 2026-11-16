@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { calculateTreeStats } from "@/lib/treeProgress";
+import { getSessionUser, getUserTreeStats } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -93,30 +93,23 @@ function calculateStreak(dates: Date[]): number {
   return Math.max(1, streak);
 }
 
-// Ensure demo user & child profile exists in database
-async function ensureDefaultProfile() {
-  const sql = getDb();
-  await sql`
-    INSERT INTO "User" ("id", "isVerified", "isActive", "createdAt", "updatedAt")
-    VALUES ('user-permata-demo', true, true, NOW(), NOW())
-    ON CONFLICT ("id") DO NOTHING;
-  `;
-  await sql`
-    INSERT INTO "ChildProfile" (
-      "id", "createdByUserId", "fullName", "displayName", "nickname", "isActive", "createdAt", "updatedAt"
-    )
-    VALUES (
-      'child-permata-demo', 'user-permata-demo', 'Cut Rayyan Al-Farizi', 'Rayyan', 'Rayyan', true, NOW(), NOW()
-    )
-    ON CONFLICT ("id") DO NOTHING;
-  `;
-}
-
-// GET: Fetch journal entries & statistics from Neon PostgreSQL
+// GET: Fetch journal entries & statistics from Neon PostgreSQL for authenticated user
 export async function GET() {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          error:
+            "Silakan masuk ke akun Anda untuk mengakses Jurnal Hikmah dan progres Pohon Harapan pribadi.",
+        },
+        { status: 401 }
+      );
+    }
+
     const sql = getDb();
-    await ensureDefaultProfile();
 
     const rows = (await sql`
       SELECT 
@@ -132,7 +125,8 @@ export async function GET() {
         "updatedAt", 
         "deletedAt"
       FROM "RecoveryJournalEntry"
-      WHERE "deletedAt" IS NULL
+      WHERE "childId" = ${session.childId}
+        AND "deletedAt" IS NULL
       ORDER BY "createdAt" DESC;
     `) as DBJournalRow[];
 
@@ -186,52 +180,11 @@ export async function GET() {
       };
     });
 
-    // Query total waterings count from AuditLog
-    const waterCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'WATER_HOPE_TREE';
-    `) as { count: number }[];
-    const waterCount = waterCountRes[0]?.count || 0;
-
-    // Query total breathing exercises from AuditLog
-    const breatheCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'BREATHING_EXERCISE';
-    `) as { count: number }[];
-    const breatheCount = breatheCountRes[0]?.count || 0;
-
-    // Query total tele-screening assessments from AuditLog
-    const screeningCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'TELESCREENING_DASS21';
-    `) as { count: number }[];
-    const screeningCount = screeningCountRes[0]?.count || 0;
-
-    // Query total mood food analyses from AuditLog
-    const moodFoodCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'MOOD_FOOD_ANALYSIS';
-    `) as { count: number }[];
-    const moodFoodCount = moodFoodCountRes[0]?.count || 0;
-
-    // Check if tree was watered today
-    const wateredTodayRes = (await sql`
-      SELECT COUNT(*)::int AS count 
-      FROM "AuditLog" 
-      WHERE "action" = 'WATER_HOPE_TREE' 
-        AND "createdAt" >= CURRENT_DATE;
-    `) as { count: number }[];
-    const wateredToday = (wateredTodayRes[0]?.count || 0) > 0;
-
-    // Calculate dynamic Tree XP and Level Stats from DB records
-    const treeStats = calculateTreeStats({
-      journalCount: entries.length,
-      waterCount,
-      breatheCount,
-      screeningCount,
-      moodFoodCount,
-      wateredToday,
-    });
+    const treeStats = await getUserTreeStats(session.userId, session.childId);
 
     // Calculate streak
     const dates = rows.map((r) => new Date(r.createdAt));
-    const streakDays = calculateStreak(dates);
+    const streakDays = rows.length ? calculateStreak(dates) : 0;
 
     return NextResponse.json({
       success: true,
@@ -241,7 +194,7 @@ export async function GET() {
         treeXp: treeStats.totalXp,
         treeStats,
         streakDays,
-        childName: "Rayyan",
+        childName: session.childName,
       },
     });
   } catch (error) {
@@ -260,6 +213,18 @@ export async function GET() {
 // POST: Save new journal entry to Neon PostgreSQL and generate AI Cultural Hikmah
 export async function POST(req: NextRequest) {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          error: "Silakan masuk ke akun Anda untuk menyimpan catatan jurnal pribadi.",
+        },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
     const { content, mood = 3, culture = "aceh", privacy = "PRIVATE", tags = [] } = body;
 
@@ -271,7 +236,6 @@ export async function POST(req: NextRequest) {
     }
 
     const sql = getDb();
-    await ensureDefaultProfile();
 
     // 1. Generate Cultural AI Insight
     let insight = getFallbackInsight(culture, mood);
@@ -356,7 +320,7 @@ Hasilkan respons dalam JSON sesuai instruksi.`;
       )
       VALUES (
         ${entryId},
-        'child-permata-demo',
+        ${session.childId},
         ${`Refleksi ${culture === "sumbar" ? "Batang Tarandam" : "Meuseuraya"}`},
         ${content.trim()},
         ${mood},
@@ -387,36 +351,8 @@ Hasilkan respons dalam JSON sesuai instruksi.`;
       year: "numeric",
     });
 
-    // 4. Query total entries, waterings, and breathing exercises for updated tree progress
-    const countResult = (await sql`
-      SELECT COUNT(*)::int AS count FROM "RecoveryJournalEntry" WHERE "deletedAt" IS NULL;
-    `) as { count: number }[];
-    const totalCount = countResult[0]?.count || 1;
-
-    const waterCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'WATER_HOPE_TREE';
-    `) as { count: number }[];
-    const waterCount = waterCountRes[0]?.count || 0;
-
-    const breatheCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'BREATHING_EXERCISE';
-    `) as { count: number }[];
-    const breatheCount = breatheCountRes[0]?.count || 0;
-
-    const wateredTodayRes = (await sql`
-      SELECT COUNT(*)::int AS count 
-      FROM "AuditLog" 
-      WHERE "action" = 'WATER_HOPE_TREE' 
-        AND "createdAt" >= CURRENT_DATE;
-    `) as { count: number }[];
-    const wateredToday = (wateredTodayRes[0]?.count || 0) > 0;
-
-    const treeStats = calculateTreeStats({
-      journalCount: totalCount,
-      waterCount,
-      breatheCount,
-      wateredToday,
-    });
+    // 4. Query total entries and user-scoped tree progress
+    const treeStats = await getUserTreeStats(session.userId, session.childId);
 
     return NextResponse.json({
       success: true,
@@ -437,7 +373,7 @@ Hasilkan respons dalam JSON sesuai instruksi.`;
       },
       insight,
       stats: {
-        totalEntries: totalCount,
+        totalEntries: treeStats.journalCount,
         treeXp: treeStats.totalXp,
         treeStats,
       },

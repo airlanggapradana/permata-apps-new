@@ -230,15 +230,18 @@ export default function LandingPage() {
                   </p>
                 </div>
 
-                <div className="space-y-0.5">
+                <Link
+                  href="/offline-survival"
+                  className="space-y-0.5 rounded-lg p-1.5 -m-1.5 hover:bg-brand-50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+                >
                   <div className="flex items-center gap-1.5 text-brand-900 font-extrabold text-lg">
                     <span className="text-brand-600 text-base">📶</span>
                     <span>Offline</span>
                   </div>
                   <p className="text-xs text-slate-500 font-medium">
-                    Ready di Pengungsian
+                    Survival Mode Siap
                   </p>
-                </div>
+                </Link>
               </div>
             </div>
 
@@ -1498,6 +1501,14 @@ export default function LandingPage() {
                     href="/ai-companion"
                   >
                     Gemini PFA Companion
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="hover:text-brand-700 transition"
+                    href="/offline-survival"
+                  >
+                    Offline Survival Mode
                   </Link>
                 </li>
                 <li>
