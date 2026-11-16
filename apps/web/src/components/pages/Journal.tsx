@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
+import { useAuth } from "@/context/AuthContext";
 import { TreeStats, calculateTreeStats } from "@/lib/treeProgress";
 
 export interface SavedJournalEntry {
@@ -19,6 +20,7 @@ export interface SavedJournalEntry {
 
 export default function Journal() {
   const { culture, setCulture } = useCulture();
+  const { user, isLoading: authLoading } = useAuth();
 
   // Form states matching desain_jurnal_hikmah.html
   const [msg, setMsg] = useState("");
@@ -62,10 +64,23 @@ export default function Journal() {
       wateredToday: treeWatered,
     });
 
-  // Fetch real data from PostgreSQL on component mount
+  // Fetch real data from PostgreSQL scoped to authenticated user
   useEffect(() => {
     let isMounted = true;
     async function fetchJournalData() {
+      if (!user) {
+        if (isMounted) {
+          setSavedEntries([]);
+          setTreeStats(null);
+          setTreeXp(150);
+          setStreakDays(0);
+          setTreeWatered(false);
+          setDbConnected(false);
+          setIsLoading(false);
+        }
+        return;
+      }
+      setIsLoading(true);
       try {
         const res = await fetch("/api/journal");
         const rawText = await res.text();
@@ -109,11 +124,13 @@ export default function Journal() {
         if (isMounted) setIsLoading(false);
       }
     }
-    fetchJournalData();
+    if (!authLoading) {
+      fetchJournalData();
+    }
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [user, authLoading]);
 
   // Custom AI Reflection state
   const [customInsight, setCustomInsight] = useState<{
@@ -444,6 +461,25 @@ export default function Journal() {
                 </span>
               </div>
             </div>
+
+            {!authLoading && !user && (
+              <div className="mb-6 bg-surface border border-line border-l-4 border-l-warning rounded-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold text-fg">
+                    Masuk ke akun Anda untuk menyimpan Jurnal Hikmah dan Pohon Harapan pribadi
+                  </p>
+                  <p className="text-xs text-fg-muted">
+                    Setiap pengguna memiliki catatan jurnal dan perkembangan Pohon Harapan tersendiri yang tidak tercampur dengan pengguna lain.
+                  </p>
+                </div>
+                <Link
+                  href="/login?next=/jurnal"
+                  className="inline-flex items-center justify-center min-h-11 px-5 rounded-md bg-action hover:bg-action-hover text-white text-sm font-medium shrink-0 transition-colors"
+                >
+                  Masuk Akun
+                </Link>
+              </div>
+            )}
 
             {/* Two-Column Interactive Workspace */}
             <div className="grid grid-cols-1 lg:grid-cols-12 items-start gap-6">
@@ -954,7 +990,7 @@ export default function Journal() {
                   </div>
 
                   {/* Dynamic XP Activity Sources Breakdown from Database */}
-                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-line text-center">
                     <div className="p-2 rounded-lg bg-[#f2f4f6] flex flex-col">
                       <span className="text-[10px] text-[#414844] font-medium">Refleksi</span>
                       <span className="text-xs font-bold text-[#006c48]">
@@ -1127,8 +1163,8 @@ export default function Journal() {
       {/* Entry Modal View if clicked */}
       {selectedEntry && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="bg-surface rounded-xl max-w-lg w-full p-6 shadow-lg border border-line flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-line">
               <div className="flex items-center gap-2">
                 <span className="text-xl">
                   {moodOptions.find((m) => m.value === selectedEntry.mood)
@@ -1141,7 +1177,7 @@ export default function Journal() {
               <button
                 type="button"
                 onClick={() => setSelectedEntry(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-colors"
+                className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-fg-muted hover:text-fg transition-colors"
               >
                 ✕
               </button>
@@ -1155,25 +1191,25 @@ export default function Journal() {
               </p>
             </div>
             {selectedEntry.proverb && (
-              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/60 text-xs text-amber-950 space-y-1">
-                <span className="font-bold text-[#5e3000]">Hikmah Budaya:</span>
+              <div className="p-3.5 rounded-lg bg-accent-50 border border-accent-200 text-xs text-fg space-y-1">
+                <span className="font-bold text-fg-accent">Hikmah Budaya:</span>
                 <p className="italic font-medium">{selectedEntry.proverb}</p>
                 {selectedEntry.proverbMeaning && (
-                  <p className="text-slate-600 mt-1">
+                  <p className="text-fg-muted mt-1">
                     {selectedEntry.proverbMeaning}
                   </p>
                 )}
               </div>
             )}
             {selectedEntry.aiInsight && (
-              <div className="p-4 rounded-xl bg-[#f2f4f6] text-xs text-[#414844] space-y-1">
+              <div className="p-4 rounded-lg bg-[#f2f4f6] text-xs text-[#414844] space-y-1">
                 <span className="font-bold text-[#006c48]">
                   Empati &amp; Validasi AI:
                 </span>
                 <p className="leading-relaxed">{selectedEntry.aiInsight}</p>
               </div>
             )}
-            <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between text-xs text-fg-subtle pt-2 border-t border-line">
               <span className="truncate max-w-[200px]">
                 ID: {selectedEntry.id}
               </span>

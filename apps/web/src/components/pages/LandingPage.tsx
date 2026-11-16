@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -39,7 +39,7 @@ const ICONS: Record<IconName, React.ReactNode> = {
   ),
   arrow: <path d="M14 5l7 7m0 0l-7 7m7-7H3" />,
   chevron: <path d="M6 9l6 6 6-6" />,
-  // Tahap pertumbuhan Hope Tree: benih → tunas → pohon kecil → pohon besar tunggal
+  // Tahap pertumbuhan Hope Tree: benih â†’ tunas â†’ pohon kecil â†’ pohon besar tunggal
   seed: (
     <>
       <ellipse cx="12" cy="13" rx="3.2" ry="4.6" transform="rotate(35 12 13)" />
@@ -221,7 +221,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
   );
 }
 
-/* Ambang XP: 0–999 L2, 1.000–2.499 L3, 2.500–4.999 L4, 5.000+ L5 */
+/* Ambang XP: 0â€“999 L2, 1.000â€“2.499 L3, 2.500â€“4.999 L4, 5.000+ L5 */
 type Level = {
   min: number;
   next: number | null;
@@ -232,10 +232,10 @@ type Level = {
 };
 
 const LEVELS: Level[] = [
-  { min: 0, next: 1000, name: "Level 2 • Tunas Muda", icon: "seed", status: "Mulai Menstabilkan Emosi", readiness: "74 / 100 (Cukup Siap)" },
-  { min: 1000, next: 2500, name: "Level 3 • Tunas Mekar", icon: "seedling", status: "Bertumbuh Positif Pascabencana", readiness: "84 / 100 (Sigap)" },
-  { min: 2500, next: 5000, name: "Level 4 • Pohon Rindang Bertunas", icon: "sapling", status: "Adaptif & Resiliensi Tinggi", readiness: "92 / 100 (Sangat Sigap)" },
-  { min: 5000, next: null, name: "Level 5 • Rimba Resiliensi Mandiri", icon: "pine", status: "Sangat Tangguh & Agen PFA Cilik", readiness: "98 / 100 (Paling Sigap)" },
+  { min: 0, next: 1000, name: "Level 2 â€¢ Tunas Muda", icon: "seed", status: "Mulai Menstabilkan Emosi", readiness: "74 / 100 (Cukup Siap)" },
+  { min: 1000, next: 2500, name: "Level 3 â€¢ Tunas Mekar", icon: "seedling", status: "Bertumbuh Positif Pascabencana", readiness: "84 / 100 (Sigap)" },
+  { min: 2500, next: 5000, name: "Level 4 â€¢ Pohon Rindang Bertunas", icon: "sapling", status: "Adaptif & Resiliensi Tinggi", readiness: "92 / 100 (Sangat Sigap)" },
+  { min: 5000, next: null, name: "Level 5 â€¢ Rimba Resiliensi Mandiri", icon: "pine", status: "Sangat Tangguh & Agen PFA Cilik", readiness: "98 / 100 (Paling Sigap)" },
 ];
 
 const MODULES: {
@@ -317,7 +317,7 @@ const NUTRITION = [
 
 const STORIES = [
   {
-    quote: "“Anak-anak di tenda darurat menyambut latihan pernapasan dan AI Jurnal Hikmah dengan ceria. Konsep Meuseuraya membuat mereka saling menguatkan alih-alih larut dalam kesedihan.”",
+    quote: "â€œAnak-anak di tenda darurat menyambut latihan pernapasan dan AI Jurnal Hikmah dengan ceria. Konsep Meuseuraya membuat mereka saling menguatkan alih-alih larut dalam kesedihan.â€",
     initials: "RA",
     tag: "Relawan PFA",
     highlight: "saling menguatkan alih-alih larut dalam kesedihan",
@@ -325,7 +325,7 @@ const STORIES = [
     role: "Relawan PFA & Psikososial Posko Pidie Aceh",
   },
   {
-    quote: "“Filosofi Mambangkik Batang Tarandam menumbuhkan harga diri anak-anak sekolah dasar pasca gempa Pasaman. Mereka belajar bahwa musibah adalah awal kebangkitan karakter.”",
+    quote: "â€œFilosofi Mambangkik Batang Tarandam menumbuhkan harga diri anak-anak sekolah dasar pasca gempa Pasaman. Mereka belajar bahwa musibah adalah awal kebangkitan karakter.â€",
     initials: "BS",
     tag: "Pendidik",
     highlight: "musibah adalah awal kebangkitan karakter",
@@ -333,7 +333,7 @@ const STORIES = [
     role: "Guru Pendamping SD Pasaman Barat, Sumbar",
   },
   {
-    quote: "“Kami bisa mengenali anak yang menunjukkan tanda depresi berat lebih cepat dan merujuknya tepat waktu, sebelum terlambat.”",
+    quote: "â€œKami bisa mengenali anak yang menunjukkan tanda depresi berat lebih cepat dan merujuknya tepat waktu, sebelum terlambat.â€",
     initials: "FW",
     tag: "Tenaga medis",
     highlight: "merujuknya tepat waktu, sebelum terlambat",
@@ -352,6 +352,7 @@ const FOOTER_MODULES = [
 
 const FOOTER_SERVICES = [
   { label: "Pendamping AI", href: "/ai-companion" },
+  { label: "Offline Survival Mode", href: "/offline-survival" },
   { label: "Hotline 119", href: "#stories" },
   { label: "Dokumentasi API", href: "#programs" },
   { label: "Perlindungan data anak", href: "#privacy" },
@@ -386,10 +387,10 @@ const PARTICLES = [
 
 const HERO_TITLE_WORDS = ["Pulihkan", "Senyum", "&", "Resiliensi", "Jiwa", "Anak", "Pascabencana"];
 
-/* ── Splash screen → hero ───────────────────────────────────────────── */
+/* â”€â”€ Splash screen â†’ hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const SPLASH_MIN_MS = 2200; // splash minimal tampil (logo + teks selesai masuk)
 const SPLASH_MAX_MS = 4500; // batas tunggu preload gambar hero
-const EXIT_MS = 1000;       // durasi transisi splash → hero
+const EXIT_MS = 1000;       // durasi transisi splash â†’ hero
 
 // Delay animasi masuk per elemen, dibaca CSS lewat var(--d)
 const idx = (n: number) => ({ "--i": n }) as React.CSSProperties;
@@ -514,7 +515,7 @@ html { scrollbar-gutter: stable; }
   .pm-hero-actions a { padding-top: .5rem; padding-bottom: .5rem; }
 }
 
-/* ── Alur 3 langkah: masuk/keluar (dua arah, mengikuti viewport) + idle (hanya saat terlihat) ── */
+/* â”€â”€ Alur 3 langkah: masuk/keluar (dua arah, mengikuti viewport) + idle (hanya saat terlihat) â”€â”€ */
 .pm-flow-head > * { opacity: 0; transform: translateY(18px);
   transition: opacity 450ms ease, transform 450ms ease, background-color 300ms, color 300ms; }
 .pm-flow[data-show="true"] .pm-flow-head > * { opacity: 1; transform: none;
@@ -798,7 +799,7 @@ html { scrollbar-gutter: stable; }
 }
 `;
 
-/* ── Scrollbar "Pohon Harapan" ──────────────────────────────────────────
+/* â”€â”€ Scrollbar "Pohon Harapan" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    Batang (vertikal di desktop, horizontal di bawah layar pada HP & tablet) tumbuh mengikuti scroll; tiap bagian halaman punya daun yang
    mekar saat dilewati. Bisa diseret, dan daunnya bisa diklik untuk loncat ke bagian itu.
    Posisi daun dibagi rata; kemajuan di antara dua daun mengikuti jarak scroll nyata. */
@@ -1011,7 +1012,7 @@ function useInView<T extends HTMLElement>(threshold = 0.2) {
 
 function StoryQuote({ quote, highlight }: { quote: string; highlight: string }) {
   // Tanda kutip dilepas dari teks (diganti ikon kutip di kartu); frasa kunci diberi stabilo hijau tipis
-  const text = quote.replace(/^[“"]|[”"]$/g, "");
+  const text = quote.replace(/^[â€œ"]|[â€"]$/g, "");
   const at = text.indexOf(highlight);
   if (at === -1) return <>{text}</>;
   return (
@@ -1090,7 +1091,7 @@ export default function LandingPage() {
   const [ctaInRef, ctaShow] = useInView<HTMLDivElement>(0.15);
   const [footRef, footShow] = useInView<HTMLElement>(0.15);
 
-  // splash → exit (overlay memudar) → done
+  // splash â†’ exit (overlay memudar) â†’ done
   const [phase, setPhase] = useState<"splash" | "exit" | "done">("splash");
   const heroLogoRef = useRef<HTMLImageElement>(null);
   const heroRef = useRef<HTMLElement>(null);
@@ -1189,7 +1190,7 @@ export default function LandingPage() {
     return () => window.removeEventListener("resize", fit);
   }, []);
 
-  // Simulator Hope Tree (nilai awal sengaja di tengah rentang: 40 × 3 × 12 = 1.440 XP)
+  // Simulator Hope Tree (nilai awal sengaja di tengah rentang: 40 Ã— 3 Ã— 12 = 1.440 XP)
   const [cause, setCause] = useState<number>(40);
   const [frequencyInput, setFrequencyInput] = useState<string>("3");
   const [duration, setDuration] = useState<number>(12);
@@ -1224,7 +1225,7 @@ export default function LandingPage() {
       ? 100
       : Math.round(((totalXP - level.min) / (level.next - level.min)) * 100);
   const progressText = nextLevel
-    ? `${progress}% menuju ${nextLevel.name.split(" • ")[0]}`
+    ? `${progress}% menuju ${nextLevel.name.split(" â€¢ ")[0]}`
     : "Level maksimal tercapai";
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
@@ -1577,10 +1578,10 @@ export default function LandingPage() {
                   <div className="pm-sim-in" style={idx(2)}>
                     <div className="mb-1.5 flex items-center justify-between gap-3">
                       <label className="text-sm font-medium text-white" htmlFor="frequency-input">
-                        Frekuensi mingguan (1–14 sesi)
+                        Frekuensi mingguan (1â€“14 sesi)
                       </label>
                       <output htmlFor="frequency-input" className="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold tabular-nums text-brand-900">
-                        {frequency}× / minggu
+                        {frequency}Ã— / minggu
                       </output>
                     </div>
                     <input
@@ -1650,7 +1651,7 @@ export default function LandingPage() {
                           {xpShown.toLocaleString("id-ID")} XP
                         </p>
                         <p className="mt-2 inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-medium tabular-nums text-brand-800">
-                          {cause} XP × {frequency} sesi × {duration} minggu
+                          {cause} XP Ã— {frequency} sesi Ã— {duration} minggu
                         </p>
                       </div>
                       <div className="pm-sim-tile relative flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700">
@@ -2044,7 +2045,7 @@ export default function LandingPage() {
 
           <div className="pm-sim-in pt-6 border-t border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-slate-500" style={idx(4)}>
             <p>
-              © {new Date().getFullYear()} PERMATA Nusantara Foundation.
+              Â© {new Date().getFullYear()} PERMATA Nusantara Foundation.
               Seluruh hak cipta dilindungi undang-undang.
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-1">

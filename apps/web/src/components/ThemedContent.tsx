@@ -16,6 +16,11 @@ import GameAdventure from "./pages/GameAdventure";
 import GameBreathing from "./pages/GameBreathing";
 import GameHealing from "./pages/GameHealing";
 import GameSiagaMinang from "./pages/GameSiagaMinang";
+import OfflineSurvival from "./pages/OfflineSurvival";
+import OfflineRuntime from "./OfflineRuntime";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import SafetyPassportPage from "./pages/SafetyPassportPage";
 
 const GameQuake = dynamic(() => import("./pages/GameQuake"), {
   ssr: false,
@@ -40,6 +45,10 @@ const KNOWN_ROUTES = new Set([
   "/game-healing",
   "/game-siagaminang",
   "/game-quake",
+  "/offline-survival",
+  "/login",
+  "/register",
+  "/safety-passport",
 ]);
 
 function normalizePath(path: string): string {
@@ -166,6 +175,14 @@ export default function ThemedContent({
         return <GameSiagaMinang />;
       case "/game-quake":
         return <GameQuake />;
+      case "/offline-survival":
+        return <OfflineSurvival />;
+      case "/login":
+        return <LoginPage />;
+      case "/register":
+        return <RegisterPage />;
+      case "/safety-passport":
+        return <SafetyPassportPage />;
       default:
         return children;
     }
@@ -174,9 +191,10 @@ export default function ThemedContent({
   return (
     <div
       onClickCapture={handleClickCapture}
-      className="min-h-screen bg-[#F8FAF8] text-slate-800 font-sans selection:bg-brand-500 selection:text-white"
+      className="min-h-screen bg-canvas text-fg font-sans selection:bg-action selection:text-white"
     >
       <Navbar currentPath={currentPath} />
+      <OfflineRuntime currentPath={currentPath} />
       {renderPage()}
     </div>
   );

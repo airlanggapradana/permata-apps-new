@@ -1,19 +1,32 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { calculateTreeStats } from "@/lib/treeProgress";
+import { getSessionUser, getUserTreeStats } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
   try {
+    const session = await getSessionUser();
+    if (!session) {
+      return NextResponse.json(
+        {
+          success: false,
+          requiresAuth: true,
+          error: "Silakan masuk ke akun Anda untuk mencatat progres latihan napas.",
+        },
+        { status: 401 }
+      );
+    }
+
     const sql = getDb();
 
-    // Log the breathing exercise action in AuditLog table
+    // Log the breathing exercise action in AuditLog table scoped to user & child
     const logId = `audit-breathe-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
     await sql`
       INSERT INTO "AuditLog" (
         "id",
         "actorId",
+        "userId",
         "action",
         "resourceType",
         "resourceId",
@@ -22,53 +35,24 @@ export async function POST() {
       )
       VALUES (
         ${logId},
-        'user-permata-demo',
+        ${session.userId},
+        ${session.userId},
         'BREATHING_EXERCISE',
         'BreathingExercise',
-        'child-permata-demo',
+        ${session.childId},
         ${JSON.stringify({ xp: 15, durationSec: 4, type: "4-4-4 Box Breathing" })},
         NOW()
       );
     `;
 
-    // Query total counts
-    const entriesCount = (await sql`
-      SELECT COUNT(*)::int AS count FROM "RecoveryJournalEntry" WHERE "deletedAt" IS NULL;
-    `) as { count: number }[];
-
-    const waterCount = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'WATER_HOPE_TREE';
-    `) as { count: number }[];
-
-    const breatheCountRes = (await sql`
-      SELECT COUNT(*)::int AS count FROM "AuditLog" WHERE "action" = 'BREATHING_EXERCISE';
-    `) as { count: number }[];
-
-    const wateredTodayRes = (await sql`
-      SELECT COUNT(*)::int AS count 
-      FROM "AuditLog" 
-      WHERE "action" = 'WATER_HOPE_TREE' 
-        AND "createdAt" >= CURRENT_DATE;
-    `) as { count: number }[];
-    const wateredToday = (wateredTodayRes[0]?.count || 0) > 0;
-
-    const totalEntries = entriesCount[0]?.count || 0;
-    const totalWaterings = waterCount[0]?.count || 0;
-    const totalBreathing = breatheCountRes[0]?.count || 1;
-
-    const treeStats = calculateTreeStats({
-      journalCount: totalEntries,
-      waterCount: totalWaterings,
-      breatheCount: totalBreathing,
-      wateredToday,
-    });
+    const treeStats = await getUserTreeStats(session.userId, session.childId);
 
     return NextResponse.json({
       success: true,
       message: "Latihan napas tenang selesai! +15 XP ketenangan batin.",
       treeStats,
       treeXp: treeStats.totalXp,
-      breatheCount: totalBreathing,
+      breatheCount: treeStats.breatheCount,
     });
   } catch (error) {
     console.error("POST /api/journal/breathe error:", error);

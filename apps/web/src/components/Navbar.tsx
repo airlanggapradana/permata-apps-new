@@ -2,7 +2,9 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { LogOut, User } from "lucide-react";
 import { useCulture } from "@/context/CultureContext";
+import { useAuth } from "@/context/AuthContext";
 
 /*
  * Navbar tunggal untuk seluruh halaman, mengikuti header landing page.
@@ -10,9 +12,10 @@ import { useCulture } from "@/context/CultureContext";
  * ThemedContent meneruskan hash tersebut ke scroll setelah halaman berganti.
  */
 const NAV_LINKS = [
-  { href: "/#programs", label: "Modul Resiliensi" },
+  { href: "/#programs", label: "Modul" },
   { href: "/#calculator", label: "Pohon Harapan" },
-  { href: "/#game-showcase", label: "Game Mitigasi" },
+  { href: "/safety-passport", label: "Safety Passport" },
+  { href: "/offline-survival", label: "Siaga Offline" },
 ];
 
 const LOCATIONS = [
@@ -211,6 +214,7 @@ export default function Navbar({
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const progressRef = useRef<HTMLSpanElement>(null);
+  const { user, isLoading: authLoading, logout } = useAuth();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -310,27 +314,63 @@ export default function Navbar({
           aria-label="Navigasi utama"
           className="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-700"
         >
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`relative py-2 rounded-sm transition-colors duration-200 hover:text-brand-800 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-brand-700 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none ${focusRing}`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const isActive = currentPath === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative py-2 rounded-sm transition-colors duration-200 hover:text-brand-800 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-brand-700 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none ${focusRing} ${isActive ? "text-brand-800 after:scale-x-100" : ""}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="hidden lg:flex items-center gap-3 shrink-0">
           <LocationMenu />
-          <Link
-            href="/dashboard"
-            aria-current={currentPath === "/dashboard" ? "page" : undefined}
-            className={ctaClass}
-          >
-            Akses Dashboard
-            {ctaArrow}
-          </Link>
+          {!authLoading && user ? (
+            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+              <Link
+                href="/dashboard"
+                aria-current={currentPath === "/dashboard" ? "page" : undefined}
+                className={`inline-flex items-center gap-2 min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold pl-2 pr-4 rounded-full transition-colors duration-200 shadow-sm ${focusRing}`}
+              >
+                <span className="w-7 h-7 rounded-full bg-brand-700 flex items-center justify-center text-white shrink-0">
+                  <User size={15} strokeWidth={1.75} aria-hidden="true" />
+                </span>
+                <span>{user.childName}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={logout}
+                className={`inline-flex items-center gap-1.5 min-h-11 px-3.5 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-600 hover:text-red-600 text-xs font-semibold transition-colors ${focusRing}`}
+              >
+                <LogOut size={15} strokeWidth={1.75} aria-hidden="true" />
+                <span>Keluar</span>
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                aria-current={currentPath === "/login" ? "page" : undefined}
+                className={`inline-flex items-center min-h-11 px-4 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-sm font-semibold transition-colors ${focusRing}`}
+              >
+                Masuk
+              </Link>
+              <Link
+                href="/dashboard"
+                aria-current={currentPath === "/dashboard" ? "page" : undefined}
+                className={ctaClass}
+              >
+                Dashboard
+                {ctaArrow}
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -370,20 +410,24 @@ export default function Navbar({
               aria-label="Navigasi utama (seluler)"
               className="flex flex-col"
             >
-              {NAV_LINKS.map((link, i) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={closeMenu}
-                  style={{ transitionDelay: menuOpen ? `${80 + i * 60}ms` : "0ms" }}
-                  className={`flex items-center min-h-12 text-base font-medium text-slate-800 hover:text-brand-700 rounded-sm transition-all duration-400 ${ease} ${focusRing} ${menuOpen
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 -translate-y-2"
-                    }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {NAV_LINKS.map((link, i) => {
+                const isActive = currentPath === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={closeMenu}
+                    aria-current={isActive ? "page" : undefined}
+                    style={{ transitionDelay: menuOpen ? `${80 + i * 60}ms` : "0ms" }}
+                    className={`flex items-center min-h-12 text-base font-medium rounded-sm transition-all duration-400 ${ease} ${focusRing} ${menuOpen
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 -translate-y-2"
+                      } ${isActive ? "text-brand-800 font-semibold" : "text-slate-800 hover:text-brand-700"}`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </nav>
             <div
               style={{ transitionDelay: menuOpen ? "260ms" : "0ms" }}
@@ -393,15 +437,48 @@ export default function Navbar({
                 }`}
             >
               <LocationMenu inline />
-              <Link
-                href="/dashboard"
-                onClick={closeMenu}
-                aria-current={currentPath === "/dashboard" ? "page" : undefined}
-                className={ctaClass}
-              >
-                Akses Dashboard
-                {ctaArrow}
-              </Link>
+              {!authLoading && user ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href="/dashboard"
+                    onClick={closeMenu}
+                    aria-current={currentPath === "/dashboard" ? "page" : undefined}
+                    className={`inline-flex items-center gap-2 min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+                  >
+                    Dashboard ({user.childName})
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeMenu();
+                      logout();
+                    }}
+                    className={`inline-flex items-center min-h-11 px-4 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium ${focusRing}`}
+                  >
+                    Keluar
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href="/login"
+                    onClick={closeMenu}
+                    aria-current={currentPath === "/login" ? "page" : undefined}
+                    className={`inline-flex items-center min-h-11 px-4 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-sm font-semibold ${focusRing}`}
+                  >
+                    Masuk
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    onClick={closeMenu}
+                    aria-current={currentPath === "/dashboard" ? "page" : undefined}
+                    className={ctaClass}
+                  >
+                    Akses Dashboard
+                    {ctaArrow}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
