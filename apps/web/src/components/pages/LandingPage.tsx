@@ -2419,7 +2419,7 @@ export default function LandingPage({
                   className="w-10 h-10 object-contain shrink-0"
                 />
                 <span className="text-xl font-extrabold tracking-tight text-slate-900">
-                  PERMATA <span className="text-brand-700">Nusantara</span>
+                  PERMATA
                 </span>
               </Link>
               <p className="text-sm text-slate-600 max-w-sm leading-relaxed">
@@ -2432,10 +2432,6 @@ export default function LandingPage({
                 href="tel:119"
                 className={`inline-flex items-center gap-2.5 min-h-11 px-4 rounded-full border border-brand-200 bg-brand-50 text-sm font-medium text-brand-900 hover:bg-brand-100 transition-colors duration-200 ${focusRing}`}
               >
-                <span className="relative flex w-2.5 h-2.5" aria-hidden="true">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-60 motion-safe:animate-ping" />
-                  <span className="relative inline-flex w-2.5 h-2.5 rounded-full bg-brand-500" />
-                </span>
                 Terhubung ke Hotline 119
               </a>
             </div>
@@ -2532,8 +2528,8 @@ export default function LandingPage({
             style={idx(4)}
           >
             <p>
-              Â© {new Date().getFullYear()} PERMATA Nusantara Foundation.
-              Seluruh hak cipta dilindungi undang-undang.
+              © {new Date().getFullYear()} PERMATA. Seluruh hak cipta dilindungi
+              undang-undang.
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
               <Link

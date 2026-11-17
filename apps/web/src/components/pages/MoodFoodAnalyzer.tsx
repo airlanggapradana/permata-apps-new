@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
 import { TreeStats } from "@/lib/treeProgress";
+import { AnimatedSection } from "@/components/PageMotion";
 
 export interface FoodAnalysisData {
   detectedFood: string;
@@ -533,7 +534,8 @@ export default function MoodFoodAnalyzer() {
         <div className="flex flex-col w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full flex flex-col gap-6 md:gap-8">
             {/* Breadcrumb & Protocol Badges */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+            <AnimatedSection index={0}>
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
               <nav
                 aria-label="Breadcrumb"
                 className="flex flex-wrap items-center gap-2 font-label-md text-label-md text-[#414844]"
@@ -569,10 +571,12 @@ export default function MoodFoodAnalyzer() {
                   <span>Analisis Nutrisi Emosi</span>
                 </span>
               </div>
-            </div>
+              </div>
+            </AnimatedSection>
 
             {/* Header Section */}
-            <div className="relative bg-white rounded-xl p-8 shadow-sm border border-slate-100">
+            <AnimatedSection index={1}>
+              <div className="relative bg-white rounded-xl p-8 shadow-sm border border-slate-100">
               <div className="max-w-3xl space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c1ecd4] text-[#274e3d] text-xs font-medium">
                   <span className="material-symbols-outlined text-[16px]">
@@ -590,14 +594,16 @@ export default function MoodFoodAnalyzer() {
                   pangan lokal Nusantara.
                 </p>
               </div>
-            </div>
+              </div>
+            </AnimatedSection>
 
             {/* 2-Column Responsive Workspace Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* LEFT COLUMN: Main Interactive Form & Analyzer */}
               <div className="lg:col-span-8 flex flex-col space-y-8">
                 {/* Interactive Card (Form Wrapper) */}
-                <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-8">
+                <AnimatedSection index={2}>
+                  <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-8">
                   {/* STEP 1: Pilih Mood Kamu Saat Ini */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -1069,13 +1075,15 @@ export default function MoodFoodAnalyzer() {
                       </span>
                     </button>
                   </div>
-                </div>
+                  </div>
+                </AnimatedSection>
 
                 {/* STEP 3: HASIL ANALISIS AI GEMINI & KEARIFAN PANGAN LOKAL */}
-                <div
-                  id="analysis-results"
-                  className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-6"
-                >
+                <AnimatedSection index={3}>
+                  <div
+                    id="analysis-results"
+                    className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-6"
+                  >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#eceef0] gap-3">
                     <div className="flex items-center gap-3">
                       <div
@@ -1396,10 +1404,12 @@ export default function MoodFoodAnalyzer() {
                       </div>
                     </>
                   )}
-                </div>
+                  </div>
+                </AnimatedSection>
 
                 {/* STEP 4: RIWAYAT CATATAN NUTRISI & EMOSI DARI DATABASE */}
-                <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-5">
+                <AnimatedSection index={4}>
+                  <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-lg bg-[#c1ecd4] text-[#012d1d] flex items-center justify-center">
@@ -1529,13 +1539,15 @@ export default function MoodFoodAnalyzer() {
                       })}
                     </div>
                   )}
-                </div>
+                  </div>
+                </AnimatedSection>
               </div>
 
               {/* RIGHT COLUMN: Sidebar Pendamping & Insights */}
               <div className="lg:col-span-4 flex flex-col space-y-6">
                 {/* CARD 1: Radar Keseimbangan Mood & Gut-Brain Axis (100% Dynamic + Empty/Loading State) */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 space-y-5">
+                <AnimatedSection index={2}>
+                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 space-y-5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-base font-bold text-[#012d1d]">
                       Koneksi Gut-Brain Axis
@@ -1681,10 +1693,12 @@ export default function MoodFoodAnalyzer() {
                       </div>
                     </>
                   )}
-                </div>
+                  </div>
+                </AnimatedSection>
 
                 {/* CARD 2: Kearifan Pangan Nusantara & Meuseuraya */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 space-y-4">
+                <AnimatedSection index={3}>
+                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 space-y-4">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-[#006c48] text-[22px]">
                       history_edu
@@ -1719,10 +1733,12 @@ export default function MoodFoodAnalyzer() {
                         : "Makan bersama dalam lingkar komunal posko terbukti menurunkan hormon stres kortisol sebesar 24% dibandingkan menyantap makanan sendirian di tenda pengungsian."}
                     </p>
                   </div>
-                </div>
+                  </div>
+                </AnimatedSection>
 
                 {/* CARD 3: Hope Tree / Pohon Harapan Status (Live from Database) */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 space-y-4">
+                <AnimatedSection index={4}>
+                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-[#006c48] text-[22px]">
@@ -1773,10 +1789,12 @@ export default function MoodFoodAnalyzer() {
                       />
                     </div>
                   </div>
-                </div>
+                  </div>
+                </AnimatedSection>
 
                 {/* CARD 4: Siaga SafeConnect 119 */}
-                <div className="bg-[#ffdad6] text-[#93000a] rounded-xl p-5 shadow-sm space-y-3 border border-red-200">
+                <AnimatedSection index={5}>
+                  <div className="bg-[#ffdad6] text-[#93000a] rounded-xl p-5 shadow-sm space-y-3 border border-red-200">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-full bg-[#ba1a1a] text-white flex items-center justify-center shrink-0 shadow-xs">
                       <span className="material-symbols-outlined text-[18px]">
@@ -1801,7 +1819,8 @@ export default function MoodFoodAnalyzer() {
                     </span>
                     <span>Konseling Darurat Bebas Pulsa</span>
                   </a>
-                </div>
+                  </div>
+                </AnimatedSection>
               </div>
             </div>
           </div>

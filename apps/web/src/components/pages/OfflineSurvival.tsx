@@ -34,6 +34,7 @@ import {
   CloudRain,
 } from "lucide-react";
 import { useCulture } from "@/context/CultureContext";
+import { AnimatedSection } from "@/components/PageMotion";
 import {
   EMERGENCY_NUMBERS,
   GO_BAG_ITEMS,
@@ -313,10 +314,11 @@ export default function OfflineSurvival() {
     <main className="min-h-screen bg-canvas text-fg pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 space-y-8">
         {/* ================= ZONE 1: HEADER & OFFLINE READINESS ================= */}
-        <section
-          aria-labelledby="survival-heading"
-          className="bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-xs"
-        >
+        <AnimatedSection index={0}>
+          <section
+            aria-labelledby="survival-heading"
+            className="bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-xs"
+          >
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div className="space-y-3 max-w-[65ch]">
               <div className="flex flex-wrap items-center gap-2.5">
@@ -454,13 +456,15 @@ export default function OfflineSurvival() {
               )}
             </div>
           </div>
-        </section>
+          </section>
+        </AnimatedSection>
 
         {/* ================= ZONE 2: TRIAGE TABS & SEARCH ================= */}
-        <section
-          aria-label="Navigasi dan pencarian panduan darurat"
-          className="flex flex-col md:flex-row md:items-center justify-between gap-4"
-        >
+        <AnimatedSection index={1}>
+          <section
+            aria-label="Navigasi dan pencarian panduan darurat"
+            className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+          >
           <div
             role="tablist"
             aria-label="Kategori panduan keselamatan offline"
@@ -544,7 +548,8 @@ export default function OfflineSurvival() {
               />
             </div>
           </div>
-        </section>
+          </section>
+        </AnimatedSection>
 
         {/* Search summary across both domains when filtering */}
         {normalizedQuery && (
@@ -564,6 +569,7 @@ export default function OfflineSurvival() {
           </div>
         )}
 
+        <AnimatedSection index={2}>
         {/* ================= PANEL 1: KESELAMATAN FISIK ================= */}
         {activeTab === "physical" && (
           <section
@@ -1410,12 +1416,14 @@ export default function OfflineSurvival() {
             </div>
           </section>
         )}
+        </AnimatedSection>
 
         {/* Quick links to standalone offline-capable games */}
-        <section
-          aria-label="Akses cepat modul relaksasi dan kesiapsiagaan"
-          className="bg-surface border border-line rounded-lg p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-        >
+        <AnimatedSection index={3}>
+          <section
+            aria-label="Akses cepat modul relaksasi dan kesiapsiagaan"
+            className="bg-surface border border-line rounded-lg p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          >
           <div className="space-y-1">
             <h2 className="text-base font-semibold text-fg">
               Akses Modul Pendukung Tanpa Login
@@ -1445,7 +1453,8 @@ export default function OfflineSurvival() {
               Ke Dashboard
             </Link>
           </div>
-        </section>
+          </section>
+        </AnimatedSection>
       </div>
     </main>
   );

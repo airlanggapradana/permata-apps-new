@@ -5,6 +5,7 @@ import Link from "next/link";
 import { dassQuestions } from "@/data/dassQuestions";
 import { calculateDASS, interpretDASS } from "@/utils/dassScoring";
 import { useCulture } from "@/context/CultureContext";
+import { AnimatedSection } from "@/components/PageMotion";
 
 // Option definitions matching desain_telescreening.html
 const DASS_OPTIONS = [
@@ -338,7 +339,8 @@ export default function TeleScreening() {
       <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-2">
           {/* Breadcrumb & Protocol Badges */}
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <AnimatedSection index={0}>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div className="flex items-center gap-2 text-[#414844] font-label-md text-label-md">
               <Link
                 className="hover:text-[#012d1d] transition-colors flex items-center gap-1"
@@ -385,11 +387,13 @@ export default function TeleScreening() {
                 <span>SafeConnect 119 Siaga</span>
               </span>
             </div>
-          </div>
+            </div>
+          </AnimatedSection>
 
           {/* ================= CONDITION 1: RESULT SCREEN ================= */}
           {submitted && result && rawScores ? (
-            <div className="flex flex-col gap-8 animate-fade-in">
+            <AnimatedSection index={1}>
+              <div className="flex flex-col gap-8 animate-fade-in">
               {/* Result Banner Card */}
               <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#012d1d] to-[#1b4332] p-6 sm:p-8 text-white shadow-sm">
                 <div className="relative z-10 max-w-3xl">
@@ -713,12 +717,14 @@ export default function TeleScreening() {
                   </div>
                 </div>
               </div>
-            </div>
+              </div>
+            </AnimatedSection>
           ) : (
             /* ================= CONDITION 2: QUESTIONNAIRE SCREEN ================= */
             <div className="flex flex-col w-full">
               {/* Main Title Card / Editorial Scrim Banner */}
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#012d1d] to-[#1b4332] p-6 sm:p-8 text-white shadow-sm mb-8">
+              <AnimatedSection index={1}>
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#012d1d] to-[#1b4332] p-6 sm:p-8 text-white shadow-sm mb-8">
                 <div className="relative z-10 max-w-3xl">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md font-label-sm text-label-sm text-[#c1ecd4] mb-3">
                     <span className="material-symbols-outlined text-[16px]">
@@ -751,14 +757,16 @@ export default function TeleScreening() {
                     </p>
                   </div>
                 </div>
-              </div>
+                </div>
+              </AnimatedSection>
 
               {/* 12-Column Balanced Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* LEFT COLUMN: Interactive DASS-21 Questionnaire (8 Columns) */}
                 <div className="lg:col-span-8 flex flex-col gap-6">
                   {/* Category Tracker / Domain Sub-Navigation */}
-                  <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <AnimatedSection index={2}>
+                    <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Kecemasan Pill */}
                       <button
@@ -815,10 +823,12 @@ export default function TeleScreening() {
                       </span>
                       <span>Domain: {currentDomain.label}</span>
                     </span>
-                  </div>
+                    </div>
+                  </AnimatedSection>
 
                   {/* Question Container */}
-                  <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col gap-6 relative">
+                  <AnimatedSection index={3}>
+                    <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col gap-6 relative">
                     {/* Step indicator & Progress */}
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center justify-between text-label-sm font-label-sm">
@@ -989,10 +999,12 @@ export default function TeleScreening() {
                         </button>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  </AnimatedSection>
 
                   {/* Quick Reference Preview Section (Matriks Instrumen DASS-21) */}
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col gap-4">
+                  <AnimatedSection index={4}>
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col gap-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="material-symbols-outlined text-[#006c48] text-[20px]">
@@ -1167,13 +1179,15 @@ export default function TeleScreening() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  </AnimatedSection>
                 </div>
 
                 {/* RIGHT COLUMN: Sidebar Pendamping & Live Triage Preview (4 Columns) */}
                 <div className="lg:col-span-4 flex flex-col gap-6">
                   {/* Live Triage Indicator Card */}
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col gap-4">
+                  <AnimatedSection index={2}>
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col gap-4">
                     <div className="flex items-center justify-between">
                       <span className="font-label-sm text-label-sm text-[#414844] uppercase font-semibold">
                         Live Triase Psikologis
@@ -1219,10 +1233,12 @@ export default function TeleScreening() {
                         </span>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  </AnimatedSection>
 
                   {/* Local Wisdom & PFA Guidance Card */}
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col gap-4">
+                  <AnimatedSection index={3}>
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex flex-col gap-4">
                     <div className="flex items-center gap-2 text-[#012d1d]">
                       <span className="material-symbols-outlined text-[22px]">
                         diversity_3
@@ -1266,10 +1282,12 @@ export default function TeleScreening() {
                         </p>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  </AnimatedSection>
 
                   {/* SafeConnect 119 Emergency Card */}
-                  <div className="bg-[#ffdad6] text-[#93000a] rounded-xl p-6 shadow-sm flex flex-col gap-4 border border-red-200">
+                  <AnimatedSection index={4}>
+                    <div className="bg-[#ffdad6] text-[#93000a] rounded-xl p-6 shadow-sm flex flex-col gap-4 border border-red-200">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-[#ba1a1a] text-white flex items-center justify-center">
@@ -1298,10 +1316,12 @@ export default function TeleScreening() {
                       </span>
                       <span>Hubungi SafeConnect Bebas Pulsa</span>
                     </a>
-                  </div>
+                    </div>
+                  </AnimatedSection>
 
                   {/* Resilience Reward & Gamification Card */}
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex items-center justify-between gap-4">
+                  <AnimatedSection index={5}>
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3.5">
                       <div className="w-12 h-12 rounded-xl bg-[#1b4332] text-[#92f7c3] flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined text-[26px]">
@@ -1320,7 +1340,8 @@ export default function TeleScreening() {
                     <span className="material-symbols-outlined text-[#006c48] text-[24px]">
                       verified
                     </span>
-                  </div>
+                    </div>
+                  </AnimatedSection>
                 </div>
               </div>
             </div>

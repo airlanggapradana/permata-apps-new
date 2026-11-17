@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
 import { TreeStats, calculateTreeStats } from "@/lib/treeProgress";
+import { AnimatedSection } from "@/components/PageMotion";
 
 const crisisKeywords = [
   "bunuh diri",
@@ -424,7 +425,8 @@ export default function AiCompanion() {
       <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 flex flex-col gap-8 pb-12">
           {/* Section 1: Header, Breadcrumbs & Security Badges */}
-          <div className="flex flex-col gap-4">
+          <AnimatedSection index={0}>
+            <div className="flex flex-col gap-4">
             <nav className="flex items-center gap-2 font-label-sm text-label-sm text-[#414844]">
               <Link
                 className="hover:text-[#012d1d] transition-colors flex items-center gap-1"
@@ -505,13 +507,15 @@ export default function AiCompanion() {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          </AnimatedSection>
 
           {/* Section 2: Main Two-Column Interactive Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* COLUMN 1: Interaktif Chat Workspace (Col-span-8) */}
             <section className="lg:col-span-8 flex flex-col gap-4">
-              <div className="bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col overflow-hidden">
+              <AnimatedSection index={1}>
+                <div className="bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col overflow-hidden">
                 {/* Workspace Header & Cultural Selector */}
                 <div className="bg-[#f2f4f6]/80 px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-100">
                   <div className="flex items-center gap-3">
@@ -994,67 +998,75 @@ export default function AiCompanion() {
                     </span>
                   </div>
                 </div>
-              </div>
+                </div>
+              </AnimatedSection>
 
               {/* Supportive Micro Cards Below Chat */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 rounded-xl bg-white shadow-sm border border-slate-100 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#c1ecd4] text-[#274e3d] flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[18px]">
-                      verified
-                    </span>
+                <AnimatedSection index={2} className="h-full">
+                  <div className="h-full p-4 rounded-xl bg-white shadow-sm border border-slate-100 flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#c1ecd4] text-[#274e3d] flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-[18px]">
+                        verified
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-headline-sm text-sm text-[#012d1d] font-semibold">
+                        Validasi Emosi
+                      </span>
+                      <span className="font-body-sm text-xs text-[#414844]">
+                        Takut, sedih, dan marah adalah emosi yang sah setelah
+                        peristiwa genting.
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-headline-sm text-sm text-[#012d1d] font-semibold">
-                      Validasi Emosi
-                    </span>
-                    <span className="font-body-sm text-xs text-[#414844]">
-                      Takut, sedih, dan marah adalah emosi yang sah setelah
-                      peristiwa genting.
-                    </span>
-                  </div>
-                </div>
+                </AnimatedSection>
 
-                <div className="p-4 rounded-xl bg-white shadow-sm border border-slate-100 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#92f7c3] text-[#005235] flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[18px]">
-                      group
-                    </span>
+                <AnimatedSection index={3} className="h-full">
+                  <div className="h-full p-4 rounded-xl bg-white shadow-sm border border-slate-100 flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#92f7c3] text-[#005235] flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-[18px]">
+                        group
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-headline-sm text-sm text-[#012d1d] font-semibold">
+                        Meuseuraya Jiwa
+                      </span>
+                      <span className="font-body-sm text-xs text-[#414844]">
+                        Beban hati berkurang saat dipikul bersama komunitas yang
+                        peduli.
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-headline-sm text-sm text-[#012d1d] font-semibold">
-                      Meuseuraya Jiwa
-                    </span>
-                    <span className="font-body-sm text-xs text-[#414844]">
-                      Beban hati berkurang saat dipikul bersama komunitas yang
-                      peduli.
-                    </span>
-                  </div>
-                </div>
+                </AnimatedSection>
 
-                <div className="p-4 rounded-xl bg-white shadow-sm border border-slate-100 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#ffdcc3] text-[#2f1500] flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined text-[18px]">
-                      emoji_objects
-                    </span>
+                <AnimatedSection index={4} className="h-full">
+                  <div className="h-full p-4 rounded-xl bg-white shadow-sm border border-slate-100 flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#ffdcc3] text-[#2f1500] flex items-center justify-center shrink-0">
+                      <span className="material-symbols-outlined text-[18px]">
+                        emoji_objects
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-headline-sm text-sm text-[#012d1d] font-semibold">
+                        Tumbuh Melenting
+                      </span>
+                      <span className="font-body-sm text-xs text-[#414844]">
+                        Setiap percakapan membantu membentuk kembali fondasi
+                        ketangguhanmu.
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="font-headline-sm text-sm text-[#012d1d] font-semibold">
-                      Tumbuh Melenting
-                    </span>
-                    <span className="font-body-sm text-xs text-[#414844]">
-                      Setiap percakapan membantu membentuk kembali fondasi
-                      ketangguhanmu.
-                    </span>
-                  </div>
-                </div>
+                </AnimatedSection>
               </div>
             </section>
 
             {/* COLUMN 2: Sidebar Panel Pendamping & Keselamatan (Col-span-4) */}
             <aside className="lg:col-span-4 flex flex-col gap-6">
               {/* Widget 1: Radar Emosi Sesi */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col gap-4">
+              <AnimatedSection index={2}>
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-[#006c48] text-[22px]">
@@ -1118,10 +1130,12 @@ export default function AiCompanion() {
                     trending_up
                   </span>
                 </div>
-              </div>
+                </div>
+              </AnimatedSection>
 
               {/* Widget 2: Grounding 5-4-3-2-1 Guide */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col gap-4">
+              <AnimatedSection index={3}>
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-[#006c48] text-[22px]">
@@ -1185,10 +1199,12 @@ export default function AiCompanion() {
                     );
                   })}
                 </div>
-              </div>
+                </div>
+              </AnimatedSection>
 
               {/* Widget 3: Petuah Kearifan Nusantara Card */}
-              <div className="bg-gradient-to-br from-white to-[#f2f4f6] rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col gap-3 relative overflow-hidden">
+              <AnimatedSection index={4}>
+                <div className="bg-gradient-to-br from-white to-[#f2f4f6] rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col gap-3 relative overflow-hidden">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-[#f48c24] text-[20px]">
                     auto_stories
@@ -1216,10 +1232,12 @@ export default function AiCompanion() {
                       : "Artinya: Kebersamaan adalah penyembuh terbesar; sesudah badai lebat, fajar harapan akan selalu merekah."}
                   </span>
                 </div>
-              </div>
+                </div>
+              </AnimatedSection>
 
               {/* Widget 4: Pohon Harapan (Hope Tree Mini Progress) */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col gap-3">
+              <AnimatedSection index={5}>
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-[#006c48] text-[22px]">
@@ -1266,10 +1284,12 @@ export default function AiCompanion() {
                     arrow_forward
                   </span>
                 </Link>
-              </div>
+                </div>
+              </AnimatedSection>
 
               {/* Widget 5: Darurat Siaga SafeConnect 119 Card */}
-              <div className="bg-[#ffdad6] rounded-xl p-5 shadow-sm border border-red-200 flex flex-col gap-3">
+              <AnimatedSection index={6}>
+                <div className="bg-[#ffdad6] rounded-xl p-5 shadow-sm border border-red-200 flex flex-col gap-3">
                 <div className="flex items-center gap-2.5 text-[#93000a]">
                   <div className="w-8 h-8 rounded-full bg-[#ba1a1a] text-white flex items-center justify-center shrink-0">
                     <span className="material-symbols-outlined text-[18px]">
@@ -1298,7 +1318,8 @@ export default function AiCompanion() {
                   </span>
                   <span>Hubungi SafeConnect 119</span>
                 </a>
-              </div>
+                </div>
+              </AnimatedSection>
             </aside>
           </div>
         </div>

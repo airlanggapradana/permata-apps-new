@@ -2,16 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Map, ArrowRight } from "lucide-react";
+import { AnimatedSection } from "@/components/PageMotion";
 
 const GameAdventure = () => {
   return (
     <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.32 }}
+      <AnimatedSection
+        index={0}
         className="max-w-md w-full bg-surface border border-line rounded-xl p-8 shadow-lg text-center space-y-6"
       >
         {/* Icon tile */}
@@ -50,7 +48,7 @@ const GameAdventure = () => {
         >
           Kembali ke Dashboard
         </Link>
-      </motion.div>
+      </AnimatedSection>
     </div>
   );
 };

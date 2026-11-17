@@ -16,6 +16,7 @@ import {
   Users,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { AnimatedSection } from "@/components/PageMotion";
 
 interface PassportContact {
   name: string;
@@ -184,7 +185,8 @@ export default function SafetyPassportPage() {
   if (!user) {
     return (
       <main className="min-h-[calc(100vh-5rem)] bg-canvas text-fg py-12 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-xl mx-auto bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
+        <AnimatedSection index={0}>
+          <div className="max-w-xl mx-auto bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
           <div className="w-12 h-12 rounded-md bg-tint text-fg-brand flex items-center justify-center">
             <Lock size={24} strokeWidth={1.75} aria-hidden="true" />
           </div>
@@ -226,7 +228,8 @@ export default function SafetyPassportPage() {
             </Link>
             .
           </div>
-        </div>
+          </div>
+        </AnimatedSection>
       </main>
     );
   }
@@ -235,7 +238,8 @@ export default function SafetyPassportPage() {
     <main className="min-h-screen bg-canvas text-fg py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Header */}
-        <section className="bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <AnimatedSection index={0}>
+          <section className="bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tint border border-[var(--brand-200)] text-fg-brand text-xs font-medium">
               <ShieldCheck size={14} strokeWidth={1.75} aria-hidden="true" />
@@ -263,7 +267,8 @@ export default function SafetyPassportPage() {
               </div>
             </div>
           )}
-        </section>
+          </section>
+        </AnimatedSection>
 
         {loadingPassport && (
           <div className="bg-surface border border-line rounded-lg p-8 text-center text-sm text-fg-muted">
@@ -298,7 +303,8 @@ export default function SafetyPassportPage() {
         {passport && !loadingPassport && (
           <form onSubmit={handleSave} className="space-y-6">
             {/* Section 1: Identitas Profil Anak */}
-            <section className="bg-surface border border-line rounded-lg p-6 shadow-xs space-y-4">
+            <AnimatedSection index={1}>
+              <section className="bg-surface border border-line rounded-lg p-6 shadow-xs space-y-4">
               <h2 className="text-lg font-semibold text-fg">
                 Identitas Pemilik Paspor
               </h2>
@@ -361,10 +367,12 @@ export default function SafetyPassportPage() {
                   className={`w-full bg-surface border border-line-input rounded-md p-3.5 text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
                 />
               </div>
-            </section>
+              </section>
+            </AnimatedSection>
 
             {/* Section 2: Kontak Orang Tua / Wali */}
-            <section className="bg-surface border border-line rounded-lg p-6 shadow-xs space-y-4">
+            <AnimatedSection index={2}>
+              <section className="bg-surface border border-line rounded-lg p-6 shadow-xs space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Phone
@@ -526,10 +534,12 @@ export default function SafetyPassportPage() {
                   ))}
                 </div>
               )}
-            </section>
+              </section>
+            </AnimatedSection>
 
             {/* Section 3: Anggota Keluarga & Titik Kumpul */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AnimatedSection index={3}>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Anggota Keluarga */}
               <section className="bg-surface border border-line rounded-lg p-6 shadow-xs space-y-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -777,10 +787,12 @@ export default function SafetyPassportPage() {
                   </div>
                 )}
               </section>
-            </div>
+              </div>
+            </AnimatedSection>
 
             {/* Section 4: Kebutuhan Darurat */}
-            <section className="bg-surface border border-line rounded-lg p-6 shadow-xs space-y-4">
+            <AnimatedSection index={4}>
+              <section className="bg-surface border border-line rounded-lg p-6 shadow-xs space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <HeartPulse
@@ -880,10 +892,12 @@ export default function SafetyPassportPage() {
                   ))}
                 </div>
               )}
-            </section>
+              </section>
+            </AnimatedSection>
 
             {/* Save Bar */}
-            <div className="bg-surface border border-line rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <AnimatedSection index={5}>
+              <div className="bg-surface border border-line rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="text-xs sm:text-sm text-fg-muted">
                 {saveFeedback ? (
                   <span
@@ -917,7 +931,8 @@ export default function SafetyPassportPage() {
                     : "Simpan My Safety Passport"}
                 </span>
               </button>
-            </div>
+              </div>
+            </AnimatedSection>
           </form>
         )}
       </div>

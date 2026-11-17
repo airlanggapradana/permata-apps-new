@@ -8,6 +8,7 @@ import PageTransitionOverlay, {
   type TransitionKind,
   type TransitionPhase,
 } from "./PageTransitionOverlay";
+import { PageMotionProvider } from "./PageMotion";
 
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
@@ -376,7 +377,9 @@ export default function ThemedContent({
       />
       <Navbar currentPath={displayedPath} />
       <OfflineRuntime currentPath={displayedPath} />
-      {renderPage()}
+      <PageMotionProvider transitionPhase={transitionPhase}>
+        {renderPage()}
+      </PageMotionProvider>
     </div>
   );
 }

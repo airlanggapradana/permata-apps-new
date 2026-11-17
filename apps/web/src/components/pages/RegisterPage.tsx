@@ -11,6 +11,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { AnimatedSection } from "@/components/PageMotion";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]";
@@ -92,7 +93,8 @@ export default function RegisterPage() {
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-canvas text-fg py-10 sm:py-16 px-4 sm:px-6">
       <div className="max-w-md mx-auto">
-        <div className="bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
+        <AnimatedSection index={0}>
+          <div className="bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
           <div className="space-y-2">
             <div className="w-11 h-11 rounded-md bg-tint text-fg-brand flex items-center justify-center">
               <UserPlus size={22} strokeWidth={1.75} aria-hidden="true" />
@@ -287,7 +289,8 @@ export default function RegisterPage() {
               </span>
             </div>
           </div>
-        </div>
+          </div>
+        </AnimatedSection>
       </div>
     </main>
   );

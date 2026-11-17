@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import dynamic from "next/dynamic";
+import { AnimatedSection } from "@/components/PageMotion";
 
 // Phaser must only run in browser - dynamic import with SSR disabled
 function GameQuakeInner() {
@@ -28,7 +28,9 @@ function GameQuakeInner() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-canvas">
-      <div id="game-container" />
+      <AnimatedSection index={0}>
+        <div id="game-container" />
+      </AnimatedSection>
     </div>
   );
 }

@@ -35,6 +35,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { AnimatedSection } from "@/components/PageMotion";
 import acehBackground from "@/assets/localization/aceh/background.png";
 
 const focusRing =
@@ -238,28 +239,31 @@ export default function LoginPage() {
       <main className="w-full flex-grow">
         <div className="max-w-7xl mx-auto w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-md lg:py-space-lg">
           {/* Breadcrumb & status */}
-          <div className="flex flex-wrap items-center justify-between gap-space-sm mb-space-md">
-            <div className="flex items-center gap-2">
-              <Link
-                href="/"
-                className={`text-xs font-semibold tracking-[0.02em] text-secondary hover:underline flex items-center gap-1 ${focusRing}`}
-              >
-                <ArrowLeft size={16} strokeWidth={2} aria-hidden="true" />
-                Kembali ke Beranda
-              </Link>
-              <span className="text-outline-variant text-xs" aria-hidden="true">
-                •
-              </span>
-              <span className="text-xs tracking-[0.02em] text-on-surface-variant">
-                Gerbang Autentikasi Psikososial
-              </span>
+          <AnimatedSection index={0}>
+            <div className="flex flex-wrap items-center justify-between gap-space-sm mb-space-md">
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/"
+                  className={`text-xs font-semibold tracking-[0.02em] text-secondary hover:underline flex items-center gap-1 ${focusRing}`}
+                >
+                  <ArrowLeft size={16} strokeWidth={2} aria-hidden="true" />
+                  Kembali ke Beranda
+                </Link>
+                <span className="text-outline-variant text-xs" aria-hidden="true">
+                  •
+                </span>
+                <span className="text-xs tracking-[0.02em] text-on-surface-variant">
+                  Gerbang Autentikasi Psikososial
+                </span>
+              </div>
             </div>
-          </div>
+          </AnimatedSection>
 
           {/* Two-column card grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-stretch">
             {/* LEFT: showcase */}
-            <div className="lg:col-span-5 flex flex-col justify-between rounded-md bg-primary-container text-on-primary p-space-md sm:p-space-lg relative overflow-hidden shadow-xl">
+            <AnimatedSection index={1} className="lg:col-span-5 flex">
+              <div className="w-full flex flex-col justify-between rounded-md bg-primary-container text-on-primary p-space-md sm:p-space-lg relative overflow-hidden shadow-xl">
               <div
                 className="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-secondary/20 blur-3xl pointer-events-none"
                 aria-hidden="true"
@@ -372,10 +376,12 @@ export default function LoginPage() {
                   ))}
                 </div>
               </div>
-            </div>
+              </div>
+            </AnimatedSection>
 
             {/* RIGHT: login */}
-            <div className="lg:col-span-7 flex flex-col justify-between bg-surface-container-lowest rounded-md p-space-md sm:p-space-lg lg:p-space-xl shadow-md">
+            <AnimatedSection index={2} className="lg:col-span-7 flex">
+              <div className="w-full flex flex-col justify-between bg-surface-container-lowest rounded-md p-space-md sm:p-space-lg lg:p-space-xl shadow-md">
               <div>
                 <div className="flex flex-col gap-1 mb-space-md">
                   <div className="flex items-center justify-between">
@@ -730,11 +736,13 @@ export default function LoginPage() {
                   </p>
                 </div>
               </div>
-            </div>
+              </div>
+            </AnimatedSection>
           </div>
 
           {/* Emergency strip */}
-          <div className="mt-space-md rounded-md bg-surface-container-low p-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm">
+          <AnimatedSection index={3}>
+            <div className="mt-space-md rounded-md bg-surface-container-low p-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
                 <LifeBuoy size={22} strokeWidth={1.75} aria-hidden="true" />
@@ -759,11 +767,13 @@ export default function LoginPage() {
                 Hubungi 119 Bebas Pulsa
               </a>
             </div>
-          </div>
+            </div>
+          </AnimatedSection>
         </div>
       </main>
 
-      <footer className="w-full bg-surface-container-low mt-space-xl">
+      <AnimatedSection index={4}>
+        <footer className="w-full bg-surface-container-low mt-space-xl">
         <div className="bg-primary-container text-on-primary py-space-sm px-margin md:px-margin-tablet lg:px-margin-desktop">
           <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-space-sm">
             <div className="flex items-center gap-space-sm">
@@ -818,7 +828,8 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-      </footer>
+        </footer>
+      </AnimatedSection>
     </div>
   );
 }

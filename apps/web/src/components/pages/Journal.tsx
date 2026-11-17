@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
 import { useAuth } from "@/context/AuthContext";
 import { TreeStats, calculateTreeStats } from "@/lib/treeProgress";
+import { AnimatedSection } from "@/components/PageMotion";
 
 export interface SavedJournalEntry {
   id: string;
@@ -443,7 +444,8 @@ export default function Journal() {
         <div className="flex flex-col w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full flex flex-col gap-6 md:gap-8">
             {/* Breadcrumb & Protocol Badges */}
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+            <AnimatedSection index={0}>
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
               <nav className="flex items-center gap-2 font-label-md text-label-md text-[#414844]">
                 <Link
                   className="hover:text-[#012d1d] transition-colors flex items-center gap-1"
@@ -488,7 +490,8 @@ export default function Journal() {
                   <span>SafeConnect 119 Siaga</span>
                 </span>
               </div>
-            </div>
+              </div>
+            </AnimatedSection>
 
             {!authLoading && !user && (
               <div className="mb-6 bg-surface border border-line border-l-4 border-l-warning rounded-lg p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -514,7 +517,8 @@ export default function Journal() {
               {/* LEFT COLUMN: Main Journaling Canvas & AI Wisdom Insights (65% / col-span-8) */}
               <div className="lg:col-span-8 flex flex-col gap-6">
                 {/* CARD 1: Write Journal Entry */}
-                <section className="p-6 sm:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6">
+                <AnimatedSection index={1}>
+                  <section className="p-6 sm:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-[#1b4332] text-white flex items-center justify-center">
@@ -769,10 +773,12 @@ export default function Journal() {
                       )}
                     </button>
                   </div>
-                </section>
+                  </section>
+                </AnimatedSection>
 
                 {/* CARD 2: AI Cultural Insight & Wisdom Reflection */}
-                <section className="p-6 sm:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6 relative overflow-hidden">
+                <AnimatedSection index={2}>
+                  <section className="p-6 sm:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6 relative overflow-hidden">
                   {/* Subtle decorative amber cultural banner strip */}
                   <div className="w-full h-1.5 bg-gradient-to-r from-[#ffb77d] via-[#f48c24] to-[#006c48] rounded-t-xl -mt-6 sm:-mt-8 -mx-6 sm:-mx-8" />
 
@@ -897,10 +903,12 @@ export default function Journal() {
                       </div>
                     </div>
                   </div>
-                </section>
+                  </section>
+                </AnimatedSection>
 
                 {/* Cultural Foundation Banner */}
-                <section className="p-6 rounded-xl bg-[#f2f4f6] flex flex-col md:flex-row items-center justify-between gap-6">
+                <AnimatedSection index={3}>
+                  <section className="p-6 rounded-xl bg-[#f2f4f6] flex flex-col md:flex-row items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-[#ffdcc3] flex items-center justify-center shrink-0 text-[#2f1500]">
                       <span className="material-symbols-outlined text-[26px]">
@@ -929,13 +937,15 @@ export default function Journal() {
                       arrow_forward
                     </span>
                   </Link>
-                </section>
+                  </section>
+                </AnimatedSection>
               </div>
 
               {/* RIGHT COLUMN: Sidebar, Hope Tree, Journal History, SafeConnect (35% / col-span-4) */}
               <aside className="lg:col-span-4 flex flex-col gap-6 w-full">
                 {/* WIDGET 1: Pohon Harapan (Hope Tree) Progress Card */}
-                <section className="p-6 rounded-xl bg-white shadow-sm flex flex-col gap-5">
+                <AnimatedSection index={2}>
+                  <section className="p-6 rounded-xl bg-white shadow-sm flex flex-col gap-5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-[#006c48] text-[22px]">
@@ -1087,10 +1097,12 @@ export default function Journal() {
                       </span>
                     </div>
                   </div>
-                </section>
+                  </section>
+                </AnimatedSection>
 
                 {/* WIDGET 2: Riwayat Refleksi Terakhir (Journal History from Database) */}
-                <section className="p-6 rounded-xl bg-white shadow-sm flex flex-col gap-4">
+                <AnimatedSection index={3}>
+                  <section className="p-6 rounded-xl bg-white shadow-sm flex flex-col gap-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-[#006c48] text-[22px]">
@@ -1170,10 +1182,12 @@ export default function Journal() {
                       arrow_forward
                     </span>
                   </button>
-                </section>
+                  </section>
+                </AnimatedSection>
 
                 {/* WIDGET 3: SafeConnect PFA & Crisis Guard */}
-                <section className="p-6 rounded-xl bg-[#f2f4f6] shadow-sm flex flex-col gap-4">
+                <AnimatedSection index={4}>
+                  <section className="p-6 rounded-xl bg-[#f2f4f6] shadow-sm flex flex-col gap-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-[#012d1d] text-white flex items-center justify-center shrink-0">
                       <span className="material-symbols-outlined text-[#92f7c3] text-[22px]">
@@ -1214,23 +1228,26 @@ export default function Journal() {
                       <span>Chat dengan Relawan Siaga</span>
                     </Link>
                   </div>
-                </section>
+                  </section>
+                </AnimatedSection>
 
                 {/* Community Wisdom Snippet Card */}
-                <div className="p-5 rounded-xl bg-white shadow-sm flex items-start gap-3.5">
-                  <span className="material-symbols-outlined text-[#006c48] text-[24px] mt-0.5">
-                    forum
-                  </span>
-                  <div className="flex flex-col gap-1">
-                    <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
-                      Tersambung dengan Posko Ramah Anak
+                <AnimatedSection index={5}>
+                  <div className="p-5 rounded-xl bg-white shadow-sm flex items-start gap-3.5">
+                    <span className="material-symbols-outlined text-[#006c48] text-[24px] mt-0.5">
+                      forum
                     </span>
-                    <p className="font-body-sm text-body-sm text-[#414844]">
-                      Tenda belajar terdekat di wilayahmu siap mendampingi
-                      aktivitas bermain dan pemulihan trauma harian.
-                    </p>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
+                        Tersambung dengan Posko Ramah Anak
+                      </span>
+                      <p className="font-body-sm text-body-sm text-[#414844]">
+                        Tenda belajar terdekat di wilayahmu siap mendampingi
+                        aktivitas bermain dan pemulihan trauma harian.
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </AnimatedSection>
               </aside>
             </div>
           </div>
