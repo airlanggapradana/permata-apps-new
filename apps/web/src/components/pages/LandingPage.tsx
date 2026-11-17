@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -10,17 +10,43 @@ import jurnalIllustration from "@/assets/localization/aceh/JurnalHikmah.png";
 import screeningIllustration from "@/assets/localization/aceh/ScreeningTriase.png"; // ganti ekstensi dari .jfif, lihat catatan
 import hutanPinus from "@/assets/image/HutanPinus.avif";
 import { useTiltSurface } from "@/components/ui-kit/TiltSurfaces/TiltSurfaces";
+import type { TransitionPhase } from "@/components/PageTransitionOverlay";
 
 type IconName =
-  | "book" | "shield" | "heart" | "play" | "gamepad" | "arrow" | "check" | "signal"
-  | "sprout" | "leaf" | "pine" | "trees" | "landmark" | "backpack"
-  | "pin" | "wind" | "users" | "bowl" | "star" | "chevron"
-  | "seed" | "seedling" | "sapling";
+  | "book"
+  | "shield"
+  | "heart"
+  | "play"
+  | "gamepad"
+  | "arrow"
+  | "check"
+  | "signal"
+  | "sprout"
+  | "leaf"
+  | "pine"
+  | "trees"
+  | "landmark"
+  | "backpack"
+  | "pin"
+  | "wind"
+  | "users"
+  | "bowl"
+  | "star"
+  | "chevron"
+  | "seed"
+  | "seedling"
+  | "sapling";
 
 const ICONS: Record<IconName, React.ReactNode> = {
-  book: <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />,
-  shield: <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />,
-  heart: <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />,
+  book: (
+    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  ),
+  shield: (
+    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+  ),
+  heart: (
+    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+  ),
   play: (
     <>
       <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -112,8 +138,12 @@ const ICONS: Record<IconName, React.ReactNode> = {
       <path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
     </>
   ),
-  users: <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />,
-  star: <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />,
+  users: (
+    <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+  ),
+  star: (
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  ),
   bowl: (
     <>
       <path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z" />
@@ -164,7 +194,10 @@ function ArrowLink({
   className?: string;
 }) {
   return (
-    <Link href={href} className={`pm-ab ${variant === "light" ? "pm-ab-light" : ""} font-semibold ${className} ${focusRing}`}>
+    <Link
+      href={href}
+      className={`pm-ab ${variant === "light" ? "pm-ab-light" : ""} font-semibold ${className} ${focusRing}`}
+    >
       <span className="pm-ab-in">
         <span className="pm-ab-fill" aria-hidden="true">
           <span className="pm-ab-arrow" />
@@ -190,7 +223,10 @@ function GlowLink({
   className?: string;
 }) {
   return (
-    <Link href={href} className={`pm-gl ${variant === "light" ? "pm-gl-light" : ""} font-semibold ${className} ${focusRing}`}>
+    <Link
+      href={href}
+      className={`pm-gl ${variant === "light" ? "pm-gl-light" : ""} font-semibold ${className} ${focusRing}`}
+    >
       <span className="pm-gl-in">
         <span className={`pm-gl-face ${size === "lg" ? "pm-gl-lg" : ""}`}>
           {children}
@@ -202,7 +238,13 @@ function GlowLink({
 }
 
 /* Tautan footer: garis bawah menyapu + panah muncul saat hover */
-function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+function FooterLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
   return (
     <Link
       href={href}
@@ -232,10 +274,38 @@ type Level = {
 };
 
 const LEVELS: Level[] = [
-  { min: 0, next: 1000, name: "Level 2 â€¢ Tunas Muda", icon: "seed", status: "Mulai Menstabilkan Emosi", readiness: "74 / 100 (Cukup Siap)" },
-  { min: 1000, next: 2500, name: "Level 3 â€¢ Tunas Mekar", icon: "seedling", status: "Bertumbuh Positif Pascabencana", readiness: "84 / 100 (Sigap)" },
-  { min: 2500, next: 5000, name: "Level 4 â€¢ Pohon Rindang Bertunas", icon: "sapling", status: "Adaptif & Resiliensi Tinggi", readiness: "92 / 100 (Sangat Sigap)" },
-  { min: 5000, next: null, name: "Level 5 â€¢ Rimba Resiliensi Mandiri", icon: "pine", status: "Sangat Tangguh & Agen PFA Cilik", readiness: "98 / 100 (Paling Sigap)" },
+  {
+    min: 0,
+    next: 1000,
+    name: "Level 2 â€¢ Tunas Muda",
+    icon: "seed",
+    status: "Mulai Menstabilkan Emosi",
+    readiness: "74 / 100 (Cukup Siap)",
+  },
+  {
+    min: 1000,
+    next: 2500,
+    name: "Level 3 â€¢ Tunas Mekar",
+    icon: "seedling",
+    status: "Bertumbuh Positif Pascabencana",
+    readiness: "84 / 100 (Sigap)",
+  },
+  {
+    min: 2500,
+    next: 5000,
+    name: "Level 4 â€¢ Pohon Rindang Bertunas",
+    icon: "sapling",
+    status: "Adaptif & Resiliensi Tinggi",
+    readiness: "92 / 100 (Sangat Sigap)",
+  },
+  {
+    min: 5000,
+    next: null,
+    name: "Level 5 â€¢ Rimba Resiliensi Mandiri",
+    icon: "pine",
+    status: "Sangat Tangguh & Agen PFA Cilik",
+    readiness: "98 / 100 (Paling Sigap)",
+  },
 ];
 
 const MODULES: {
@@ -248,50 +318,65 @@ const MODULES: {
   href: string;
   cta: string;
 }[] = [
-    {
-      icon: "book",
-      iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
-      image: { src: jurnalIllustration.src, alt: "Anak menulis jurnal ditemani maskot AI pendamping" },
-      tag: "Refleksi harian",
-      title: "AI Jurnal Hikmah",
-      desc: "Ruang aman bagi anak untuk menuliskan perasaan harian dan menemukan makna dari pengalaman sulit, berlandaskan kearifan Meuseuraya dan Mambangkik Batang Tarandam.",
-      href: "/jurnal",
-      cta: "Buka jurnal",
+  {
+    icon: "book",
+    iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
+    image: {
+      src: jurnalIllustration.src,
+      alt: "Anak menulis jurnal ditemani maskot AI pendamping",
     },
-    {
-      icon: "shield",
-      iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
-      image: { src: screeningIllustration.src, alt: "Ilustrasi skrining kesehatan mental dan triase anak" },
-      tag: "Deteksi dini",
-      title: "Skrining & triase",
-      desc: "Mendeteksi dini depresi, kecemasan, dan stres pada anak, lengkap dengan rekomendasi rujukan.",
-      href: "/tele-screening",
-      cta: "Mulai skrining",
+    tag: "Refleksi harian",
+    title: "AI Jurnal Hikmah",
+    desc: "Ruang aman bagi anak untuk menuliskan perasaan harian dan menemukan makna dari pengalaman sulit, berlandaskan kearifan Meuseuraya dan Mambangkik Batang Tarandam.",
+    href: "/jurnal",
+    cta: "Buka jurnal",
+  },
+  {
+    icon: "shield",
+    iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
+    image: {
+      src: screeningIllustration.src,
+      alt: "Ilustrasi skrining kesehatan mental dan triase anak",
     },
-    {
-      icon: "heart",
-      iconBoxClass: "bg-teal-50 text-teal-700 ring-1 ring-teal-200/70",
-      tag: "Teman bicara",
-      title: "Pendamping AI",
-      desc: "Teman bicara yang empatik, dengan pengaman bawaan untuk melindungi anak.",
-      href: "/ai-companion",
-      cta: "Buka pendamping",
-    },
-    {
-      icon: "gamepad",
-      iconBoxClass: "bg-amber-50 text-amber-600 ring-1 ring-amber-200/70",
-      tag: "Latihan siaga",
-      title: "Game resiliensi",
-      desc: "Belajar siaga gempa dan tsunami lewat permainan, sambil melatih napas untuk menenangkan diri.",
-      href: "#game-showcase",
-      cta: "Lihat permainan",
-    },
-  ];
+    tag: "Deteksi dini",
+    title: "Skrining & triase",
+    desc: "Mendeteksi dini depresi, kecemasan, dan stres pada anak, lengkap dengan rekomendasi rujukan.",
+    href: "/tele-screening",
+    cta: "Mulai skrining",
+  },
+  {
+    icon: "heart",
+    iconBoxClass: "bg-teal-50 text-teal-700 ring-1 ring-teal-200/70",
+    tag: "Teman bicara",
+    title: "Pendamping AI",
+    desc: "Teman bicara yang empatik, dengan pengaman bawaan untuk melindungi anak.",
+    href: "/ai-companion",
+    cta: "Buka pendamping",
+  },
+  {
+    icon: "gamepad",
+    iconBoxClass: "bg-amber-50 text-amber-600 ring-1 ring-amber-200/70",
+    tag: "Latihan siaga",
+    title: "Game resiliensi",
+    desc: "Belajar siaga gempa dan tsunami lewat permainan, sambil melatih napas untuk menenangkan diri.",
+    href: "#game-showcase",
+    cta: "Lihat permainan",
+  },
+];
 
 const STEPS = [
-  { title: "Kenali kondisi emosi", desc: "Anak mengisi kuesioner DASS-21 dan mencatat suasana hati harian di Jurnal Hikmah." },
-  { title: "Tenangkan diri", desc: "Latihan napas terpandu, permainan simulasi gempa, dan afirmasi dari tradisi lokal." },
-  { title: "Tumbuh bersama", desc: "Perkembangan anak terpantau lewat Hope Tree, dengan dukungan berkala orang tua dan guru serta jalur darurat bila dibutuhkan." },
+  {
+    title: "Kenali kondisi emosi",
+    desc: "Anak mengisi kuesioner DASS-21 dan mencatat suasana hati harian di Jurnal Hikmah.",
+  },
+  {
+    title: "Tenangkan diri",
+    desc: "Latihan napas terpandu, permainan simulasi gempa, dan afirmasi dari tradisi lokal.",
+  },
+  {
+    title: "Tumbuh bersama",
+    desc: "Perkembangan anak terpantau lewat Hope Tree, dengan dukungan berkala orang tua dan guru serta jalur darurat bila dibutuhkan.",
+  },
 ];
 
 const STEP_ICONS: IconName[] = ["book", "wind", "sprout"];
@@ -303,21 +388,48 @@ const DURATIONS = [
 ];
 
 const GAMES: { icon: IconName; title: string; desc: string; href: string }[] = [
-  { icon: "backpack", title: "Simulasi tas siaga bencana", desc: "Memilah kebutuhan penting untuk 72 jam pertama evakuasi dengan drag-and-drop.", href: "/game-healing" },
-  { icon: "pin", title: "Evakuasi cepat Minang", desc: "Mengenali sirine tsunami di pesisir Sumatera Barat dan titik perbukitan yang aman.", href: "/game-siagaminang" },
-  { icon: "wind", title: "Breathing Calm", desc: "Latihan napas untuk menurunkan ritme panik, dengan metafora mekarnya bunga Jeumpa.", href: "/game-breath" },
-  { icon: "users", title: "Meuseuraya puzzle siaga", desc: "Membersihkan puing sekolah bersama-sama secara gotong royong, berhadiah Hope XP.", href: "/game-quake" },
+  {
+    icon: "backpack",
+    title: "Simulasi tas siaga bencana",
+    desc: "Memilah kebutuhan penting untuk 72 jam pertama evakuasi dengan drag-and-drop.",
+    href: "/game-healing",
+  },
+  {
+    icon: "pin",
+    title: "Evakuasi cepat Minang",
+    desc: "Mengenali sirine tsunami di pesisir Sumatera Barat dan titik perbukitan yang aman.",
+    href: "/game-siagaminang",
+  },
+  {
+    icon: "wind",
+    title: "Breathing Calm",
+    desc: "Latihan napas untuk menurunkan ritme panik, dengan metafora mekarnya bunga Jeumpa.",
+    href: "/game-breath",
+  },
+  {
+    icon: "users",
+    title: "Meuseuraya puzzle siaga",
+    desc: "Membersihkan puing sekolah bersama-sama secara gotong royong, berhadiah Hope XP.",
+    href: "/game-quake",
+  },
 ];
 
 const NUTRITION = [
   { title: "Omega-3 & seng", desc: "Meredam kecemasan akut pascagempa" },
-  { title: "Karbohidrat kompleks", desc: "Stabilitas energi dan suasana hati anak di posko" },
-  { title: "Rempah hangat lokal", desc: "Jahe dan kunyit untuk membantu tidur" },
+  {
+    title: "Karbohidrat kompleks",
+    desc: "Stabilitas energi dan suasana hati anak di posko",
+  },
+  {
+    title: "Rempah hangat lokal",
+    desc: "Jahe dan kunyit untuk membantu tidur",
+  },
 ];
 
 const STORIES = [
   {
-    quote: "â€œAnak-anak di tenda darurat menyambut latihan pernapasan dan AI Jurnal Hikmah dengan ceria. Konsep Meuseuraya membuat mereka saling menguatkan alih-alih larut dalam kesedihan.â€",
+    quote:
+      "â€œAnak-anak di tenda darurat menyambut latihan pernapasan dan AI Jurnal Hikmah dengan ceria. Konsep Meuseuraya membuat mereka saling menguatkan alih-alih larut dalam kesedihan.â€",
     initials: "RA",
     tag: "Relawan PFA",
     highlight: "saling menguatkan alih-alih larut dalam kesedihan",
@@ -325,7 +437,8 @@ const STORIES = [
     role: "Relawan PFA & Psikososial Posko Pidie Aceh",
   },
   {
-    quote: "â€œFilosofi Mambangkik Batang Tarandam menumbuhkan harga diri anak-anak sekolah dasar pasca gempa Pasaman. Mereka belajar bahwa musibah adalah awal kebangkitan karakter.â€",
+    quote:
+      "â€œFilosofi Mambangkik Batang Tarandam menumbuhkan harga diri anak-anak sekolah dasar pasca gempa Pasaman. Mereka belajar bahwa musibah adalah awal kebangkitan karakter.â€",
     initials: "BS",
     tag: "Pendidik",
     highlight: "musibah adalah awal kebangkitan karakter",
@@ -333,7 +446,8 @@ const STORIES = [
     role: "Guru Pendamping SD Pasaman Barat, Sumbar",
   },
   {
-    quote: "â€œKami bisa mengenali anak yang menunjukkan tanda depresi berat lebih cepat dan merujuknya tepat waktu, sebelum terlambat.â€",
+    quote:
+      "â€œKami bisa mengenali anak yang menunjukkan tanda depresi berat lebih cepat dan merujuknya tepat waktu, sebelum terlambat.â€",
     initials: "FW",
     tag: "Tenaga medis",
     highlight: "merujuknya tepat waktu, sebelum terlambat",
@@ -362,7 +476,10 @@ const FOOTER_SERVICES = [
 // Gambar hero per tema daerah. Kunci harus sama dengan nilai `culture` di CultureContext.
 // Daerah yang belum terdaftar otomatis memakai tema Aceh.
 const HERO_THEMES: Record<string, { src: string; alt: string }> = {
-  aceh: { src: acehBackground.src, alt: "Anak-anak Aceh merangkul di zona rekonstruksi pascabencana" },
+  aceh: {
+    src: acehBackground.src,
+    alt: "Anak-anak Aceh merangkul di zona rekonstruksi pascabencana",
+  },
 };
 
 const HERO_STATS: { icon: IconName; value: string; label: string }[] = [
@@ -374,23 +491,107 @@ const HERO_STATS: { icon: IconName; value: string; label: string }[] = [
 
 // Partikel melayang (nilai tetap, bukan acak, agar SSR dan klien identik)
 const PARTICLES = [
-  { left: "6%", top: "78%", size: 4, dur: 13, del: 0, dx: 28, o: 0.6, tint: "bg-white" },
-  { left: "17%", top: "62%", size: 3, dur: 15, del: 2200, dx: -20, o: 0.5, tint: "bg-brand-200" },
-  { left: "28%", top: "85%", size: 5, dur: 12, del: 4100, dx: 18, o: 0.55, tint: "bg-white" },
-  { left: "41%", top: "70%", size: 3, dur: 16, del: 900, dx: -26, o: 0.45, tint: "bg-brand-200" },
-  { left: "55%", top: "88%", size: 4, dur: 14, del: 5200, dx: 22, o: 0.5, tint: "bg-white" },
-  { left: "66%", top: "66%", size: 3, dur: 17, del: 3000, dx: -18, o: 0.5, tint: "bg-brand-200" },
-  { left: "76%", top: "80%", size: 5, dur: 12.5, del: 6200, dx: 30, o: 0.6, tint: "bg-white" },
-  { left: "88%", top: "60%", size: 4, dur: 15, del: 1500, dx: -24, o: 0.5, tint: "bg-brand-200" },
-  { left: "94%", top: "84%", size: 3, dur: 13.5, del: 7400, dx: -16, o: 0.45, tint: "bg-white" },
+  {
+    left: "6%",
+    top: "78%",
+    size: 4,
+    dur: 13,
+    del: 0,
+    dx: 28,
+    o: 0.6,
+    tint: "bg-white",
+  },
+  {
+    left: "17%",
+    top: "62%",
+    size: 3,
+    dur: 15,
+    del: 2200,
+    dx: -20,
+    o: 0.5,
+    tint: "bg-brand-200",
+  },
+  {
+    left: "28%",
+    top: "85%",
+    size: 5,
+    dur: 12,
+    del: 4100,
+    dx: 18,
+    o: 0.55,
+    tint: "bg-white",
+  },
+  {
+    left: "41%",
+    top: "70%",
+    size: 3,
+    dur: 16,
+    del: 900,
+    dx: -26,
+    o: 0.45,
+    tint: "bg-brand-200",
+  },
+  {
+    left: "55%",
+    top: "88%",
+    size: 4,
+    dur: 14,
+    del: 5200,
+    dx: 22,
+    o: 0.5,
+    tint: "bg-white",
+  },
+  {
+    left: "66%",
+    top: "66%",
+    size: 3,
+    dur: 17,
+    del: 3000,
+    dx: -18,
+    o: 0.5,
+    tint: "bg-brand-200",
+  },
+  {
+    left: "76%",
+    top: "80%",
+    size: 5,
+    dur: 12.5,
+    del: 6200,
+    dx: 30,
+    o: 0.6,
+    tint: "bg-white",
+  },
+  {
+    left: "88%",
+    top: "60%",
+    size: 4,
+    dur: 15,
+    del: 1500,
+    dx: -24,
+    o: 0.5,
+    tint: "bg-brand-200",
+  },
+  {
+    left: "94%",
+    top: "84%",
+    size: 3,
+    dur: 13.5,
+    del: 7400,
+    dx: -16,
+    o: 0.45,
+    tint: "bg-white",
+  },
 ];
 
-const HERO_TITLE_WORDS = ["Pulihkan", "Senyum", "&", "Resiliensi", "Jiwa", "Anak", "Pascabencana"];
-
-/* â”€â”€ Splash screen â†’ hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-const SPLASH_MIN_MS = 2200; // splash minimal tampil (logo + teks selesai masuk)
-const SPLASH_MAX_MS = 4500; // batas tunggu preload gambar hero
-const EXIT_MS = 1000;       // durasi transisi splash â†’ hero
+const HERO_TITLE_WORDS = [
+  "Pulihkan",
+  "Senyum",
+  "&",
+  "Resiliensi",
+  "Jiwa",
+  "Anak",
+  "Pascabencana",
+];
 
 // Delay animasi masuk per elemen, dibaca CSS lewat var(--d)
 const idx = (n: number) => ({ "--i": n }) as React.CSSProperties;
@@ -475,16 +676,9 @@ html { scrollbar-gutter: stable; }
   .pm-label { display: none; }
 }
 
-@keyframes pm-pop    { from { opacity: 0; transform: scale(.6); filter: blur(10px); } to { opacity: 1; transform: scale(1); filter: blur(0); } }
-@keyframes pm-ring   { from { opacity: .5; transform: scale(.9); } to { opacity: 0; transform: scale(1.9); } }
-@keyframes pm-letter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pm-rise   { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pm-zoom   { from { transform: scale(1.12); } to { transform: scale(1); } }
 @keyframes pm-fade   { from { opacity: 0; } to { opacity: 1; } }
-
-.pm-logo-in { animation: pm-pop 800ms cubic-bezier(.22,1,.36,1) both; }
-.pm-ring    { opacity: 0; animation: pm-ring 1400ms ease-out 500ms forwards; }
-.pm-letter  { display: inline-block; opacity: 0; animation: pm-letter 700ms cubic-bezier(.22,1,.36,1) forwards; animation-delay: var(--d, 0ms); }
 
 .pm-enter   { opacity: 0; }
 .pm-enter[data-play="true"] { animation: pm-rise 900ms cubic-bezier(.22,1,.36,1) forwards; animation-delay: var(--d, 0ms); }
@@ -503,7 +697,7 @@ html { scrollbar-gutter: stable; }
 
 /* Konten hero mengecil mengikuti tinggi layar agar selalu muat dalam satu layar.
    Kelas Tailwind di elemen tetap jadi nilai cadangan bila svh tidak didukung. */
-.pm-hero-content { --pm-logo: clamp(3rem, 8svh, 5rem); padding-top: clamp(1rem, 5svh, 6rem); padding-bottom: clamp(4.5rem, 11svh, 7rem); }
+.pm-hero-content { --pm-logo: clamp(3rem, 8svh, 5rem); padding-top: calc(clamp(1rem, 5svh, 6rem) + 5rem); padding-bottom: clamp(4.5rem, 11svh, 7rem); }
 .pm-hero-logobox { margin-bottom: clamp(.75rem, 2.4svh, 1.5rem); }
 .pm-hero-logo    { width: var(--pm-logo); height: var(--pm-logo); }
 .pm-hero-ring    { width: calc(var(--pm-logo) * 2); height: calc(var(--pm-logo) * 2); }
@@ -825,7 +1019,10 @@ function HopeScrollbar({ visible }: { visible: boolean }) {
     let raf = 0;
 
     const measure = () => {
-      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const maxScroll = Math.max(
+        1,
+        document.documentElement.scrollHeight - window.innerHeight,
+      );
       const A: number[] = [];
       TREE_SECTIONS.forEach((sec, i) => {
         const el = document.getElementById(sec.id);
@@ -885,7 +1082,9 @@ function HopeScrollbar({ visible }: { visible: boolean }) {
     const rect = track.getBoundingClientRect();
     // >= 1024px batang vertikal, di bawahnya horizontal
     const vertical = window.matchMedia("(min-width: 1024px)").matches;
-    const raw = vertical ? (clientY - rect.top) / rect.height : (clientX - rect.left) / rect.width;
+    const raw = vertical
+      ? (clientY - rect.top) / rect.height
+      : (clientX - rect.left) / rect.width;
     const p = Math.min(1, Math.max(0, raw));
     const pos = p * n;
     const k = Math.min(n - 1, Math.floor(pos));
@@ -894,7 +1093,12 @@ function HopeScrollbar({ visible }: { visible: boolean }) {
   };
 
   return (
-    <nav ref={trackRef} className="pm-tree" data-show={visible} aria-label="Navigasi bagian halaman">
+    <nav
+      ref={trackRef}
+      className="pm-tree"
+      data-show={visible}
+      aria-label="Navigasi bagian halaman"
+    >
       <div className="pm-stem" aria-hidden="true" />
       <div className="pm-fill" aria-hidden="true" />
       <div
@@ -917,13 +1121,22 @@ function HopeScrollbar({ visible }: { visible: boolean }) {
       />
 
       {TREE_SECTIONS.map((sec, i) => (
-        <div key={sec.id} className="pm-node" style={{ "--f": i / n } as React.CSSProperties}>
+        <div
+          key={sec.id}
+          className="pm-node"
+          style={{ "--f": i / n } as React.CSSProperties}
+        >
           <button
             type="button"
             className={`pm-leafbtn ${i % 2 ? "pm-l" : "pm-r"}`}
             data-on={i < reached}
             aria-label={`Ke bagian ${sec.label}`}
-            onClick={() => window.scrollTo({ top: anchors.current[i] ?? 0, behavior: "smooth" })}
+            onClick={() =>
+              window.scrollTo({
+                top: anchors.current[i] ?? 0,
+                behavior: "smooth",
+              })
+            }
           >
             <span className="pm-leaf">
               <Icon name="leaf" className="w-6 h-6" strokeWidth={1.8} />
@@ -985,23 +1198,27 @@ function useInView<T extends HTMLElement>(threshold = 0.2) {
     let lastY = window.scrollY;
     let initialized = false;
 
-    const io = new IntersectionObserver(([entry]) => {
-      const currentY = window.scrollY;
-      const direction = currentY > lastY ? "down" : currentY < lastY ? "up" : "still";
-      lastY = currentY;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const currentY = window.scrollY;
+        const direction =
+          currentY > lastY ? "down" : currentY < lastY ? "up" : "still";
+        lastY = currentY;
 
-      if (!initialized) {
-        initialized = true;
-        if (entry.isIntersecting) setInView(true);
-        return;
-      }
+        if (!initialized) {
+          initialized = true;
+          if (entry.isIntersecting) setInView(true);
+          return;
+        }
 
-      if (direction === "down" && entry.isIntersecting) setInView(true);
-      if (direction === "up" && !entry.isIntersecting) setInView(false);
-    }, {
-      threshold,
-      rootMargin: "-8% 0px -8% 0px",
-    });
+        if (direction === "down" && entry.isIntersecting) setInView(true);
+        if (direction === "up" && !entry.isIntersecting) setInView(false);
+      },
+      {
+        threshold,
+        rootMargin: "-8% 0px -8% 0px",
+      },
+    );
 
     io.observe(el);
     return () => io.disconnect();
@@ -1010,7 +1227,13 @@ function useInView<T extends HTMLElement>(threshold = 0.2) {
   return [ref, inView] as const;
 }
 
-function StoryQuote({ quote, highlight }: { quote: string; highlight: string }) {
+function StoryQuote({
+  quote,
+  highlight,
+}: {
+  quote: string;
+  highlight: string;
+}) {
   // Tanda kutip dilepas dari teks (diganti ikon kutip di kartu); frasa kunci diberi stabilo hijau tipis
   const text = quote.replace(/^[â€œ"]|[â€"]$/g, "");
   const at = text.indexOf(highlight);
@@ -1018,7 +1241,9 @@ function StoryQuote({ quote, highlight }: { quote: string; highlight: string }) 
   return (
     <>
       {text.slice(0, at)}
-      <mark className="pm-mark rounded bg-gradient-to-r from-brand-100/60 to-brand-100/60 bg-no-repeat px-1 font-medium text-slate-900 box-decoration-clone">{highlight}</mark>
+      <mark className="pm-mark rounded bg-gradient-to-r from-brand-100/60 to-brand-100/60 bg-no-repeat px-1 font-medium text-slate-900 box-decoration-clone">
+        {highlight}
+      </mark>
       {text.slice(at + highlight.length)}
     </>
   );
@@ -1035,7 +1260,10 @@ function ModuleItem({ d, children }: { d: number; children: React.ReactNode }) {
 
 /* Mouse-track untuk kartu beraura: mengisi --mx/--my (0-1) pada elemen stage dengan easing,
    langsung ke style (tanpa re-render React). Nonaktif di layar sentuh dan saat prefers-reduced-motion. */
-function useAuraPointer(ref: React.RefObject<HTMLElement | null>, stageSelector: string) {
+function useAuraPointer(
+  ref: React.RefObject<HTMLElement | null>,
+  stageSelector: string,
+) {
   useEffect(() => {
     const el = ref.current;
     const stage = el?.querySelector<HTMLElement>(stageSelector);
@@ -1043,18 +1271,24 @@ function useAuraPointer(ref: React.RefObject<HTMLElement | null>, stageSelector:
     if (
       !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) return;
+    )
+      return;
 
     let raf = 0;
-    let tx = 0.5, ty = 0.5; // target
-    let cx = 0.5, cy = 0.5; // posisi tampil (dihaluskan)
+    let tx = 0.5,
+      ty = 0.5; // target
+    let cx = 0.5,
+      cy = 0.5; // posisi tampil (dihaluskan)
 
     const loop = () => {
       cx += (tx - cx) * 0.08;
       cy += (ty - cy) * 0.08;
       stage.style.setProperty("--mx", cx.toFixed(4));
       stage.style.setProperty("--my", cy.toFixed(4));
-      raf = Math.abs(tx - cx) > 0.001 || Math.abs(ty - cy) > 0.001 ? requestAnimationFrame(loop) : 0;
+      raf =
+        Math.abs(tx - cx) > 0.001 || Math.abs(ty - cy) > 0.001
+          ? requestAnimationFrame(loop)
+          : 0;
     };
     const kick = () => {
       if (!raf) raf = requestAnimationFrame(loop);
@@ -1081,7 +1315,13 @@ function useAuraPointer(ref: React.RefObject<HTMLElement | null>, stageSelector:
   }, [ref, stageSelector]);
 }
 
-export default function LandingPage() {
+export default function LandingPage({
+  transitionPhase = "idle",
+  onHeroReady,
+}: {
+  transitionPhase?: TransitionPhase;
+  onHeroReady?: () => void;
+}) {
   const { culture } = useCulture();
   const heroTheme = HERO_THEMES[String(culture)] ?? HERO_THEMES.aceh;
   const [flowRef, flowShow] = useInView<HTMLDivElement>();
@@ -1091,63 +1331,18 @@ export default function LandingPage() {
   const [ctaInRef, ctaShow] = useInView<HTMLDivElement>(0.15);
   const [footRef, footShow] = useInView<HTMLElement>(0.15);
 
-  // splash â†’ exit (overlay memudar) â†’ done
-  const [phase, setPhase] = useState<"splash" | "exit" | "done">("splash");
   const heroLogoRef = useRef<HTMLImageElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const [heroPhase, setHeroPhase] = useState<"init" | "out" | "back">("init");
-  const exiting = phase === "exit";
-  const play = phase !== "splash"; // pemicu animasi masuk elemen hero
+  const play = transitionPhase === "exiting" || transitionPhase === "idle";
 
+  // Preload gambar hero agar siap sebelum curtain transisi terbuka
   useEffect(() => {
-    // Pengguna yang meminta reduced motion langsung melihat hero
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const id = requestAnimationFrame(() => setPhase("done"));
-      return () => cancelAnimationFrame(id);
-    }
-
-    // Fast Refresh (dev) menjalankan ulang efek ini sambil mempertahankan state lama
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPhase("splash");
-    setHeroPhase("init");
-
-    window.scrollTo(0, 0);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const timers: number[] = [];
-    let cancelled = false;
-
-    const minShown = new Promise<void>((resolve) => {
-      timers.push(window.setTimeout(resolve, SPLASH_MIN_MS));
-    });
-    // Preload gambar hero supaya tidak "pop" saat splash terbuka
-    const imageReady = new Promise<void>((resolve) => {
-      const img = new Image();
-      img.onload = img.onerror = () => resolve();
-      img.src = heroTheme.src;
-      timers.push(window.setTimeout(resolve, SPLASH_MAX_MS));
-    });
-
-    Promise.all([minShown, imageReady]).then(() => {
-      if (cancelled) return;
-      setPhase("exit");
-      timers.push(
-        window.setTimeout(() => {
-          document.body.style.overflow = prevOverflow;
-          setPhase("done");
-        }, EXIT_MS),
-      );
-    });
-
-    return () => {
-      cancelled = true;
-      timers.forEach((t) => window.clearTimeout(t));
-      document.body.style.overflow = prevOverflow;
-    };
-    // Splash hanya berjalan sekali saat halaman dimuat
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!onHeroReady) return;
+    const img = new Image();
+    img.onload = img.onerror = () => onHeroReady();
+    img.src = heroTheme.src;
+  }, [heroTheme.src, onHeroReady]);
 
   // Hero keluar saat hampir tidak terlihat (di-reset di luar layar), lalu masuk lagi
   // dari awal setiap kali kembali terlihat, baik dari scroll naik maupun turun/anchor.
@@ -1158,18 +1353,21 @@ export default function LandingPage() {
 
     let initialized = false;
 
-    const io = new IntersectionObserver(([entry]) => {
-      if (!initialized) {
-        initialized = true; // callback pertama hanya melaporkan kondisi awal
-        return;
-      }
-      const ratio = entry.intersectionRatio;
-      if (ratio < 0.15) {
-        setHeroPhase("out");
-      } else if (ratio >= 0.35) {
-        setHeroPhase((current) => (current === "out" ? "back" : current));
-      }
-    }, { threshold: [0, 0.15, 0.35] });
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!initialized) {
+          initialized = true; // callback pertama hanya melaporkan kondisi awal
+          return;
+        }
+        const ratio = entry.intersectionRatio;
+        if (ratio < 0.15) {
+          setHeroPhase("out");
+        } else if (ratio >= 0.35) {
+          setHeroPhase((current) => (current === "out" ? "back" : current));
+        }
+      },
+      { threshold: [0, 0.15, 0.35] },
+    );
 
     io.observe(el);
     return () => io.disconnect();
@@ -1182,7 +1380,7 @@ export default function LandingPage() {
       if (!el) return;
       const offsetTop = el.getBoundingClientRect().top + window.scrollY;
       const top = Math.round(offsetTop);
-      el.style.height = `calc(100vh - ${top}px)`;  // fallback browser lama
+      el.style.height = `calc(100vh - ${top}px)`; // fallback browser lama
       el.style.height = `calc(100svh - ${top}px)`; // diabaikan jika svh tidak didukung
     };
     fit();
@@ -1200,7 +1398,10 @@ export default function LandingPage() {
 
   const frequency = Math.min(14, Math.max(1, Number(frequencyInput) || 1));
   const totalXP = cause * frequency * duration;
-  const levelIdx = LEVELS.reduce((acc, l, i) => (totalXP >= l.min ? i : acc), 0);
+  const levelIdx = LEVELS.reduce(
+    (acc, l, i) => (totalXP >= l.min ? i : acc),
+    0,
+  );
   const level = LEVELS[levelIdx];
   const [simRef, simShow] = useInView<HTMLDivElement>(0.15);
   const xpShown = useCountUp(totalXP, simShow);
@@ -1208,7 +1409,11 @@ export default function LandingPage() {
 
   // Mouse-track 3D kartu Hope Tree: pembungkus memicu, kartu yang miring
   const tiltRef = useRef<HTMLDivElement>(null);
-  const tilt = useTiltSurface(tiltRef, { perspective: 1100, rotate: 6, scale: 1.015 });
+  const tilt = useTiltSurface(tiltRef, {
+    perspective: 1100,
+    rotate: 6,
+    scale: 1.015,
+  });
   const canTilt = () =>
     window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
     !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1218,7 +1423,10 @@ export default function LandingPage() {
   const ctaRef = useRef<HTMLDivElement>(null);
   useAuraPointer(moodRef, ".pm-aura-stage");
   useAuraPointer(ctaRef, ".pm-hz-stage");
-  const durIdx = Math.max(0, DURATIONS.findIndex((d) => d.v === duration));
+  const durIdx = Math.max(
+    0,
+    DURATIONS.findIndex((d) => d.v === duration),
+  );
   const nextLevel = LEVELS[levelIdx + 1];
   const progress =
     level.next === null
@@ -1238,51 +1446,15 @@ export default function LandingPage() {
   return (
     <div className="w-full bg-white text-slate-800 selection:bg-brand-500 selection:text-white">
       <style>{SPLASH_CSS}</style>
-      <HopeScrollbar visible={phase === "done"} />
-
-      {/* BEGIN: Splash */}
-      {phase !== "done" && (
-        <div
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-brand-950 pointer-events-none transition-opacity duration-700 ease-out"
-          role="status"
-          aria-label="Memuat PERMATA Nusantara"
-          style={{ opacity: exiting ? 0 : 1 }}
-        >
-          <div className="flex flex-col items-center justify-center">
-            <div className="pm-logo-in relative">
-              <span className="pm-ring absolute inset-0 rounded-full border border-white/40" aria-hidden="true" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/permata-logo.webp"
-                alt=""
-                width={128}
-                height={128}
-                className="relative w-28 h-28 sm:w-32 sm:h-32 brightness-0 invert object-contain drop-shadow-[0_2px_12px_rgba(255,255,255,0.2)]"
-              />
-            </div>
-
-            <p
-              aria-hidden="true"
-              className="mt-7 flex pl-[0.35em] text-2xl sm:text-3xl font-semibold text-white tracking-[0.35em]"
-              style={{
-                opacity: exiting ? 0 : 1,
-                transform: exiting ? "translateY(12px)" : "none",
-                transition: "opacity 400ms ease, transform 400ms ease",
-              }}
-            >
-              {"PERMATA".split("").map((ch, i) => (
-                <span key={i} className="pm-letter" style={delay(700 + i * 80)}>
-                  {ch}
-                </span>
-              ))}
-            </p>
-          </div>
-        </div>
-      )}
-      {/* END: Splash */}
+      <HopeScrollbar visible={transitionPhase === "idle"} />
 
       {/* BEGIN: Hero */}
-      <section id="home" ref={heroRef} data-hero={heroPhase} className="relative min-h-[28rem] flex items-center justify-center overflow-hidden bg-slate-900">
+      <section
+        id="home"
+        ref={heroRef}
+        data-hero={heroPhase}
+        className="relative min-h-[28rem] flex items-center justify-center overflow-hidden bg-slate-900"
+      >
         {/* Background Image */}
         <div
           className="pm-hero-bg absolute inset-0 bg-cover bg-center bg-no-outset"
@@ -1295,7 +1467,10 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/60 to-slate-900/75" />
 
         {/* Partikel melayang pelan (kunang-kunang) */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1]"
+        >
           {PARTICLES.map((pt, i) => (
             <span
               key={i}
@@ -1339,10 +1514,14 @@ export default function LandingPage() {
               style={{ opacity: play ? 1 : 0 }}
             />
           </div>
-          <h1 className="pm-hero-title text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] text-balance">
+          <h1 className="pm-hero-title mt-14 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] text-balance">
             {HERO_TITLE_WORDS.map((w, i) => (
               <React.Fragment key={`${w}-${i}`}>
-                <span className="pm-enter inline-block" data-play={play} style={delay(550 + i * 70)}>
+                <span
+                  className="pm-enter inline-block"
+                  data-play={play}
+                  style={delay(550 + i * 70)}
+                >
                   {w}
                 </span>{" "}
               </React.Fragment>
@@ -1354,11 +1533,20 @@ export default function LandingPage() {
             data-play={play}
             style={delay(1000)}
           >
-            Platform pendampingan psikososial berbasis kearifan budaya lokal untuk mengembalikan harapan dan keceriaan anak.
+            Platform pendampingan psikososial berbasis kearifan budaya lokal
+            untuk mengembalikan harapan dan keceriaan anak.
           </p>
 
-          <div className="pm-enter pm-hero-actions mt-8 flex flex-wrap justify-center gap-3" data-play={play} style={delay(1150)}>
-            <GlowLink href="#programs" variant="light" className="text-sm sm:text-base">
+          <div
+            className="pm-enter pm-hero-actions mt-8 flex flex-wrap justify-center gap-3"
+            data-play={play}
+            style={delay(1150)}
+          >
+            <GlowLink
+              href="#programs"
+              variant="light"
+              className="text-sm sm:text-base"
+            >
               Mulai Pemulihan
             </GlowLink>
             <a
@@ -1369,9 +1557,18 @@ export default function LandingPage() {
             </a>
           </div>
 
-          <ul className="pm-fade pm-hero-stats mt-12 pt-8 border-t border-white/20 grid grid-cols-2 sm:grid-cols-4 gap-6" data-play={play} style={delay(1250)}>
+          <ul
+            className="pm-fade pm-hero-stats mt-12 pt-8 border-t border-white/20 grid grid-cols-2 sm:grid-cols-4 gap-6"
+            data-play={play}
+            style={delay(1250)}
+          >
             {HERO_STATS.map((st, i) => (
-              <li key={st.label} className="pm-enter" data-play={play} style={delay(1300 + i * 90)}>
+              <li
+                key={st.label}
+                className="pm-enter"
+                data-play={play}
+                style={delay(1300 + i * 90)}
+              >
                 <p className="flex items-center justify-center gap-1.5 text-base sm:text-lg font-semibold">
                   <Icon name={st.icon} className="w-4 h-4" />
                   {st.value}
@@ -1398,9 +1595,16 @@ export default function LandingPage() {
       {/* END: Hero */}
 
       {/* BEGIN: Modul */}
-      <section className="py-20 bg-white border-y border-slate-100" id="programs">
+      <section
+        className="py-20 bg-white border-y border-slate-100"
+        id="programs"
+      >
         <div className="max-w-7xl mx-auto px-6">
-          <div ref={modHeadRef} data-show={modHeadShow} className="pm-flow max-w-2xl mb-12">
+          <div
+            ref={modHeadRef}
+            data-show={modHeadShow}
+            className="pm-flow max-w-2xl mb-12"
+          >
             <div className="pm-flow-head">
               <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight">
                 Empat modul pendampingan resiliensi anak
@@ -1415,9 +1619,7 @@ export default function LandingPage() {
           <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {MODULES.map((m, i) => (
               <ModuleItem key={m.title} d={i * 120}>
-                <div
-                  className="group relative flex h-full flex-col rounded-[1.75rem] bg-white p-3 shadow-[0_10px_30px_-14px_rgba(15,45,33,0.28)] ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_44px_-16px_rgba(15,45,33,0.35)] focus-within:ring-2 focus-within:ring-brand-500 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
-                >
+                <div className="group relative flex h-full flex-col rounded-[1.75rem] bg-white p-3 shadow-[0_10px_30px_-14px_rgba(15,45,33,0.28)] ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_44px_-16px_rgba(15,45,33,0.35)] focus-within:ring-2 focus-within:ring-brand-500 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
                   {/* Ilustrasi masuk ke dalam bingkai putih kartu */}
                   <div className="relative flex aspect-square items-end justify-center overflow-hidden rounded-[1.25rem] bg-white">
                     {m.image ? (
@@ -1433,8 +1635,14 @@ export default function LandingPage() {
                       </span>
                     ) : (
                       <span className="pm-mod-float relative flex h-full w-full items-center justify-center">
-                        <span className={`flex h-20 w-20 items-center justify-center rounded-full ${m.iconBoxClass}`}>
-                          <Icon name={m.icon} className="w-9 h-9" strokeWidth={1.5} />
+                        <span
+                          className={`flex h-20 w-20 items-center justify-center rounded-full ${m.iconBoxClass}`}
+                        >
+                          <Icon
+                            name={m.icon}
+                            className="w-9 h-9"
+                            strokeWidth={1.5}
+                          />
                         </span>
                       </span>
                     )}
@@ -1444,17 +1652,28 @@ export default function LandingPage() {
                       className={`pm-ico absolute left-3 top-3 flex h-11 w-11 items-center justify-center rounded-2xl shadow-xs ${m.iconBoxClass}`}
                       aria-hidden="true"
                     >
-                      <Icon name={m.icon} className="w-5 h-5" strokeWidth={1.9} />
+                      <Icon
+                        name={m.icon}
+                        className="w-5 h-5"
+                        strokeWidth={1.9}
+                      />
                     </span>
                   </div>
 
                   <div className="flex flex-1 flex-col px-2 pb-1 pt-4">
-                    <h3 className="text-xl font-semibold tracking-tight text-slate-900">{m.title}</h3>
+                    <h3 className="text-xl font-semibold tracking-tight text-slate-900">
+                      {m.title}
+                    </h3>
                     <p className="mt-0.5 text-sm text-slate-500">{m.tag}</p>
-                    <p className="mt-3 mb-5 text-sm text-slate-600 leading-relaxed">{m.desc}</p>
+                    <p className="mt-3 mb-5 text-sm text-slate-600 leading-relaxed">
+                      {m.desc}
+                    </p>
 
                     {/* Link meregang: seluruh kartu bisa diklik, fokus keyboard tetap di satu link */}
-                    <ArrowLink href={m.href} className="mt-auto w-full text-sm after:absolute after:inset-0 after:rounded-[1.75rem]">
+                    <ArrowLink
+                      href={m.href}
+                      className="mt-auto w-full text-sm after:absolute after:inset-0 after:rounded-[1.75rem]"
+                    >
                       {m.cta}
                     </ArrowLink>
                   </div>
@@ -1468,7 +1687,11 @@ export default function LandingPage() {
 
       {/* BEGIN: Alur */}
       <section className="py-20 bg-white" id="how-it-works">
-        <div ref={flowRef} data-show={flowShow} className="pm-flow max-w-7xl mx-auto px-6">
+        <div
+          ref={flowRef}
+          data-show={flowShow}
+          className="pm-flow max-w-7xl mx-auto px-6"
+        >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="pm-flow-head lg:col-span-4 space-y-4">
               <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
@@ -1485,7 +1708,11 @@ export default function LandingPage() {
 
             <ol className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 md:pt-4">
               {STEPS.map((s, i) => (
-                <li key={s.title} className="pm-step relative pl-12 md:pl-0 md:pt-8" style={delay(200 + i * 350)}>
+                <li
+                  key={s.title}
+                  className="pm-step relative pl-12 md:pl-0 md:pt-8"
+                  style={delay(200 + i * 350)}
+                >
                   {i < STEPS.length - 1 && (
                     <span className="pm-seg" aria-hidden="true">
                       <span className="pm-seg-fill" />
@@ -1496,14 +1723,21 @@ export default function LandingPage() {
                     {i + 1}
                   </span>
                   <div className="group relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_18px_36px_-16px_rgba(15,45,33,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                    <span aria-hidden="true" className="pm-ghost pointer-events-none absolute right-4 top-2 select-none text-6xl font-bold leading-none text-brand-100/70">
+                    <span
+                      aria-hidden="true"
+                      className="pm-ghost pointer-events-none absolute right-4 top-2 select-none text-6xl font-bold leading-none text-brand-100/70"
+                    >
                       0{i + 1}
                     </span>
                     <span className="pm-tile relative mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700 transition-colors duration-300 group-hover:border-brand-700 group-hover:bg-brand-700 group-hover:text-white">
                       <Icon name={STEP_ICONS[i]} className="pm-ico w-5 h-5" />
                     </span>
-                    <h3 className="relative text-lg font-semibold text-slate-900">{s.title}</h3>
-                    <p className="relative mt-2 text-sm text-slate-600 leading-relaxed">{s.desc}</p>
+                    <h3 className="relative text-lg font-semibold text-slate-900">
+                      {s.title}
+                    </h3>
+                    <p className="relative mt-2 text-sm text-slate-600 leading-relaxed">
+                      {s.desc}
+                    </p>
                   </div>
                 </li>
               ))}
@@ -1514,7 +1748,10 @@ export default function LandingPage() {
       {/* END: Alur */}
 
       {/* BEGIN: Simulator Hope Tree */}
-      <section className="py-20 bg-white border-t border-slate-100" id="calculator">
+      <section
+        className="py-20 bg-white border-t border-slate-100"
+        id="calculator"
+      >
         <div className="max-w-7xl mx-auto px-6">
           <div
             ref={simRef}
@@ -1522,12 +1759,18 @@ export default function LandingPage() {
             className="pm-flow relative overflow-hidden rounded-2xl border border-brand-100 bg-cover bg-center p-8 sm:p-12"
             style={{ backgroundImage: `url(${hutanPinus.src})` }}
           >
-            <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/70 via-brand-950/45 to-brand-950/25" />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/70 via-brand-950/45 to-brand-950/25"
+            />
             {/* Partikel WebGL (React Bits) di atas hutan; muncul perlahan saat section terlihat */}
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0"
-              style={{ opacity: simShow ? 1 : 0, transition: "opacity 900ms ease" }}
+              style={{
+                opacity: simShow ? 1 : 0,
+                transition: "opacity 900ms ease",
+              }}
             >
               <Particles
                 particleCount={140}
@@ -1557,9 +1800,15 @@ export default function LandingPage() {
                   </p>
                 </div>
 
-                <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+                <form
+                  className="space-y-5"
+                  onSubmit={(e) => e.preventDefault()}
+                >
                   <div className="pm-sim-in" style={idx(1)}>
-                    <label className="block text-sm font-medium text-white mb-1.5" htmlFor="cause-select">
+                    <label
+                      className="block text-sm font-medium text-white mb-1.5"
+                      htmlFor="cause-select"
+                    >
                       Fokus modul harian
                     </label>
                     <select
@@ -1568,19 +1817,33 @@ export default function LandingPage() {
                       value={cause}
                       onChange={(e) => setCause(Number(e.target.value))}
                     >
-                      <option value="50">Jurnal Hikmah Harian (+50 XP / sesi)</option>
-                      <option value="30">Latihan Napas Tenang 4-7-8 (+30 XP / sesi)</option>
-                      <option value="40">Refleksi Budaya &amp; Cerita (+40 XP / sesi)</option>
-                      <option value="60">Simulasi Game Tas Siaga Bencana (+60 XP / sesi)</option>
+                      <option value="50">
+                        Jurnal Hikmah Harian (+50 XP / sesi)
+                      </option>
+                      <option value="30">
+                        Latihan Napas Tenang 4-7-8 (+30 XP / sesi)
+                      </option>
+                      <option value="40">
+                        Refleksi Budaya &amp; Cerita (+40 XP / sesi)
+                      </option>
+                      <option value="60">
+                        Simulasi Game Tas Siaga Bencana (+60 XP / sesi)
+                      </option>
                     </select>
                   </div>
 
                   <div className="pm-sim-in" style={idx(2)}>
                     <div className="mb-1.5 flex items-center justify-between gap-3">
-                      <label className="text-sm font-medium text-white" htmlFor="frequency-input">
+                      <label
+                        className="text-sm font-medium text-white"
+                        htmlFor="frequency-input"
+                      >
                         Frekuensi mingguan (1â€“14 sesi)
                       </label>
-                      <output htmlFor="frequency-input" className="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold tabular-nums text-brand-900">
+                      <output
+                        htmlFor="frequency-input"
+                        className="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold tabular-nums text-brand-900"
+                      >
                         {frequency}Ã— / minggu
                       </output>
                     </div>
@@ -1593,16 +1856,25 @@ export default function LandingPage() {
                       step={1}
                       value={frequency}
                       onChange={(e) => setFrequencyInput(e.target.value)}
-                      style={{ "--v": `${((frequency - 1) / 13) * 100}%` } as React.CSSProperties}
+                      style={
+                        {
+                          "--v": `${((frequency - 1) / 13) * 100}%`,
+                        } as React.CSSProperties
+                      }
                     />
-                    <div className="mt-1 flex justify-between text-xs text-white/70" aria-hidden="true">
+                    <div
+                      className="mt-1 flex justify-between text-xs text-white/70"
+                      aria-hidden="true"
+                    >
                       <span>1</span>
                       <span>14</span>
                     </div>
                   </div>
 
                   <fieldset className="pm-sim-in" style={idx(3)}>
-                    <legend className="mb-1.5 block text-sm font-medium text-white">Durasi program</legend>
+                    <legend className="mb-1.5 block text-sm font-medium text-white">
+                      Durasi program
+                    </legend>
                     <div className="relative grid grid-cols-3 rounded-xl border border-white/30 bg-white/10 p-1 backdrop-blur-sm">
                       <span
                         aria-hidden="true"
@@ -1610,7 +1882,10 @@ export default function LandingPage() {
                         style={{ transform: `translateX(${durIdx * 100}%)` }}
                       />
                       {DURATIONS.map((d) => (
-                        <label key={d.v} className="relative z-10 cursor-pointer">
+                        <label
+                          key={d.v}
+                          className="relative z-10 cursor-pointer"
+                        >
                           <input
                             type="radio"
                             name="duration"
@@ -1620,11 +1895,20 @@ export default function LandingPage() {
                             className="peer sr-only"
                           />
                           <span
-                            className={`block rounded-lg px-2 py-2 text-center transition-colors duration-300 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white ${duration === d.v ? "text-brand-900" : "text-white/85 hover:text-white"
-                              }`}
+                            className={`block rounded-lg px-2 py-2 text-center transition-colors duration-300 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white ${
+                              duration === d.v
+                                ? "text-brand-900"
+                                : "text-white/85 hover:text-white"
+                            }`}
                           >
-                            <span className="block text-sm font-semibold">{d.label}</span>
-                            <span className={`block text-xs ${duration === d.v ? "text-brand-700" : "text-white/65"}`}>{d.sub}</span>
+                            <span className="block text-sm font-semibold">
+                              {d.label}
+                            </span>
+                            <span
+                              className={`block text-xs ${duration === d.v ? "text-brand-700" : "text-white/65"}`}
+                            >
+                              {d.sub}
+                            </span>
                           </span>
                         </label>
                       ))}
@@ -1636,18 +1920,30 @@ export default function LandingPage() {
               <div className="pm-sim-card lg:col-span-6">
                 <div
                   className="pm-3d"
-                  onMouseMove={(e) => { if (canTilt()) tilt.onMouseMove(e); }}
+                  onMouseMove={(e) => {
+                    if (canTilt()) tilt.onMouseMove(e);
+                  }}
                   onMouseLeave={tilt.onMouseLeave}
                 >
-                  <div ref={tiltRef} className="pm-3d-card rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_-24px_rgba(15,45,33,0.35)] sm:p-8">
+                  <div
+                    ref={tiltRef}
+                    className="pm-3d-card rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_-24px_rgba(15,45,33,0.35)] sm:p-8"
+                  >
                     <p className="sr-only" aria-live="polite">
-                      Estimasi {totalXP.toLocaleString("id-ID")} XP, {level.name}
+                      Estimasi {totalXP.toLocaleString("id-ID")} XP,{" "}
+                      {level.name}
                     </p>
 
                     <div className="pm-3d-lift flex items-center justify-between gap-4 border-b border-slate-100 pb-5">
                       <div className="pm-3d-pop">
-                        <p className="text-sm text-slate-500">Estimasi akumulasi resiliensi</p>
-                        <p aria-hidden="true" className="mt-1 text-4xl font-semibold tabular-nums text-brand-900 sm:text-5xl" id="xp-result">
+                        <p className="text-sm text-slate-500">
+                          Estimasi akumulasi resiliensi
+                        </p>
+                        <p
+                          aria-hidden="true"
+                          className="mt-1 text-4xl font-semibold tabular-nums text-brand-900 sm:text-5xl"
+                          id="xp-result"
+                        >
                           {xpShown.toLocaleString("id-ID")} XP
                         </p>
                         <p className="mt-2 inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-medium tabular-nums text-brand-800">
@@ -1656,22 +1952,48 @@ export default function LandingPage() {
                       </div>
                       <div className="pm-sim-tile relative flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700">
                         <span key={level.icon} className="pm-swap flex">
-                          <Icon name={level.icon} className={`pm-ico ${["h-8 w-8", "h-9 w-9", "h-10 w-10", "h-11 w-11"][levelIdx]}`} strokeWidth={1.8} />
+                          <Icon
+                            name={level.icon}
+                            className={`pm-ico ${["h-8 w-8", "h-9 w-9", "h-10 w-10", "h-11 w-11"][levelIdx]}`}
+                            strokeWidth={1.8}
+                          />
                         </span>
                       </div>
                     </div>
 
-                    <ol className="pm-3d-flat mt-5 flex items-center" aria-label="Tahap evolusi pohon">
+                    <ol
+                      className="pm-3d-flat mt-5 flex items-center"
+                      aria-label="Tahap evolusi pohon"
+                    >
                       {LEVELS.map((l, i) => {
-                        const st = !simShow ? "todo" : i < levelIdx ? "done" : i === levelIdx ? "now" : "todo";
+                        const st = !simShow
+                          ? "todo"
+                          : i < levelIdx
+                            ? "done"
+                            : i === levelIdx
+                              ? "now"
+                              : "todo";
                         return (
                           <React.Fragment key={l.name}>
                             {i > 0 && (
-                              <li aria-hidden="true" role="presentation" className="relative h-0.5 flex-1 overflow-hidden rounded-full bg-slate-200">
-                                <span className="pm-lvl-line" data-on={simShow && i <= levelIdx} style={idx(i)} />
+                              <li
+                                aria-hidden="true"
+                                role="presentation"
+                                className="relative h-0.5 flex-1 overflow-hidden rounded-full bg-slate-200"
+                              >
+                                <span
+                                  className="pm-lvl-line"
+                                  data-on={simShow && i <= levelIdx}
+                                  style={idx(i)}
+                                />
                               </li>
                             )}
-                            <li className="pm-lvl" data-state={st} aria-current={i === levelIdx ? "step" : undefined} style={idx(i)}>
+                            <li
+                              className="pm-lvl"
+                              data-state={st}
+                              aria-current={i === levelIdx ? "step" : undefined}
+                              style={idx(i)}
+                            >
                               <Icon name={l.icon} className="h-4 w-4" />
                               <span className="sr-only">{l.name}</span>
                             </li>
@@ -1683,22 +2005,50 @@ export default function LandingPage() {
                     <dl className="mt-5 space-y-3 text-sm">
                       <div className="flex justify-between items-center gap-4">
                         <dt className="text-slate-600">Tingkat resiliensi</dt>
-                        <dd key={level.name} className="pm-swap-text font-semibold text-brand-900 text-right" id="stat-tree-level">{level.name}</dd>
+                        <dd
+                          key={level.name}
+                          className="pm-swap-text font-semibold text-brand-900 text-right"
+                          id="stat-tree-level"
+                        >
+                          {level.name}
+                        </dd>
                       </div>
                       <div className="flex justify-between items-center gap-4">
-                        <dt className="text-slate-600">Indeks ketahanan psikologis</dt>
-                        <dd key={level.status} className="pm-swap-text font-semibold text-slate-900 text-right" id="stat-mental-health">{level.status}</dd>
+                        <dt className="text-slate-600">
+                          Indeks ketahanan psikologis
+                        </dt>
+                        <dd
+                          key={level.status}
+                          className="pm-swap-text font-semibold text-slate-900 text-right"
+                          id="stat-mental-health"
+                        >
+                          {level.status}
+                        </dd>
                       </div>
                       <div className="flex justify-between items-center gap-4">
-                        <dt className="text-slate-600">Kesiapsiagaan tanggap bencana</dt>
-                        <dd key={level.readiness} className="pm-swap-text font-semibold text-brand-700 text-right" id="stat-readiness">{level.readiness}</dd>
+                        <dt className="text-slate-600">
+                          Kesiapsiagaan tanggap bencana
+                        </dt>
+                        <dd
+                          key={level.readiness}
+                          className="pm-swap-text font-semibold text-brand-700 text-right"
+                          id="stat-readiness"
+                        >
+                          {level.readiness}
+                        </dd>
                       </div>
                     </dl>
 
                     <div className="mt-6 pt-5 border-t border-slate-100">
                       <div className="flex justify-between gap-4 text-sm text-slate-600 mb-2">
                         <span>Evolusi pohon harapan</span>
-                        <span key={progressText} className="pm-swap-text font-medium text-brand-700" id="progress-percent">{progressText}</span>
+                        <span
+                          key={progressText}
+                          className="pm-swap-text font-medium text-brand-700"
+                          id="progress-percent"
+                        >
+                          {progressText}
+                        </span>
                       </div>
                       <div
                         className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden"
@@ -1715,7 +2065,8 @@ export default function LandingPage() {
                       </div>
                       {level.next !== null && (
                         <p className="mt-2 text-sm tabular-nums text-slate-500">
-                          {xpShown.toLocaleString("id-ID")} / {level.next.toLocaleString("id-ID")} XP
+                          {xpShown.toLocaleString("id-ID")} /{" "}
+                          {level.next.toLocaleString("id-ID")} XP
                         </p>
                       )}
                     </div>
@@ -1736,7 +2087,11 @@ export default function LandingPage() {
       {/* BEGIN: Game & Mood + Food */}
       <section className="py-20 bg-white" id="game-showcase">
         <div className="max-w-7xl mx-auto px-6 space-y-20">
-          <div ref={gameRef} data-show={gameShow} className="pm-flow grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <div
+            ref={gameRef}
+            data-show={gameShow}
+            className="pm-flow grid grid-cols-1 lg:grid-cols-12 gap-10"
+          >
             <div className="lg:col-span-5 space-y-4 lg:pt-2">
               <div className="pm-sim-in" style={idx(0)}>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight">
@@ -1749,7 +2104,10 @@ export default function LandingPage() {
                   gempa terjadi.
                 </p>
               </div>
-              <p className="pm-sim-in inline-flex items-center gap-2 rounded-full border border-brand-100 bg-brand-50 px-3.5 py-1.5 text-sm font-medium text-brand-800" style={idx(1)}>
+              <p
+                className="pm-sim-in inline-flex items-center gap-2 rounded-full border border-brand-100 bg-brand-50 px-3.5 py-1.5 text-sm font-medium text-brand-800"
+                style={idx(1)}
+              >
                 <span className="pm-gico-pill inline-flex">
                   <Icon name="gamepad" className="pm-ico h-4 w-4" />
                 </span>
@@ -1763,23 +2121,35 @@ export default function LandingPage() {
                   key={g.href}
                   data-g={g.icon}
                   className="pm-game-in"
-                  style={{ "--i": i, "--d": `${i * 450}ms` } as React.CSSProperties}
+                  style={
+                    { "--i": i, "--d": `${i * 450}ms` } as React.CSSProperties
+                  }
                 >
                   <Link
                     href={g.href}
                     className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_18px_36px_-16px_rgba(15,45,33,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${focusRing}`}
                   >
-                    <span aria-hidden="true" className="pm-ghost pointer-events-none absolute right-4 top-2 select-none text-5xl font-bold leading-none text-brand-100/70">
+                    <span
+                      aria-hidden="true"
+                      className="pm-ghost pointer-events-none absolute right-4 top-2 select-none text-5xl font-bold leading-none text-brand-100/70"
+                    >
                       0{i + 1}
                     </span>
                     <span className="relative mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700 transition-colors duration-300 group-hover:border-brand-700 group-hover:bg-brand-700 group-hover:text-white">
                       <Icon name={g.icon} className="pm-gico h-6 w-6" />
                     </span>
-                    <span className="relative block text-base font-semibold text-slate-900">{g.title}</span>
-                    <span className="relative mt-1.5 block text-sm text-slate-600 leading-relaxed">{g.desc}</span>
+                    <span className="relative block text-base font-semibold text-slate-900">
+                      {g.title}
+                    </span>
+                    <span className="relative mt-1.5 block text-sm text-slate-600 leading-relaxed">
+                      {g.desc}
+                    </span>
                     <span className="relative mt-auto flex items-center gap-1.5 pt-5 text-sm font-semibold text-brand-700">
                       Mainkan
-                      <Icon name="arrow" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" />
+                      <Icon
+                        name="arrow"
+                        className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
+                      />
                     </span>
                   </Link>
                 </li>
@@ -1788,7 +2158,11 @@ export default function LandingPage() {
           </div>
 
           <div ref={moodInRef} data-show={moodShow} className="pm-flow">
-            <div ref={moodRef} className="pm-aura pm-pop relative isolate overflow-hidden rounded-2xl p-8 sm:p-12 text-white" id="mood-food">
+            <div
+              ref={moodRef}
+              className="pm-aura pm-pop relative isolate overflow-hidden rounded-2xl p-8 sm:p-12 text-white"
+              id="mood-food"
+            >
               {/* Latar aura Smokeveil: dekoratif, di bawah konten */}
               <div className="pm-aura-stage" aria-hidden="true">
                 <div className="pm-aura-l pm-aura-1" />
@@ -1796,9 +2170,18 @@ export default function LandingPage() {
                 <div className="pm-aura-l pm-aura-3" />
                 <div className="pm-aura-spot" />
                 <div className="pm-aura-grain">
-                  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    width="100%"
+                    height="100%"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <filter id="pm-grain">
-                      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="4" stitchTiles="stitch" />
+                      <feTurbulence
+                        type="fractalNoise"
+                        baseFrequency="0.7"
+                        numOctaves="4"
+                        stitchTiles="stitch"
+                      />
                       <feColorMatrix
                         type="matrix"
                         values="0.181 0.608 0.061 0 0.075 0.181 0.608 0.061 0 0.075 0.181 0.608 0.061 0 0.075 0 0 0 1 0"
@@ -1812,12 +2195,21 @@ export default function LandingPage() {
                 <div className="lg:col-span-8 space-y-6">
                   <div className="space-y-3">
                     <span className="pm-sim-in block h-7 w-7" style={idx(2)}>
-                      <Icon name="bowl" className="pm-bowl w-7 h-7 text-brand-300" />
+                      <Icon
+                        name="bowl"
+                        className="pm-bowl w-7 h-7 text-brand-300"
+                      />
                     </span>
-                    <h2 className="pm-sim-in text-3xl sm:text-4xl font-semibold tracking-tight" style={idx(3)}>
+                    <h2
+                      className="pm-sim-in text-3xl sm:text-4xl font-semibold tracking-tight"
+                      style={idx(3)}
+                    >
                       Mood + Food Analyzer: gizi untuk memulihkan emosi anak
                     </h2>
-                    <p className="pm-sim-in text-base text-brand-100 leading-relaxed max-w-2xl" style={idx(4)}>
+                    <p
+                      className="pm-sim-in text-base text-brand-100 leading-relaxed max-w-2xl"
+                      style={idx(4)}
+                    >
                       Menghubungkan menu dapur umum darurat dengan kestabilan
                       emosi anak, sebagai panduan praktis bagi relawan dapur dan
                       logistik pengungsian.
@@ -1825,21 +2217,34 @@ export default function LandingPage() {
                   </div>
                   <dl className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {NUTRITION.map((n, i) => (
-                      <div key={n.title} className="pm-sim-in pm-nut border-t border-white/25 pt-3" style={idx(5 + i)}>
+                      <div
+                        key={n.title}
+                        className="pm-sim-in pm-nut border-t border-white/25 pt-3"
+                        style={idx(5 + i)}
+                      >
                         <dt className="text-base font-semibold">{n.title}</dt>
-                        <dd className="mt-1 text-sm text-brand-100">{n.desc}</dd>
+                        <dd className="mt-1 text-sm text-brand-100">
+                          {n.desc}
+                        </dd>
                       </div>
                     ))}
                   </dl>
                 </div>
 
                 <div className="lg:col-span-4 lg:self-end">
-                  <p className="pm-sim-in text-sm text-brand-100 leading-relaxed mb-4" style={idx(6)}>
+                  <p
+                    className="pm-sim-in text-sm text-brand-100 leading-relaxed mb-4"
+                    style={idx(6)}
+                  >
                     Analisis bahan makanan darurat yang tersedia untuk memenuhi
                     kebutuhan mikronutrien anak.
                   </p>
                   <div className="pm-sim-in" style={idx(8)}>
-                    <ArrowLink href="/mood-food" variant="light" className="text-sm">
+                    <ArrowLink
+                      href="/mood-food"
+                      variant="light"
+                      className="text-sm"
+                    >
                       Buka katalog Mood + Food
                     </ArrowLink>
                   </div>
@@ -1853,7 +2258,11 @@ export default function LandingPage() {
 
       {/* BEGIN: Testimoni */}
       <section className="py-20 bg-white" id="stories">
-        <div ref={storyRef} data-show={storyShow} className="pm-flow max-w-7xl mx-auto px-6">
+        <div
+          ref={storyRef}
+          data-show={storyShow}
+          className="pm-flow max-w-7xl mx-auto px-6"
+        >
           <div className="pm-sim-in max-w-2xl mb-10" style={idx(0)}>
             <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight">
               Suara dari lapangan
@@ -1869,10 +2278,17 @@ export default function LandingPage() {
               <div key={s.name} className="pm-sim-in" style={idx(i + 1)}>
                 <figure className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg">
                   <div className="flex items-center justify-between">
-                    <svg viewBox="0 0 32 32" className="pm-float h-8 w-8 text-brand-300" fill="currentColor" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 32 32"
+                      className="pm-float h-8 w-8 text-brand-300"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
                       <path d="M13.2 6C8.1 8.3 5 12.2 5 17.6V26h8.6v-8.6H9.9c.1-2.6 1.6-4.6 4.5-6.3L13.2 6zm13.6 0c-5.1 2.3-8.2 6.2-8.2 11.6V26h8.6v-8.6h-3.7c.1-2.6 1.6-4.6 4.5-6.3L26.8 6z" />
                     </svg>
-                    <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-800">{s.tag}</span>
+                    <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-800">
+                      {s.tag}
+                    </span>
                   </div>
                   <blockquote className="mt-5 flex-1 text-base leading-relaxed text-slate-700">
                     <StoryQuote quote={s.quote} highlight={s.highlight} />
@@ -1882,8 +2298,12 @@ export default function LandingPage() {
                       {s.initials}
                     </span>
                     <span>
-                      <span className="block text-sm font-semibold text-slate-900">{s.name}</span>
-                      <span className="block text-sm text-slate-600">{s.role}</span>
+                      <span className="block text-sm font-semibold text-slate-900">
+                        {s.name}
+                      </span>
+                      <span className="block text-sm text-slate-600">
+                        {s.role}
+                      </span>
                     </span>
                   </figcaption>
                 </figure>
@@ -1896,8 +2316,15 @@ export default function LandingPage() {
 
       {/* BEGIN: CTA */}
       <section className="py-12 bg-white">
-        <div ref={ctaInRef} data-show={ctaShow} className="pm-flow max-w-7xl mx-auto px-6">
-          <div ref={ctaRef} className="pm-hz pm-pop bg-brand-900 relative isolate overflow-hidden rounded-2xl p-8 sm:p-14 text-white">
+        <div
+          ref={ctaInRef}
+          data-show={ctaShow}
+          className="pm-flow max-w-7xl mx-auto px-6"
+        >
+          <div
+            ref={ctaRef}
+            className="pm-hz pm-pop bg-brand-900 relative isolate overflow-hidden rounded-2xl p-8 sm:p-14 text-white"
+          >
             {/* Latar aura Horizon: dekoratif, di bawah konten */}
             <div className="pm-hz-stage" aria-hidden="true">
               <div className="pm-hz-l pm-hz-1" />
@@ -1905,9 +2332,18 @@ export default function LandingPage() {
               <div className="pm-hz-l pm-hz-3" />
               <div className="pm-hz-spot" />
               <div className="pm-hz-grain">
-                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  width="100%"
+                  height="100%"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <filter id="pm-grain-2">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="4" stitchTiles="stitch" />
+                    <feTurbulence
+                      type="fractalNoise"
+                      baseFrequency="0.7"
+                      numOctaves="4"
+                      stitchTiles="stitch"
+                    />
                     <feColorMatrix
                       type="matrix"
                       values="0.181 0.608 0.061 0 0.075 0.181 0.608 0.061 0 0.075 0.181 0.608 0.061 0 0.075 0 0 0 1 0"
@@ -1919,10 +2355,16 @@ export default function LandingPage() {
             </div>
             <div className="relative z-[1] grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 space-y-3">
-                <h2 className="pm-sim-in text-3xl sm:text-4xl font-semibold tracking-tight leading-tight" style={idx(2)}>
+                <h2
+                  className="pm-sim-in text-3xl sm:text-4xl font-semibold tracking-tight leading-tight"
+                  style={idx(2)}
+                >
                   Wujudkan generasi anak tangguh bencana di Nusantara
                 </h2>
-                <p className="pm-sim-in text-base text-brand-100 max-w-xl leading-relaxed" style={idx(3)}>
+                <p
+                  className="pm-sim-in text-base text-brand-100 max-w-xl leading-relaxed"
+                  style={idx(3)}
+                >
                   Bergabunglah bersama relawan PFA, posko darurat, dan
                   fasilitator sekolah dalam ekosistem PERMATA Nusantara.
                 </p>
@@ -1930,11 +2372,18 @@ export default function LandingPage() {
 
               <div className="lg:col-span-4 flex flex-col items-start lg:items-end gap-3">
                 <div className="pm-sim-in" style={idx(4)}>
-                  <ArrowLink href="/dashboard" variant="light" className="text-base">
+                  <ArrowLink
+                    href="/dashboard"
+                    variant="light"
+                    className="text-base"
+                  >
                     Masuk ke dashboard
                   </ArrowLink>
                 </div>
-                <span className="pm-sim-in text-sm text-brand-100" style={idx(5)}>
+                <span
+                  className="pm-sim-in text-sm text-brand-100"
+                  style={idx(5)}
+                >
                   Gratis untuk relawan, guru, dan orang tua
                 </span>
               </div>
@@ -1945,12 +2394,22 @@ export default function LandingPage() {
       {/* END: CTA */}
 
       {/* BEGIN: Footer */}
-      <footer ref={footRef} data-show={footShow} className="pm-flow relative bg-gradient-to-b from-white to-slate-50 pt-16 pb-8 text-slate-600 text-sm">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-300 to-transparent" aria-hidden="true" />
+      <footer
+        ref={footRef}
+        data-show={footShow}
+        className="pm-flow relative bg-gradient-to-b from-white to-slate-50 pt-16 pb-8 text-slate-600 text-sm"
+      >
+        <div
+          className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-300 to-transparent"
+          aria-hidden="true"
+        />
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-12">
             <div className="pm-sim-in lg:col-span-4 space-y-5" style={idx(0)}>
-              <Link href="/" className={`inline-flex items-center gap-3 rounded-sm ${focusRing}`}>
+              <Link
+                href="/"
+                className={`inline-flex items-center gap-3 rounded-sm ${focusRing}`}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/permata-logo.webp"
@@ -1966,8 +2425,8 @@ export default function LandingPage() {
               <p className="text-sm text-slate-600 max-w-sm leading-relaxed">
                 Platform pendidikan resiliensi mental dan pendampingan anak
                 dalam konteks kebencanaan. Memadukan Psychological First Aid
-                (PFA), skrining DASS-21, serta kearifan budaya Aceh
-                (Meuseuraya) dan Minangkabau (Mambangkik Batang Tarandam).
+                (PFA), skrining DASS-21, serta kearifan budaya Aceh (Meuseuraya)
+                dan Minangkabau (Mambangkik Batang Tarandam).
               </p>
               <a
                 href="tel:119"
@@ -1981,8 +2440,14 @@ export default function LandingPage() {
               </a>
             </div>
 
-            <nav aria-label="Modul" className="pm-sim-in lg:col-span-2 lg:col-start-6" style={idx(1)}>
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Modul</h3>
+            <nav
+              aria-label="Modul"
+              className="pm-sim-in lg:col-span-2 lg:col-start-6"
+              style={idx(1)}
+            >
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">
+                Modul
+              </h3>
               <ul className="flex flex-col">
                 {FOOTER_MODULES.map((l) => (
                   <li key={l.label}>
@@ -1992,8 +2457,14 @@ export default function LandingPage() {
               </ul>
             </nav>
 
-            <nav aria-label="Layanan" className="pm-sim-in lg:col-span-2" style={idx(2)}>
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Layanan</h3>
+            <nav
+              aria-label="Layanan"
+              className="pm-sim-in lg:col-span-2"
+              style={idx(2)}
+            >
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">
+                Layanan
+              </h3>
               <ul className="flex flex-col">
                 {FOOTER_SERVICES.map((l) => (
                   <li key={l.label}>
@@ -2003,19 +2474,32 @@ export default function LandingPage() {
               </ul>
             </nav>
 
-            <div className="pm-sim-in md:col-span-2 lg:col-span-3 lg:col-start-10" style={idx(3)}>
-              <h3 className="text-sm font-semibold text-slate-900 mb-3">Warta resiliensi bencana</h3>
+            <div
+              className="pm-sim-in md:col-span-2 lg:col-span-3 lg:col-start-10"
+              style={idx(3)}
+            >
+              <h3 className="text-sm font-semibold text-slate-900 mb-3">
+                Warta resiliensi bencana
+              </h3>
               <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                Panduan PFA dan tips kesiapsiagaan sekolah langsung ke email Anda.
+                Panduan PFA dan tips kesiapsiagaan sekolah langsung ke email
+                Anda.
               </p>
               <div aria-live="polite">
                 {emailSubscribed ? (
                   <p className="flex items-start gap-2 bg-brand-50 border border-brand-200 text-brand-800 text-sm p-3.5 rounded-2xl font-medium">
-                    <Icon name="check" className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={2.5} />
+                    <Icon
+                      name="check"
+                      className="w-4 h-4 mt-0.5 shrink-0"
+                      strokeWidth={2.5}
+                    />
                     Terima kasih! Anda telah terdaftar di warta PERMATA.
                   </p>
                 ) : (
-                  <form className="flex flex-col gap-2.5" onSubmit={handleNewsletterSubmit}>
+                  <form
+                    className="flex flex-col gap-2.5"
+                    onSubmit={handleNewsletterSubmit}
+                  >
                     <input
                       className="min-h-11 w-full rounded-full border border-slate-300 bg-white px-5 text-sm text-slate-800 placeholder:text-slate-500 transition-[border-color,box-shadow] duration-200 focus:outline-none focus:border-brand-600 focus:ring-4 focus:ring-brand-100"
                       placeholder="Alamat email"
@@ -2043,19 +2527,31 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pm-sim-in pt-6 border-t border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-slate-500" style={idx(4)}>
+          <div
+            className="pm-sim-in pt-6 border-t border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm text-slate-500"
+            style={idx(4)}
+          >
             <p>
               Â© {new Date().getFullYear()} PERMATA Nusantara Foundation.
               Seluruh hak cipta dilindungi undang-undang.
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
-              <Link className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`} href="#privacy">
+              <Link
+                className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
+                href="#privacy"
+              >
                 Perlindungan data anak
               </Link>
-              <Link className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`} href="#terms">
+              <Link
+                className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
+                href="#terms"
+              >
                 Ketentuan layanan
               </Link>
-              <Link className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`} href="#security">
+              <Link
+                className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
+                href="#security"
+              >
                 Protokol rujukan darurat 119
               </Link>
               <button
@@ -2064,7 +2560,11 @@ export default function LandingPage() {
                 onClick={() =>
                   window.scrollTo({
                     top: 0,
-                    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+                    behavior: window.matchMedia(
+                      "(prefers-reduced-motion: reduce)",
+                    ).matches
+                      ? "auto"
+                      : "smooth",
                   })
                 }
                 className={`group inline-flex items-center justify-center w-11 h-11 rounded-full border border-slate-300 text-slate-700 hover:border-brand-700 hover:bg-brand-50 hover:text-brand-800 transition-colors duration-200 ${focusRing}`}

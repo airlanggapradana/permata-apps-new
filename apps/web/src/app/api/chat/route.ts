@@ -1,5 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+import {
+  buildChatSystemInstruction,
+  parseAiJsonResponse,
+  preflightGuardrail,
+  REJECTED_MESSAGES,
+} from "@/lib/aiRules";
 
 export const maxDuration = 60;
 
@@ -62,47 +68,53 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { message, culture = "aceh", history = [] } = body;
 
-    if (!message || typeof message !== "string") {
+    if (!message || typeof message !== "string" || !message.trim()) {
       return NextResponse.json(
-        { reply: "Pesan tidak boleh kosong." },
+        { success: false, status: "rejected", reply: "Pesan tidak boleh kosong." },
         { status: 400 },
       );
     }
 
-    const isAceh = culture === "aceh";
+    const preflight = preflightGuardrail(message, "chat");
+    if (preflight?.status === "crisis") {
+      return NextResponse.json(
+        {
+          success: false,
+          status: "crisis",
+          crisis: preflight,
+          reply: preflight.immediateResponse,
+        },
+        { status: 422 },
+      );
+    }
+    if (preflight?.status === "rejected") {
+      return NextResponse.json(
+        {
+          success: false,
+          status: "rejected",
+          rejected: true,
+          message: preflight.message,
+          reply: preflight.message,
+        },
+        { status: 422 },
+      );
+    }
+
     const apiKey = process.env.GEMINI_API_KEY || process.env.AI_API_KEY;
 
     if (!apiKey) {
       const fallback = getFallbackReply(message, culture);
-      return NextResponse.json({ reply: fallback });
+      return NextResponse.json({
+        success: true,
+        status: "accepted",
+        reply: fallback,
+      });
     }
-
-    const systemInstruction = `
-Kamu adalah "Sahabat Dengar PERMATA", pendamping dukungan mental dan Psychological First Aid (PFA) anak serta remaja pascabencana alam di Indonesia.
-
-PRINSIP UTAMA:
-1. Validasi Emosi: Validasi bahwa rasa takut, kaget terhadap suara keras (gemuruh angin, suara reruntuhan), sedih, atau cemas adalah respon normal terhadap peristiwa yang luar biasa.
-2. Kehangatan & Ramah Anak: Gunakan gaya bahasa Indonesia yang hangat, lembut, suportif, tidak kaku, dan mudah dipahami anak/remaja. Sapa dengan empati.
-3. Kearifan Lokal Budaya (${isAceh ? "ACEH - MEUSEURAYA" : "MINANGKABAU - MAMBANGKIK BATANG TARANDAM"}):
-${
-  isAceh
-    ? `   - Integrasikan nilai Meuseuraya (gotong-royong pemulihan jiwa, saling menguatkan, persaudaraan posko).
-   - Selipkan petuah Aceh yang menenangkan, contoh: "Bungoeng jeumpa meugisa meutaloe, saboh hatee peugot gampong" atau "Udep sare mate syahid, beusajan lam geunaseh. Badai brat ka lheueh ta lewati, singoh langet teuh glah."`
-    : `   - Integrasikan falsafah "Mambangkik Batang Tarandam" (mengangkat kembali batang kayu yang terendam air; daya lentur / resiliensi jiwa untuk bangkit kembali dari musibah bersama sanak saudara).
-   - Selipkan petuah Minang yang menenangkan, contoh: "Dima bumi dipijak, di sinan langik dijunjuang; Mambangkik batang tarandam, bangkik marwah kito basamo."`
-}
-4. Tindakan Praktis PFA:
-   - Jika anak merasa cemas/berdebar/panik, sertakan panduan relaksasi napas 4-4-4 (tarik napas 4 detik, tahan 3-4 detik, hembuskan 4-5 detik) atau teknik grounding 5-4-3-2-1.
-5. Batasan & Keamanan:
-   - Bukan pengganti diagnosis dokter psikiatri atau medis darurat.
-   - Jika mendeteksi keputusasaan ekstrim atau ancaman bahaya diri, ingatkan bahwa mereka tidak sendirian dan arahkan dengan lembut ke layanan SafeConnect 119.
-6. Panjang respons: 2 sampai 4 paragraf ringkas, terstruktur, nyaman dibaca di layar ponsel.
-`;
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: "gemini-3.8-flash",
-      systemInstruction,
+      systemInstruction: buildChatSystemInstruction(culture),
     });
 
     // Construct conversation prompt
@@ -116,35 +128,118 @@ ${
             : `Pendamping: ${h.content}`,
         )
         .join("\n\n");
-      promptText += `\n\nPengguna: ${message}\n\nPendamping:`;
+      promptText += `\n\nPengguna: ${message.trim()}\n\nHasilkan respons dalam JSON sesuai instruksi.`;
     } else {
-      promptText = message;
+      promptText = `Pesan Anak: "${message.trim()}"\n\nHasilkan respons dalam JSON sesuai instruksi.`;
     }
 
     const result = await model.generateContent(promptText);
-    const reply = result.response.text();
+    const rawText = result.response.text();
+    const parsed = parseAiJsonResponse(rawText);
+
+    if (parsed) {
+      if (parsed.status === "crisis") {
+        const immediateResponse =
+          typeof parsed.immediateResponse === "string" &&
+          parsed.immediateResponse.trim()
+            ? parsed.immediateResponse.trim()
+            : "Perasaanmu sangat berharga dan didengar. Tolong segera ceritakan kondisimu kepada orang dewasa tepercaya, pendamping lapangan PERMATA, atau hubungi layanan darurat SafeConnect 119 sekarang ya.";
+        return NextResponse.json(
+          {
+            success: false,
+            status: "crisis",
+            crisis: {
+              status: "crisis",
+              triggerCategory:
+                typeof parsed.triggerCategory === "string"
+                  ? parsed.triggerCategory
+                  : "Keselamatan Anak",
+              immediateResponse,
+              escalateToHuman: true,
+            },
+            reply: immediateResponse,
+          },
+          { status: 422 },
+        );
+      }
+
+      if (parsed.status === "rejected") {
+        const rejectedMessage =
+          typeof parsed.message === "string" && parsed.message.trim()
+            ? parsed.message.trim()
+            : REJECTED_MESSAGES.chat;
+        return NextResponse.json(
+          {
+            success: false,
+            status: "rejected",
+            rejected: true,
+            message: rejectedMessage,
+            reply: rejectedMessage,
+          },
+          { status: 422 },
+        );
+      }
+
+      if (typeof parsed.reply === "string" && parsed.reply.trim()) {
+        return NextResponse.json({
+          success: true,
+          status: "accepted",
+          reply: parsed.reply.trim(),
+        });
+      }
+    }
+
+    const trimmedRaw = rawText.trim();
+    if (/^maaf,\s*ruang ini khusus/i.test(trimmedRaw)) {
+      return NextResponse.json(
+        {
+          success: false,
+          status: "rejected",
+          rejected: true,
+          message: trimmedRaw,
+          reply: trimmedRaw,
+        },
+        { status: 422 },
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      reply: reply || getFallbackReply(message, culture),
+      status: "accepted",
+      reply: trimmedRaw || getFallbackReply(message, culture),
     });
   } catch (error) {
     console.error("CHAT ERROR:", error);
     try {
-      // Fallback response so user experience is never broken
       const body = await req
         .clone()
         .json()
         .catch(() => ({}));
-      const fallback = getFallbackReply(
-        body.message || "",
-        body.culture || "aceh",
-      );
-      return NextResponse.json({ success: true, reply: fallback });
+      const msg = typeof body.message === "string" ? body.message : "";
+      const preflight = preflightGuardrail(msg, "chat");
+      if (preflight?.status === "rejected") {
+        return NextResponse.json(
+          {
+            success: false,
+            status: "rejected",
+            rejected: true,
+            message: preflight.message,
+            reply: preflight.message,
+          },
+          { status: 422 },
+        );
+      }
+      const fallback = getFallbackReply(msg, body.culture || "aceh");
+      return NextResponse.json({
+        success: true,
+        status: "accepted",
+        reply: fallback,
+      });
     } catch {
       return NextResponse.json(
         {
           success: true,
+          status: "accepted",
           reply:
             "Terima kasih sudah berbagi ceritamu hari ini. Kamu sangat berani. Ingatlah bahwa kamu tidak sendirian di sini, dan kita akan melangkah bersama satu demi satu menuju ketenangan jiwa.",
         },

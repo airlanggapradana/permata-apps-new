@@ -17,7 +17,7 @@ const crisisKeywords = [
 
 interface ChatMessage {
   id: string;
-  role: "user" | "assistant" | "crisis";
+  role: "user" | "assistant" | "crisis" | "rejected";
   content: string;
   timeStr: string;
   culturalWisdom?: {
@@ -204,41 +204,6 @@ export default function AiCompanion() {
 
     setLoading(true);
 
-    // Dynamic emotion estimation
-    const lower = textToSend.toLowerCase();
-    if (
-      lower.includes("takut") ||
-      lower.includes("gempa") ||
-      lower.includes("panik") ||
-      lower.includes("angin")
-    ) {
-      setDetectedEmotion({
-        label: "Waspada Pascabencana",
-        stablePercent: 30,
-        alertPercent: 70,
-        resiliencePoints: detectedEmotion.resiliencePoints + 15,
-      });
-    } else if (
-      lower.includes("tenang") ||
-      lower.includes("lega") ||
-      lower.includes("terima kasih") ||
-      lower.includes("bisa")
-    ) {
-      setDetectedEmotion({
-        label: "Tenang & Berdaya",
-        stablePercent: 75,
-        alertPercent: 25,
-        resiliencePoints: detectedEmotion.resiliencePoints + 20,
-      });
-    } else {
-      setDetectedEmotion({
-        label: "Reflektif & Curhat",
-        stablePercent: 55,
-        alertPercent: 45,
-        resiliencePoints: detectedEmotion.resiliencePoints + 10,
-      });
-    }
-
     try {
       const historyPayload = messages
         .filter((m) => m.role === "user" || m.role === "assistant")
@@ -256,6 +221,80 @@ export default function AiCompanion() {
       });
 
       const data = await res.json();
+
+      if (data.status === "crisis") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `crisis-${msgCountRef.current++}`,
+            role: "crisis",
+            content:
+              data.crisis?.immediateResponse ||
+              data.reply ||
+              "Perasaanmu sangat berharga dan didengar. Segera ceritakan hal ini kepada orang dewasa tepercaya atau hubungi layanan darurat SafeConnect 119.",
+            timeStr: formatCurrentTime(),
+          },
+        ]);
+        setDetectedEmotion({
+          label: "Krisis Butuh Rujukan",
+          stablePercent: 15,
+          alertPercent: 85,
+          resiliencePoints: detectedEmotion.resiliencePoints + 10,
+        });
+        return;
+      }
+
+      if (data.status === "rejected" || data.rejected) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `rej-${msgCountRef.current++}`,
+            role: "rejected",
+            content:
+              data.message ||
+              data.reply ||
+              "Maaf, ruang ini khusus untuk mendengarkan cerita dan pendampingan pemulihan pascabencana.",
+            timeStr: formatCurrentTime(),
+          },
+        ]);
+        return;
+      }
+
+      // Dynamic emotion estimation only for accepted on-topic messages
+      const lower = textToSend.toLowerCase();
+      if (
+        lower.includes("takut") ||
+        lower.includes("gempa") ||
+        lower.includes("panik") ||
+        lower.includes("angin")
+      ) {
+        setDetectedEmotion({
+          label: "Waspada Pascabencana",
+          stablePercent: 30,
+          alertPercent: 70,
+          resiliencePoints: detectedEmotion.resiliencePoints + 15,
+        });
+      } else if (
+        lower.includes("tenang") ||
+        lower.includes("lega") ||
+        lower.includes("terima kasih") ||
+        lower.includes("bisa")
+      ) {
+        setDetectedEmotion({
+          label: "Tenang & Berdaya",
+          stablePercent: 75,
+          alertPercent: 25,
+          resiliencePoints: detectedEmotion.resiliencePoints + 20,
+        });
+      } else {
+        setDetectedEmotion({
+          label: "Reflektif & Curhat",
+          stablePercent: 55,
+          alertPercent: 45,
+          resiliencePoints: detectedEmotion.resiliencePoints + 10,
+        });
+      }
+
       const replyText =
         data.reply ||
         "Aku mendengarmu. Ceritamu sangat berharga. Mari kita hadapi perasaan ini bersama satu langkah demi satu langkah.";
@@ -607,6 +646,31 @@ export default function AiCompanion() {
                             >
                               Skrining Triase DASS-21
                             </Link>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    if (msg.role === "rejected") {
+                      return (
+                        <div
+                          key={msg.id}
+                          role="alert"
+                          className="p-4 rounded-xl bg-amber-50 text-amber-950 flex items-start gap-3 max-w-2xl border border-amber-300 animate-fade-in"
+                        >
+                          <span className="material-symbols-outlined text-amber-700 text-[20px] shrink-0 mt-0.5">
+                            info
+                          </span>
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-xs uppercase tracking-wide text-amber-900">
+                                Di Luar Topik Pemulihan
+                              </span>
+                              <span className="text-[11px] text-amber-700">
+                                {msg.timeStr}
+                              </span>
+                            </div>
+                            <p className="text-sm leading-relaxed">{msg.content}</p>
                           </div>
                         </div>
                       );

@@ -236,6 +236,10 @@ export default function MoodFoodAnalyzer() {
   const [loading, setLoading] = useState<boolean>(false);
   const [isLoadingDb, setIsLoadingDb] = useState<boolean>(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [guardrailNotice, setGuardrailNotice] = useState<{
+    type: "rejected" | "crisis";
+    message: string;
+  } | null>(null);
 
   // Dynamic database records & Hope Tree stats
   const [history, setHistory] = useState<HistoryRecord[]>([]);
@@ -408,6 +412,7 @@ export default function MoodFoodAnalyzer() {
     }
 
     setLoading(true);
+    setGuardrailNotice(null);
 
     try {
       const res = await fetch("/api/mood-food", {
@@ -423,6 +428,30 @@ export default function MoodFoodAnalyzer() {
       });
 
       const data = await res.json();
+
+      if (data.status === "crisis") {
+        const crisisMsg =
+          data.crisis?.immediateResponse ||
+          data.reply ||
+          "Perasaanmu sangat berharga dan didengar. Segera ceritakan hal ini kepada orang dewasa tepercaya atau hubungi SafeConnect 119.";
+        setGuardrailNotice({ type: "crisis", message: crisisMsg });
+        showToast("Dukungan darurat tersedia. Hubungi orang dewasa tepercaya atau 119.");
+        return;
+      }
+
+      if (data.status === "rejected" || data.rejected) {
+        const rejectMsg =
+          data.message ||
+          data.reply ||
+          "Maaf, fitur Mood + Food khusus untuk menganalisis foto makanan/minuman dan kaitannya dengan pemulihan emosi.";
+        setGuardrailNotice({ type: "rejected", message: rejectMsg });
+        showToast("Input atau gambar di luar topik tidak dapat diproses.");
+        return;
+      }
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || data.reply || "Gagal menganalisis makanan.");
+      }
 
       if (data.analysis) {
         setAnalysisResult(data.analysis);
@@ -960,12 +989,61 @@ export default function MoodFoodAnalyzer() {
                       </label>
                       <textarea
                         value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
+                        onChange={(e) => {
+                          setNotes(e.target.value);
+                          if (guardrailNotice) setGuardrailNotice(null);
+                        }}
                         className="w-full rounded-xl p-3 bg-white text-xs sm:text-sm text-[#191c1e] placeholder:text-[#717973] border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#006c48]/40 transition-all resize-none shadow-xs"
                         placeholder="Ceritakan porsi atau bagaimana perasaanmu saat menyantapnya (contoh: makan tergesa-gesa karena cemas, atau ditemani relawan posko)..."
                         rows={2}
                       />
                     </div>
+
+                    {guardrailNotice && (
+                      <div
+                        role="alert"
+                        className={`rounded-xl p-4 flex flex-col gap-2.5 border ${
+                          guardrailNotice.type === "crisis"
+                            ? "bg-[#ffdad6] text-[#93000a] border-red-300"
+                            : "bg-amber-50 text-amber-950 border-amber-300"
+                        }`}
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <span className="material-symbols-outlined text-[20px] shrink-0 mt-0.5">
+                            {guardrailNotice.type === "crisis" ? "emergency" : "info"}
+                          </span>
+                          <div className="space-y-1">
+                            <p className="font-semibold text-sm">
+                              {guardrailNotice.type === "crisis"
+                                ? "Kamu Tidak Sendirian — Bantuan Siaga Menemanimu"
+                                : "Input Di Luar Topik Mood + Food"}
+                            </p>
+                            <p className="text-xs sm:text-sm leading-relaxed">
+                              {guardrailNotice.message}
+                            </p>
+                          </div>
+                        </div>
+                        {guardrailNotice.type === "crisis" && (
+                          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                            <a
+                              href="tel:119"
+                              className="px-4 py-2 rounded-lg bg-[#ba1a1a] text-white text-xs font-bold inline-flex items-center gap-1.5 hover:opacity-90"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">
+                                call
+                              </span>
+                              <span>Hubungi SafeConnect 119</span>
+                            </a>
+                            <Link
+                              href="/tele-screening"
+                              className="px-4 py-2 rounded-lg bg-white text-[#93000a] text-xs font-semibold border border-red-200 hover:bg-red-50"
+                            >
+                              Skrining Triase DASS-21
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Main CTA Analyze Button */}
                     <button

@@ -349,9 +349,64 @@ h1, h2, h3, h4, .font-display {
   animation: bounceSubtle 3s ease-in-out infinite;
 }
 
+/* ---------- 5. Page Transition & Splash Overlay ---------- */
+@keyframes pm-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pm-pop {
+  from { opacity: 0; transform: scale(0.6); filter: blur(10px); }
+  to   { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes pm-ring {
+  from { opacity: 0.5; transform: scale(0.9); }
+  to   { opacity: 0; transform: scale(1.9); }
+}
+@keyframes pm-letter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pm-transition-enter {
+  animation: pm-overlay-in 280ms ease-out forwards;
+}
+
+.pm-logo-in {
+  animation: pm-pop 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.pm-ring {
+  opacity: 0;
+  animation: pm-ring 1400ms ease-out 500ms forwards;
+}
+.pm-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: pm-letter 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
+.pm-transition-route .pm-logo-in {
+  animation: pm-pop 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.pm-transition-route .pm-ring {
+  animation: pm-ring 1100ms ease-out 250ms forwards;
+}
+.pm-transition-route .pm-letter {
+  animation: pm-letter 550ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  .pm-logo-in, .pm-letter {
+    animation: none !important;
+    opacity: 1;
+  }
+  .pm-ring {
+    animation: none !important;
+    opacity: 0;
   }
 }

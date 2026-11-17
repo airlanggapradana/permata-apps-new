@@ -46,6 +46,10 @@ export default function Journal() {
     visible: false,
     message: "",
   });
+  const [guardrailNotice, setGuardrailNotice] = useState<{
+    type: "rejected" | "crisis";
+    message: string;
+  } | null>(null);
 
   const [savedEntries, setSavedEntries] = useState<SavedJournalEntry[]>([]);
   const [treeStats, setTreeStats] = useState<TreeStats | null>(null);
@@ -311,6 +315,7 @@ export default function Journal() {
     if (!msg.trim()) return;
 
     setIsAnalyzing(true);
+    setGuardrailNotice(null);
 
     try {
       const res = await fetch("/api/journal", {
@@ -327,6 +332,9 @@ export default function Journal() {
       const rawText = await res.text();
       let data: {
         success?: boolean;
+        status?: "accepted" | "rejected" | "crisis";
+        message?: string;
+        crisis?: { immediateResponse?: string };
         error?: string;
         details?: string;
         insight?: { empathy: string; proverb?: string; meaning?: string };
@@ -338,6 +346,26 @@ export default function Journal() {
         data = JSON.parse(rawText);
       } catch {
         throw new Error(rawText || `Server error (${res.status})`);
+      }
+
+      if (data.status === "crisis") {
+        const crisisMsg =
+          data.crisis?.immediateResponse ||
+          data.error ||
+          "Keselamatanmu sangat berharga. Segera ceritakan hal ini kepada orang dewasa tepercaya atau hubungi SafeConnect 119.";
+        setGuardrailNotice({ type: "crisis", message: crisisMsg });
+        showToast("Dukungan darurat tersedia. Hubungi orang dewasa tepercaya atau 119.");
+        return;
+      }
+
+      if (data.status === "rejected") {
+        const rejectMsg =
+          data.message ||
+          data.error ||
+          "Maaf, ruang ini khusus untuk mendengarkan cerita dan catatan pemulihan pascabencana.";
+        setGuardrailNotice({ type: "rejected", message: rejectMsg });
+        showToast("Catatan di luar topik tidak dapat diproses.");
+        return;
       }
 
       if (!res.ok || !data.success) {
@@ -598,7 +626,10 @@ export default function Journal() {
                       rows={7}
                       placeholder="Ceritakan apa yang kamu rasakan, alami, atau syukuri hari ini... Tulisanmu sepenuhnya aman dan terlindungi di sini."
                       value={msg}
-                      onChange={(e) => setMsg(e.target.value)}
+                      onChange={(e) => {
+                        setMsg(e.target.value);
+                        if (guardrailNotice) setGuardrailNotice(null);
+                      }}
                     />
                     <div className="flex items-center justify-between text-[#414844] font-label-sm text-label-sm px-1">
                       <span className="flex items-center gap-1 text-[#006c48]">
@@ -610,6 +641,52 @@ export default function Journal() {
                       </span>
                       <span id="charCount">{msg.length} karakter</span>
                     </div>
+
+                    {guardrailNotice && (
+                      <div
+                        role="alert"
+                        className={`mt-2 rounded-xl p-4 flex flex-col gap-2.5 border ${
+                          guardrailNotice.type === "crisis"
+                            ? "bg-[#ffdad6] text-[#93000a] border-red-300"
+                            : "bg-amber-50 text-amber-950 border-amber-300"
+                        }`}
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <span className="material-symbols-outlined text-[20px] shrink-0 mt-0.5">
+                            {guardrailNotice.type === "crisis" ? "emergency" : "info"}
+                          </span>
+                          <div className="space-y-1">
+                            <p className="font-semibold text-sm">
+                              {guardrailNotice.type === "crisis"
+                                ? "Kamu Tidak Sendirian — Bantuan Siaga Menemanimu"
+                                : "Catatan Di Luar Topik Pemulihan"}
+                            </p>
+                            <p className="text-sm leading-relaxed">
+                              {guardrailNotice.message}
+                            </p>
+                          </div>
+                        </div>
+                        {guardrailNotice.type === "crisis" && (
+                          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                            <a
+                              href="tel:119"
+                              className="px-4 py-2 rounded-lg bg-[#ba1a1a] text-white text-xs font-bold inline-flex items-center gap-1.5 hover:opacity-90"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">
+                                call
+                              </span>
+                              <span>Hubungi SafeConnect 119</span>
+                            </a>
+                            <Link
+                              href="/tele-screening"
+                              className="px-4 py-2 rounded-lg bg-white text-[#93000a] text-xs font-semibold border border-red-200 hover:bg-red-50"
+                            >
+                              Skrining Triase DASS-21
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Section D: Privacy Visibility Toggle */}

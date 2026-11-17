@@ -116,7 +116,7 @@ export default function SafetyPassportPage() {
       });
     } catch (err) {
       setErrorMsg(
-        err instanceof Error ? err.message : "Gagal memuat My Safety Passport."
+        err instanceof Error ? err.message : "Gagal memuat My Safety Passport.",
       );
     } finally {
       setLoadingPassport(false);
@@ -156,12 +156,15 @@ export default function SafetyPassportPage() {
         throw new Error(data.error || "Gagal menyimpan My Safety Passport.");
       }
       setSaveFeedback(
-        data.message || "My Safety Passport berhasil diperbarui dan dilindungi."
+        data.message ||
+          "My Safety Passport berhasil diperbarui dan dilindungi.",
       );
       await refreshAuth();
     } catch (err) {
       setErrorMsg(
-        err instanceof Error ? err.message : "Gagal menyimpan My Safety Passport."
+        err instanceof Error
+          ? err.message
+          : "Gagal menyimpan My Safety Passport.",
       );
     } finally {
       setSaving(false);
@@ -192,8 +195,8 @@ export default function SafetyPassportPage() {
             <p className="text-sm sm:text-base text-fg-muted leading-relaxed">
               My Safety Passport menyimpan data pribadi sensitif seperti kontak
               orang tua, anggota keluarga, titik kumpul, dan catatan medis anak.
-              Untuk menjaga privasi dan mencegah percampuran data antar pengguna,
-              masuk ke akun Anda terlebih dahulu.
+              Untuk menjaga privasi dan mencegah percampuran data antar
+              pengguna, masuk ke akun Anda terlebih dahulu.
             </p>
           </div>
 
@@ -238,7 +241,7 @@ export default function SafetyPassportPage() {
               <ShieldCheck size={14} strokeWidth={1.75} aria-hidden="true" />
               <span>Akses Pribadi Terautentikasi: {user.email}</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-fg tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-fg tracking-tight">
               My Safety Passport
             </h1>
             <p className="text-sm text-fg-muted max-w-[65ch]">
@@ -399,8 +402,8 @@ export default function SafetyPassportPage() {
 
               {passport.contacts.length === 0 ? (
                 <p className="text-sm text-fg-muted bg-sunken border border-line rounded-md p-4">
-                  Belum ada kontak wali yang tersimpan. Tekan Tambah Kontak untuk
-                  mencatat kontak darurat utama Anda.
+                  Belum ada kontak wali yang tersimpan. Tekan Tambah Kontak
+                  untuk mencatat kontak darurat utama Anda.
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -423,7 +426,10 @@ export default function SafetyPassportPage() {
                             value={contact.name}
                             onChange={(e) => {
                               const next = [...passport.contacts];
-                              next[idx] = { ...next[idx], name: e.target.value };
+                              next[idx] = {
+                                ...next[idx],
+                                name: e.target.value,
+                              };
                               setPassport({ ...passport, contacts: next });
                             }}
                             placeholder="Nama wali"
@@ -502,7 +508,7 @@ export default function SafetyPassportPage() {
                             setPassport({
                               ...passport,
                               contacts: passport.contacts.filter(
-                                (_, cIdx) => cIdx !== idx
+                                (_, cIdx) => cIdx !== idx,
                               ),
                             })
                           }
@@ -646,7 +652,7 @@ export default function SafetyPassportPage() {
                               setPassport({
                                 ...passport,
                                 familyMembers: passport.familyMembers.filter(
-                                  (_, mIdx) => mIdx !== idx
+                                  (_, mIdx) => mIdx !== idx,
                                 ),
                               })
                             }
@@ -734,7 +740,7 @@ export default function SafetyPassportPage() {
                               setPassport({
                                 ...passport,
                                 meetingPoints: passport.meetingPoints.filter(
-                                  (_, pIdx) => pIdx !== idx
+                                  (_, pIdx) => pIdx !== idx,
                                 ),
                               })
                             }
@@ -857,7 +863,7 @@ export default function SafetyPassportPage() {
                           setPassport({
                             ...passport,
                             emergencyNeeds: passport.emergencyNeeds.filter(
-                              (_, nIdx) => nIdx !== idx
+                              (_, nIdx) => nIdx !== idx,
                             ),
                           })
                         }
@@ -906,7 +912,9 @@ export default function SafetyPassportPage() {
               >
                 <Save size={16} strokeWidth={1.75} aria-hidden="true" />
                 <span>
-                  {saving ? "Menyimpan perubahan..." : "Simpan My Safety Passport"}
+                  {saving
+                    ? "Menyimpan perubahan..."
+                    : "Simpan My Safety Passport"}
                 </span>
               </button>
             </div>

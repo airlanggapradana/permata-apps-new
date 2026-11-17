@@ -2,6 +2,12 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getSessionUser, getUserTreeStats } from "@/lib/auth";
+import {
+  buildMoodFoodSystemInstruction,
+  parseAiJsonResponse,
+  preflightGuardrail,
+  REJECTED_MESSAGES,
+} from "@/lib/aiRules";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -300,6 +306,35 @@ export async function POST(req: NextRequest) {
       culture = "aceh",
     } = body;
 
+    if (typeof notes === "string" && notes.trim()) {
+      const preflight = preflightGuardrail(notes, "mood-food");
+      if (preflight?.status === "crisis") {
+        return NextResponse.json(
+          {
+            success: false,
+            status: "crisis",
+            crisis: preflight,
+            reply: preflight.immediateResponse,
+            error: preflight.immediateResponse,
+          },
+          { status: 422 }
+        );
+      }
+      if (preflight?.status === "rejected") {
+        return NextResponse.json(
+          {
+            success: false,
+            status: "rejected",
+            rejected: true,
+            message: preflight.message,
+            reply: preflight.message,
+            error: preflight.message,
+          },
+          { status: 422 }
+        );
+      }
+    }
+
     const fallback = getFallbackFoodAnalysis(mood, symptoms, culture);
     let finalAnalysis = { ...fallback };
     let replyText = `${fallback.headline}\n\n${fallback.explanation}\n\nKomponen: ${fallback.components}`;
@@ -307,39 +342,22 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.GEMINI_API_KEY || process.env.AI_API_KEY;
 
     if (apiKey && file && file.base64) {
+      let aiGuardrailResponse: NextResponse | null = null;
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
           model: "gemini-3.8-flash",
+          systemInstruction: buildMoodFoodSystemInstruction(),
         });
 
         const prompt = `
-Peran: Anda adalah pakar Psiko-Nutrisi & Gut-Brain Axis anak dan remaja pascabencana dalam ekosistem PERMATA Nusantara.
 Data Masukan:
 - Mood Pengguna: ${mood}
 - Gejala Somatis Penyerta: ${Array.isArray(symptoms) ? symptoms.join(", ") : "Tidak ada"}
 - Catatan Pengguna: ${notes || "Tidak ada catatan khusus"}
 - Konteks Budaya: ${culture === "sumbar" ? "Minangkabau (Sumatera Barat)" : "Aceh"}
 
-Tugas:
-Analisis foto makanan yang dilampirkan dan hubungkan dengan kondisi psiko-fisiologis pengguna (Gut-Brain Axis).
-Berikan output HANYA dalam format JSON valid tanpa tanda markdown (tanpa \`\`\`json):
-{
-  "detectedFood": "Nama santapan yang teridentifikasi",
-  "components": "Daftar bahan dan nutrisi kunci yang terdeteksi",
-  "headline": "Judul dampak psiko-nutrisi (misal: Pereda Ketegangan Sistem Saraf Otonom)",
-  "explanation": "Penjelasan hangat 2-3 kalimat mengenai relaksasi otot lambung, stimulasi saraf vagus, atau modulasi serotonin oleh makanan ini",
-  "tryptophanPercent": 85,
-  "tryptophanDesc": "Keterangan asam amino prekursor neurotransmitter",
-  "glycemicStatus": "Stabil Rendah",
-  "glycemicDesc": "Keterangan indeks glikemik terhadap kestabilan emosi",
-  "antiInflammatoryStatus": "Optimal",
-  "antiInflammatoryDesc": "Kapasitas pembersihan sisa stres biologis",
-  "gutBrainScore": 78,
-  "gutBrainStatus": "Seimbang",
-  "gutBrainSummary": "Ringkasan respon mikrobioma saluran cerna terhadap resiliensi mental"
-}
-`;
+Periksa foto dan catatan sesuai instruksi sistem, lalu keluarkan respons JSON murni.`;
 
         const result = await model.generateContent({
           contents: [
@@ -358,23 +376,66 @@ Berikan output HANYA dalam format JSON valid tanpa tanda markdown (tanpa \`\`\`j
           ],
         });
 
-        const rawText = result.response.text().trim();
-        const cleanJsonStr = rawText
-          .replace(/^```json/i, "")
-          .replace(/^```/i, "")
-          .replace(/```$/i, "")
-          .trim();
+        const rawText = result.response.text();
+        const parsed = parseAiJsonResponse(rawText);
 
-        const parsed = JSON.parse(cleanJsonStr);
-        finalAnalysis = {
-          ...finalAnalysis,
-          ...parsed,
-          recommendations: fallback.recommendations,
-          nutritionistNote: fallback.nutritionistNote,
-        };
-        replyText = `${finalAnalysis.headline}\n\n${finalAnalysis.explanation}\n\nKomponen: ${finalAnalysis.components}`;
+        if (parsed) {
+          if (parsed.status === "crisis") {
+            const immediateResponse =
+              typeof parsed.immediateResponse === "string" &&
+              parsed.immediateResponse.trim()
+                ? parsed.immediateResponse.trim()
+                : "Perasaanmu sangat berharga dan didengar. Tolong segera ceritakan kondisimu kepada orang dewasa tepercaya, pendamping lapangan PERMATA, atau hubungi SafeConnect 119.";
+            aiGuardrailResponse = NextResponse.json(
+              {
+                success: false,
+                status: "crisis",
+                crisis: {
+                  status: "crisis",
+                  triggerCategory:
+                    typeof parsed.triggerCategory === "string"
+                      ? parsed.triggerCategory
+                      : "Keselamatan Anak",
+                  immediateResponse,
+                  escalateToHuman: true,
+                },
+                reply: immediateResponse,
+                error: immediateResponse,
+              },
+              { status: 422 }
+            );
+          } else if (parsed.status === "rejected") {
+            const rejectedMessage =
+              typeof parsed.message === "string" && parsed.message.trim()
+                ? parsed.message.trim()
+                : REJECTED_MESSAGES["mood-food"];
+            aiGuardrailResponse = NextResponse.json(
+              {
+                success: false,
+                status: "rejected",
+                rejected: true,
+                message: rejectedMessage,
+                reply: rejectedMessage,
+                error: rejectedMessage,
+              },
+              { status: 422 }
+            );
+          } else {
+            finalAnalysis = {
+              ...finalAnalysis,
+              ...(parsed as Partial<typeof finalAnalysis>),
+              recommendations: fallback.recommendations,
+              nutritionistNote: fallback.nutritionistNote,
+            };
+            replyText = `${finalAnalysis.headline}\n\n${finalAnalysis.explanation}\n\nKomponen: ${finalAnalysis.components}`;
+          }
+        }
       } catch (geminiError) {
         console.warn("Gemini Vision processing error, using enriched fallback:", geminiError);
+      }
+
+      if (aiGuardrailResponse) {
+        return aiGuardrailResponse;
       }
     }
 

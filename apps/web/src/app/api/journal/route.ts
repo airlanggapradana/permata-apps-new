@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getSessionUser, getUserTreeStats } from "@/lib/auth";
+import {
+  buildJournalSystemInstruction,
+  parseAiJsonResponse,
+  preflightGuardrail,
+  REJECTED_MESSAGES,
+} from "@/lib/aiRules";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -51,8 +57,8 @@ function getFallbackInsight(culture: string, mood: number) {
   const tag = isLowMood
     ? "Respon Normal Distres"
     : isAceh
-    ? "Meuseuraya Gotong Royong"
-    : "Nilai Badunsanak";
+      ? "Meuseuraya Gotong Royong"
+      : "Nilai Badunsanak";
 
   return { empathy, proverb, proverbTradition, meaning, tag };
 }
@@ -61,8 +67,10 @@ function getFallbackInsight(culture: string, mood: number) {
 function calculateStreak(dates: Date[]): number {
   if (!dates.length) return 0;
   const uniqueDateStrs = Array.from(
-    new Set(dates.map((d) => d.toISOString().split("T")[0]))
-  ).sort().reverse();
+    new Set(dates.map((d) => d.toISOString().split("T")[0])),
+  )
+    .sort()
+    .reverse();
 
   let streak = 0;
   const today = new Date();
@@ -105,7 +113,7 @@ export async function GET() {
           error:
             "Silakan masuk ke akun Anda untuk mengakses Jurnal Hikmah dan progres Pohon Harapan pribadi.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -205,7 +213,7 @@ export async function GET() {
         error: "Gagal mengambil data jurnal dari database",
         details: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -219,19 +227,51 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           requiresAuth: true,
-          error: "Silakan masuk ke akun Anda untuk menyimpan catatan jurnal pribadi.",
+          error:
+            "Silakan masuk ke akun Anda untuk menyimpan catatan jurnal pribadi.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const body = await req.json();
-    const { content, mood = 3, culture = "aceh", privacy = "PRIVATE", tags = [] } = body;
+    const {
+      content,
+      mood = 3,
+      culture = "aceh",
+      privacy = "PRIVATE",
+      tags = [],
+    } = body;
 
     if (!content || typeof content !== "string" || !content.trim()) {
       return NextResponse.json(
         { success: false, error: "Isi catatan jurnal tidak boleh kosong" },
-        { status: 400 }
+        { status: 400 },
+      );
+    }
+
+    const preflight = preflightGuardrail(content, "journal");
+    if (preflight?.status === "crisis") {
+      return NextResponse.json(
+        {
+          success: false,
+          status: "crisis",
+          crisis: preflight,
+          error: preflight.immediateResponse,
+        },
+        { status: 422 },
+      );
+    }
+    if (preflight?.status === "rejected") {
+      return NextResponse.json(
+        {
+          success: false,
+          status: "rejected",
+          rejected: true,
+          message: preflight.message,
+          error: preflight.message,
+        },
+        { status: 422 },
       );
     }
 
@@ -242,26 +282,12 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.AI_API_KEY;
     if (apiKey) {
+      let aiGuardrailResponse: NextResponse | null = null;
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-          model: "gemini-2.5-flash",
-          systemInstruction: `
-Kamu adalah Konselor Psikososial Anak & Pakar Kearifan Budaya Nusantara dalam Program PERMATA.
-Tugasmu: Menganalisis catatan jurnal pemulihan pascabencana dari seorang anak dan memberikan empati mendalam serta hikmah budaya lokal yang membangkitkan harapan.
-Fokus budaya:
-- Aceh: Tradisi "Meuseuraya" (gotong royong tulus saling menopang satu sama lain), falsafah Bungoeng Jeumpa, semangat bangkit dari tsunami/bencana.
-- Sumbar: Tradisi Minang "Mambangkik Batang Tarandam" (membangkitkan kembali marwah dan ketangguhan yang sempat terbenam), kebersamaan Badunsanak.
-
-Format output WAJIB JSON murni tanpa markdown:
-{
-  "empathy": "2-3 kalimat hangat penuh empati, memvalidasi emosi anak tanpa menghakimi, menegaskan bahwa reaksinya wajar dan dia kuat.",
-  "proverb": "Pepatah atau kata hikmah budaya lokal yang relevan",
-  "proverbTradition": "Nama tradisi budaya (misal: Kearifan Tradisi Meuseuraya atau Kearifan Batang Tarandam)",
-  "meaning": "1-2 kalimat menjelaskan makna pepatah tersebut terhadap situasi anak untuk menumbuhkan asa.",
-  "tag": "Label kategori singkat (maks 4 kata)"
-}
-`,
+          model: "gemini-3.8-flash",
+          systemInstruction: buildJournalSystemInstruction(),
         });
 
         const promptText = `
@@ -273,21 +299,78 @@ Hasilkan respons dalam JSON sesuai instruksi.`;
 
         const geminiRes = await model.generateContent(promptText);
         const textRes = geminiRes.response.text();
-        const jsonMatch = textRes.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (parsed.empathy && parsed.proverb) {
+        const parsed = parseAiJsonResponse(textRes);
+        if (parsed) {
+          if (parsed.status === "crisis") {
+            const immediateResponse =
+              typeof parsed.immediateResponse === "string" &&
+              parsed.immediateResponse.trim()
+                ? parsed.immediateResponse.trim()
+                : "Perasaanmu sangat berharga dan didengar. Tolong segera ceritakan kondisimu kepada orang dewasa tepercaya, pendamping lapangan PERMATA, atau hubungi layanan darurat 119 sekarang ya.";
+            aiGuardrailResponse = NextResponse.json(
+              {
+                success: false,
+                status: "crisis",
+                crisis: {
+                  status: "crisis",
+                  triggerCategory:
+                    typeof parsed.triggerCategory === "string"
+                      ? parsed.triggerCategory
+                      : "Keselamatan Anak",
+                  immediateResponse,
+                  escalateToHuman: true,
+                },
+                error: immediateResponse,
+              },
+              { status: 422 },
+            );
+          } else if (parsed.status === "rejected") {
+            const message =
+              typeof parsed.message === "string" && parsed.message.trim()
+                ? parsed.message.trim()
+                : REJECTED_MESSAGES.journal;
+            aiGuardrailResponse = NextResponse.json(
+              {
+                success: false,
+                status: "rejected",
+                rejected: true,
+                message,
+                error: message,
+              },
+              { status: 422 },
+            );
+          } else if (
+            typeof parsed.empathy === "string" &&
+            typeof parsed.proverb === "string"
+          ) {
             insight = {
               empathy: parsed.empathy,
               proverb: parsed.proverb,
-              proverbTradition: parsed.proverbTradition || insight.proverbTradition,
-              meaning: parsed.meaning || insight.meaning,
-              tag: parsed.tag || insight.tag,
+              proverbTradition:
+                typeof parsed.proverbTradition === "string" &&
+                parsed.proverbTradition
+                  ? parsed.proverbTradition
+                  : insight.proverbTradition,
+              meaning:
+                typeof parsed.meaning === "string" && parsed.meaning
+                  ? parsed.meaning
+                  : insight.meaning,
+              tag:
+                typeof parsed.tag === "string" && parsed.tag
+                  ? parsed.tag
+                  : insight.tag,
             };
           }
         }
       } catch (aiErr) {
-        console.warn("Gemini AI generation warning (using cultural fallback):", aiErr);
+        console.warn(
+          "Gemini AI generation warning (using cultural fallback):",
+          aiErr,
+        );
+      }
+
+      if (aiGuardrailResponse) {
+        return aiGuardrailResponse;
       }
     }
 
@@ -386,7 +469,7 @@ Hasilkan respons dalam JSON sesuai instruksi.`;
         error: "Gagal menyimpan catatan jurnal ke database",
         details: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
