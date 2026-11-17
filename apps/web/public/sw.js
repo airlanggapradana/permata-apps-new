@@ -9,8 +9,10 @@ const CORE_SURVIVAL_URLS = [
   "/permata.png",
   "/tokens.css",
   "/Breathing.html",
+  "/game-breath",
   "/PickAndDrop.html",
   "/SiagaMinang.html",
+  "/game-siagaminang",
 ];
 
 async function safeCacheUrls(cache, urls) {
@@ -43,7 +45,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key !== CACHE_NAME)
+            .filter((key) => key.startsWith("permata-survival-") && key !== CACHE_NAME)
             .map((oldKey) => caches.delete(oldKey))
         )
       )
@@ -145,24 +147,35 @@ self.addEventListener("fetch", (event) => {
     url.pathname.endsWith(".webmanifest");
 
   if (isStaticAsset) {
+    // Development chunks reuse their URL between edits. Serving an older JS
+    // or stylesheet beside fresh HTML causes hydration errors. Prefer the
+    // network for executable/page assets, retaining the offline fallback.
+    const preferNetwork =
+      request.destination === "script" ||
+      request.destination === "style" ||
+      url.pathname.endsWith(".js") ||
+      url.pathname.endsWith(".css") ||
+      url.pathname.endsWith(".html") ||
+      url.pathname.endsWith(".webmanifest");
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
         const cached = await cache.match(request);
         const networkPromise = fetch(request)
-          .then((networkResponse) => {
+          .then(async (networkResponse) => {
             if (networkResponse && networkResponse.ok) {
-              cache.put(request, networkResponse.clone());
+              // A failed cache write must not discard a usable online response.
+              await cache.put(request, networkResponse.clone()).catch(() => {});
             }
             return networkResponse;
           })
           .catch(() => null);
 
-        if (cached) {
+        if (cached && !preferNetwork) {
           return cached;
         }
         const networkResponse = await networkPromise;
         return (
-          networkResponse ||
+          networkResponse || cached ||
           new Response("", { status: 504, statusText: "Offline" })
         );
       })

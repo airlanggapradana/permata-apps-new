@@ -2,6 +2,10 @@ packages:
   - "apps/*"
   - "packages/*"
 
+nodeLinker: hoisted
+autoInstallPeers: true
+strictPeerDependencies: false
+
 ignoreWorkspaceRootCheck: true
 
 allowBuilds:

@@ -28,7 +28,7 @@ export function getDb(): TaggedSqlFunction {
 
   const databaseUrl =
     process.env.DATABASE_URL ||
-    "postgresql://postgres:admin123@localhost:5432/permata";
+    "postgresql://postgres:postgres@localhost:5432/permata";
 
   const isLocal =
     databaseUrl.includes("localhost") ||
@@ -59,7 +59,7 @@ export function getDb(): TaggedSqlFunction {
 export function getPgPool(): Pool {
   const databaseUrl =
     process.env.DATABASE_URL ||
-    "postgresql://postgres:admin123@localhost:5432/permata";
+    "postgresql://postgres:postgres@localhost:5432/permata";
 
   const isLocal =
     databaseUrl.includes("localhost") ||

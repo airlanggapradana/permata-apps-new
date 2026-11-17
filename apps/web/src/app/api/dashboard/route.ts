@@ -80,7 +80,7 @@ export async function GET() {
         WHERE "actorId" = ${session.userId}
           AND "resourceId" = ${session.childId}
           AND "action" = 'BREATHING_EXERCISE'
-          AND "createdAt" >= CURRENT_DATE;
+          AND "createdAt" >= (DATE_TRUNC('day', NOW() AT TIME ZONE 'Asia/Makassar') AT TIME ZONE 'Asia/Makassar');
       `,
       sql`
         SELECT "metadata", "createdAt"

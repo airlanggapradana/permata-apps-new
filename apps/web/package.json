@@ -7,7 +7,9 @@
     "dev:turbo": "next dev --turbopack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:game": "node --test tests/emergency-bag.test.mjs tests/breathing.test.mjs tests/breathing-motion.test.mjs tests/siaga-minang-engine.test.mjs tests/siaga-minang.test.mjs tests/sigap-bencana-engine.test.mjs tests/sigap-bencana.test.mjs",
+    "test:offline": "node --test tests/offline-cache.test.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1167.0",

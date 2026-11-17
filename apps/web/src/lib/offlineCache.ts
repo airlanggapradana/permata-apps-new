@@ -44,8 +44,10 @@ export function collectRuntimeAssetUrls(): string[] {
     "/permata.png",
     "/tokens.css",
     "/Breathing.html",
+    "/game-breath",
     "/PickAndDrop.html",
     "/SiagaMinang.html",
+    "/game-siagaminang",
   ]);
 
   document.querySelectorAll("link[href], script[src]").forEach((el) => {
@@ -89,7 +91,7 @@ export async function registerSurvivalServiceWorker(): Promise<ServiceWorkerRegi
     return null;
   }
   try {
-    return await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+    return await navigator.serviceWorker.register("/sw.js", { scope: "/", updateViaCache: "none" });
   } catch {
     return null;
   }

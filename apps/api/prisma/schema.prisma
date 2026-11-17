@@ -246,6 +246,8 @@ model User {
   careAssignments       CareAssignment[]
   aiConversations       AIConversation[]
   auditLogs             AuditLog[]
+  gameAttempts          GameAttempt[]
+  gameRewards           GameDailyReward[]
   simulationAttempts    SimulationAttempt[]
   assessmentSubmissions AssessmentSubmission[]
   supervisionSessions   SupervisionSession[]   @relation("SupervisorSessions")
@@ -395,6 +397,7 @@ model ChildProfile {
   memoryBoxEntries      MemoryBoxEntry[]
   trainingProgress      TrainingProgress[]
   reunificationRequests ReunificationRequest[]
+  gameAttempts          GameAttempt[]
 
   @@index([registeredById])
   @@index([createdByUserId])
@@ -1843,6 +1846,43 @@ model SupervisionSession {
   @@index([supervisorId])
   @@index([superviseeId])
   @@index([scheduledAt])
+}
+
+model GameAttempt {
+  id              String    @id @default(uuid())
+  userId          String
+  childId         String
+  gameId          String
+  mode            String
+  status          String    @default("STARTED")
+  collectedItems  Json      @default("[]")
+  metadata        Json      @default("{}")
+  wrongSelections Int       @default(0)
+  durationSeconds Int       @default(0)
+  startedAt       DateTime  @default(now())
+  finishedAt      DateTime?
+
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  child  ChildProfile @relation(fields: [childId], references: [id], onDelete: Cascade)
+  reward GameDailyReward?
+
+  @@index([userId, gameId, startedAt])
+  @@index([childId])
+}
+
+model GameDailyReward {
+  id         String   @id @default(uuid())
+  userId     String
+  gameId     String
+  rewardDate DateTime @db.Date
+  attemptId  String   @unique
+  xp         Int
+  createdAt  DateTime @default(now())
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attempt GameAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId, rewardDate])
 }
 
 model AuditLog {

@@ -54,6 +54,18 @@ Proyek PERMATA dikelola dalam monorepo menggunakan `pnpm` dan `turbo`:
 
 ---
 
+### Pemeriksaan cache offline saat pengembangan
+
+JavaScript, CSS, dan halaman game memakai versi jaringan terbaru saat online, lalu memakai salinan tersimpan bila koneksi terputus. Ini mencegah error **hydration mismatch** akibat HTML terbaru dipasangkan dengan JavaScript lama ketika kode berubah. Script service worker diperbarui tanpa memakai cache HTTP; cache aplikasi lain tetap dipertahankan.
+
+Jalankan pengujian perilaku cache dari root repository:
+
+```powershell
+pnpm --filter @permata/web test:offline
+```
+
+Setelah pembaruan kode, muat ulang tab yang sudah terbuka agar memakai kode terbaru. Pengujian mencakup pembaruan aset online, fallback offline, penulisan cache yang gagal, serta pengecualian API dan origin lain.
+
 ## 2. Panduan Fitur Antarmuka Web (`apps/web`)
 
 ### 2.1. Navigasi Utama & Geo-Cultural Tagging (Aceh / Sumbar)
@@ -163,16 +175,161 @@ Seluruh permainan dapat diakses melalui bagian **Game Center Resiliensi** di hal
 
 | No | Nama Modul | Rute URL | Panduan & Tujuan Permainan |
 | :--- | :--- | :--- | :--- |
-| 1 | **Sigap Bencana** | `/game-quake` | Game interaktif berbasis **Phaser 3** (`900x600`). Mengajarkan respons cepat saat terjadi gempa bumi (melindungi diri, menghindari reruntuhan, dan menuju titik evakuasi) lengkap dengan sistem skor dan layar hasil evaluasi (*Result Scene*). |
-| 2 | **Pinch and Drop (Pick & Drop Emergency Bag)** | `/game-healing` | Klik tombol **`Mainkan Game`** untuk membuka simulasi `/PickAndDrop.html`. Pengguna dilatih memilah dan menyeret (*drag-and-drop*) barang-barang darurat yang wajib masuk ke dalam **Tas Siaga Bencana** sebelum waktu habis. |
-| 3 | **Breathing Calm** | `/game-breath` | Klik tombol **`Mainkan Game`** untuk membuka modul `/Breathing.html`. Menampilkan panduan visual latihan pernapasan berirama (*inhale - hold - exhale*) untuk menurunkan detak jantung dan meredakan kepanikan pascabencana. |
-| 4 | **Siaga Minang** | `/game-siagaminang` | Klik tombol **`Mainkan Game`** untuk membuka `/SiagaMinang.html`. Permainan ketangkasan motorik di mana pemain mengumpulkan logistik kesiapsiagaan bencana sembari menghindari rintangan. |
+| 1 | **Sigap Bencana** | `/game-quake` | Jelajahi rumah simulasi dengan **Phaser 3**, pelajari tiga situasi melalui pertanyaan yang bisa dicoba lagi, lalu capai pintu keluar. Keyboard atau tombol layar HP, jeda otomatis, musik opsional, dan ringkasan hasil. Pengguna yang login menyimpan sesi ke PostgreSQL; penyelesaian pertama memberi **20 XP/hari**. |
+| 2 | **Tas Siaga Bencana (Pick & Drop)** | `/game-healing` | Pilih **Latihan santai** tanpa timer atau **Tantangan 60 detik**, lalu klik **Mulai Bermain**. Ketuk barang lalu tas, atau seret barang ke tas. Kamera pelacak tangan bersifat opsional. Pilihan kurang tepat memberi petunjuk dan kesempatan mencoba lagi. Hasil pengguna yang login tersimpan di PostgreSQL; penyelesaian pertama setiap hari memberi **20 XP** ke Pohon Harapan. |
+| 3 | **Napas Tenang (Breathing Calm)** | `/game-breath` | Pilih ritme **Ringan** (3 detik tarik / 3 detik hembuskan) atau **Santai** (4 / 4), serta 5 atau 8 putaran. Klik **Mulai Latihan** untuk mengikuti lingkaran tanpa menahan napas. Bisa dijeda kapan saja; kamera opsional sebagai cermin. Hasil tersimpan untuk pengguna yang login, dengan maksimal **15 XP/hari** bersama target latihan napas di dashboard. |
+| 4 | **Siaga Minang** | `/game-siagaminang` | Klik **Mulai Petualangan**, jelajahi arena klasik layar penuh, kumpulkan 10 perlengkapan dari empat jenis, lewati tiga checkpoint, lalu capai titik akhir. Kontrol keyboard atau tombol layar HP. Jika jatuh, kembali ke pos terakhir tanpa kehilangan barang. Pengguna yang login menyimpan hasil ke PostgreSQL; penyelesaian pertama mendapat **20 XP/hari**. |
 | 5 | **Adventure Budaya** | `/game-adventure` | Klik tombol **`Mainkan Sekarang`** untuk membuka roleplay naratif mitigasi bencana berbasis kearifan lokal Nusantara (*Knock The Drought Out*). |
 | 6 | **Roleplay Psikoedukasi** | `/roleplay` | Modul simulasi pengambilan keputusan dan *Growth Path* psikologis (saat ini berstatus *Coming Soon* pada antarmuka web dan didukung oleh modul skenario bercabang di backend API). |
 
-> **Catatan Navigasi**: Pada setiap halaman pengantar game, klik tautan **`Kembali ke Dashboard`** di bagian bawah kartu untuk langsung kembali ke halaman `/dashboard`.
+> **Catatan Navigasi**: Gunakan tautan **`Kembali ke Dashboard`** untuk kembali ke `/dashboard`. Pada Tas Siaga Bencana, tautan tersedia di bagian atas halaman dan tombol **`Lihat Pohon Harapan`** tersedia setelah bermain. Alamat lama `/PickAndDrop.html` otomatis membuka permainan yang baru.
+
+#### Walkthrough Tas Siaga Bencana
+
+1. Buka `/game-healing` dari kartu **Tas Siaga Bencana** di Game Center.
+2. Pilih **Latihan santai** (pilihan awal, tanpa timer) atau **Tantangan 60 detik**. Kontrol **Sentuh / mouse** langsung tersedia; kamera hanya diminta setelah permainan dimulai dengan kontrol kamera.
+3. Klik **Mulai Bermain**. Ketuk/klik barang lalu tas, atau seret barang ke tas. Keyboard juga bisa digunakan dengan Tab dan Enter.
+4. Temukan air minum, senter, makanan siap santap, kotak P3K, jas hujan, dan masker. Barang tambahan memberi petunjuk tanpa mengakhiri permainan atau mengurangi poin.
+5. Setelah tas lengkap, waktu habis, atau memilih **Akhiri latihan**, baca ringkasan kegunaan keenam perlengkapan. Kamera berhenti saat keluar dari permainan atau dimatikan.
+6. Untuk pengguna yang login, hasil tersimpan di PostgreSQL. Penyelesaian pertama memberikan **20 XP per hari**, dihitung berdasarkan zona waktu **Asia/Makassar**. Pengulangan tetap bisa dimainkan tanpa hadiah ganda. Hasil yang belum lengkap tersimpan tanpa XP.
+7. Jika penyimpanan gagal, gunakan **Coba Simpan Lagi**. Setelah tersimpan, pilih **Main Lagi** atau **Lihat Pohon Harapan**. Tamu bisa bermain; login sebelum sesi berikutnya untuk menyimpan progres.
+
+Implementasi tahap pertama selesai: materi berbahasa Indonesia, umpan balik ramah, mode latihan/tantangan, kontrol tanpa kamera, kamera opsional, penyimpanan sesi, batas XP harian, dan pembaruan kartu Game Center.
+
+Untuk menjalankan pengujian integrasi, siapkan PostgreSQL lokal dengan migration terbaru dan jalankan frontend, lalu dari root repository:
+
+```powershell
+pnpm --filter @permata/web test:game
+```
+
+Pengujian membuat akun sementara dan membersihkannya setelah selesai. Cakupannya mencakup autentikasi, kepemilikan sesi, validasi hasil, penyimpanan sesi belum lengkap, batas waktu tantangan, penyimpanan ulang, hadiah bersamaan, pergantian hari, dan kontribusi XP di dashboard.
+
+#### Walkthrough Napas Tenang
+
+1. Buka **Napas Tenang** dari Game Center atau target harian **Latihan Napas**. Alamat lama `/Breathing.html` mengarah ke `/game-breath`.
+2. Pilih ritme **Ringan** atau **Santai**, lalu 5 atau 8 putaran. Perkiraan durasi 30–64 detik ditampilkan sebelum mulai. Semua latihan bisa diikuti tanpa kamera dan tanpa login.
+3. Klik **Mulai Latihan**. Lingkaran membesar untuk **Tarik napas** dan mengecil untuk **Hembuskan napas**. Tidak ada fase menahan napas. Ikuti senyamanmu tanpa memaksakan hitungan; kamu boleh bernapas biasa dan berhenti kapan saja.
+4. Gunakan **Jeda** dan **Lanjutkan** sesuai kebutuhan. Saat pindah tab, latihan dijeda otomatis; waktu jeda tidak menambah durasi atau putaran. Pengaturan perangkat untuk mengurangi animasi dihormati dengan lingkaran diam dan instruksi teks.
+5. Kamera mati secara default. Klik **Nyalakan Kamera** saat latihan berjalan jika ingin menggunakan cermin. Untuk mencoba perkiraan pola gerakan dada/perut, pilih **Deteksi kamera (percobaan)** sebelum mulai. Video diproses di perangkat, tanpa perekaman atau unggahan. Izin ditolak tidak menghalangi latihan.
+6. Kamera dimatikan saat jeda, pindah tab, selesai, atau meninggalkan halaman. Setelah melanjutkan, kamera tetap mati sampai dinyalakan lagi.
+7. Setelah seluruh putaran atau **Akhiri Latihan**, lihat waktu aktif dan jumlah putaran. Tidak ada skor kegagalan. Pengguna yang login menyimpan sesi selesai maupun sesi yang diakhiri lebih awal ke PostgreSQL.
+8. Penyelesaian pertama mendapat **15 XP/hari** (Asia/Makassar) dan menandai target napas harian di dashboard. Hadiah ini memakai pencatatan yang sama dengan checkbox dashboard, sehingga dua tab, pengulangan, atau penggunaan kedua jalur tidak menggandakan XP. Sesi yang diakhiri lebih awal tersimpan tanpa XP.
+9. Jika koneksi gagal, klik **Coba Simpan Lagi**. Pilih **Latihan Lagi** atau **Lihat Pohon Harapan** setelah hasil tersimpan.
+
+Task implementasi Napas Tenang:
+
+- [x] Nama dan bahasa konsisten pada halaman, landing page, serta kartu dashboard.
+- [x] Panduan lingkaran yang halus, pilihan ritme dan jumlah putaran.
+- [x] Jeda/lanjutkan dan jeda otomatis saat pindah tab.
+- [x] Kamera opsional, penanganan izin ditolak, serta penghentian stream.
+- [x] Ringkasan waktu dan putaran, latihan lagi, serta navigasi dashboard.
+- [x] Penyimpanan sesi dan hadiah harian bersama dashboard.
+- [x] Pengujian integrasi PostgreSQL untuk validasi, kepemilikan, hadiah bersamaan, dan pergantian hari.
+- [x] Uji browser HP/desktop: timer, jeda/lanjutkan, perpindahan tab, pengurangan animasi, kamera ditolak, izin kamera terlambat, penyimpanan ulang, dan progres dashboard.
+
+Perintah `pnpm --filter @permata/web test:game` menjalankan tes Tas Siaga, Napas Tenang, analisis kamera, Siaga Minang, serta Sigap Bencana. Tes integrasi membutuhkan frontend dan PostgreSQL lokal yang sudah berjalan.
+
+Materi umum kenyamanan bernapas mengacu pada [panduan NHS](https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/): bernapas dengan nyaman tanpa memaksakan kedalaman atau hitungan. Pilihan ritme dan jumlah putaran dalam aplikasi adalah pengaturan antarmuka latihan.
+
+#### Percobaan deteksi kamera
+
+1. Centang **Deteksi kamera (percobaan)**, lalu klik **Mulai Latihan**. Saat pertama disiapkan, deteksi memerlukan internet untuk memuat model posisi tubuh. Kamera hanya diminta setelah tombol mulai ditekan.
+2. Pastikan bahu hingga perut terlihat, dengan cahaya merata dari depan dan kamera diam. Tidak perlu mengangkat bahu atau membesarkan napas untuk kamera.
+3. Tunggu kalibrasi gambar stabil sekitar tiga detik. Waktu latihan belum berjalan selama persiapan. Gambar gelap, detail yang kurang jelas, posisi tubuh yang tidak terlihat, atau gerakan besar akan meminta penyesuaian. **Mulai Tanpa Deteksi** selalu tersedia.
+4. Hitungan dimulai setelah kalibrasi. Panduan tarik/hembuskan juga ditampilkan di panel kamera agar tetap terlihat pada HP. Analisis mencari beberapa siklus gerakan dada/perut yang berulang dan konsisten; wajah atau tubuh yang terlihat saja tidak cukup menghasilkan deteksi.
+5. Status **Pola gerakan berulang terdeteksi** disertai keyakinan sedang dan kemiripan periode gerakan dengan ritme panduan. **Pola napas belum terbaca** berarti bukti gerakan belum cukup, bukan kegagalan pemain. Jangan memaksakan napas untuk memperoleh deteksi.
+6. Hasil menampilkan ringkasan perkiraan siklus yang teramati selama sesi. Gambar, titik posisi tubuh, dan ringkasan deteksi tidak dikirim ke API atau disimpan dalam database. XP tetap berdasarkan penyelesaian latihan, dengan batas harian yang sama.
+7. Saat jeda, pindah tab, selesai, atau keluar, kamera dan pemrosesan deteksi berhenti. Setelah dilanjutkan, kamera perlu dinyalakan kembali jika masih ingin dipakai.
+
+Task deteksi kamera:
+
+- [x] Pilihan mode, persetujuan kamera melalui tombol mulai, dan panduan posisi.
+- [x] Kalibrasi serta pemeriksaan pencahayaan, detail gambar, dan pergerakan tubuh.
+- [x] Analisis gerakan lokal dan pembandingan periode dengan panduan.
+- [x] Status hasil yang menyatakan perkiraan tanpa menentukan kelulusan atau XP.
+- [x] Tes gambar diam, perubahan cahaya, translasi/zoom bersama, gerakan besar, pola berulang, dan penghitungan siklus.
+- [x] Uji browser kalibrasi, pembacaan gambar sintetis, penghentian kamera, serta kelanjutan mode tanpa deteksi.
+
+**Batas percobaan:** analisis gerakan gambar tidak membuktikan orang mengikuti napas, tidak mengukur kondisi kesehatan, dan bisa dipengaruhi pakaian, pencahayaan, kamera, serta gerakan lain. Label keyakinan adalah indikator heuristik, bukan probabilitas yang sudah divalidasi. Implementasi sudah diuji dengan video/gambar sintetis; akurasinya pada napas manusia belum divalidasi. MediaPipe dipakai untuk menentukan area tubuh, sedangkan pola dibaca dari perubahan gambar dada/perut, bukan sekadar naik-turun bahu. Rujukan: [MediaPipe Pose](https://chuoling.github.io/mediapipe/solutions/pose.html).
 
 ---
+
+#### Walkthrough Siaga Minang
+
+1. Buka kartu **Siaga Minang** di Game Center, baca petunjuk, lalu klik **Mulai Petualangan**. Alamat lama `/SiagaMinang.html` mengarah ke `/game-siagaminang`.
+2. Berlatih bergerak dan melompat di area awal. Jalur dan penempatan barang tetap, sehingga semua rintangan dan perlengkapan dapat dijangkau. Tidak ada batas waktu.
+3. Kumpulkan **10 perlengkapan**: tiga air minum, tiga makanan siap santap, dua kotak P3K, dan dua senter. Sentuh barang menggunakan karakter untuk mengambilnya otomatis; beberapa berada di atas papan kayu yang harus dilompati. Penjelasan kegunaan muncul saat jenis barang pertama kali ditemukan. HUD menghitung semua barang, sedangkan menu jeda menampilkan jumlah per jenis.
+4. Lewati **Pos 1**, **Pos 2**, dan **Pos 3**. Jika jatuh, karakter kembali ke checkpoint terakhir; perlengkapan yang sudah terkumpul tetap dibawa selama sesi.
+5. Jika perlu istirahat, tekan **Jeda** atau **Esc**. Hitungan, gerakan, dan input berhenti; berpindah tab atau meninggalkan jendela juga menjeda permainan. **Lanjutkan** memulai kembali tanpa mempertahankan tombol yang sebelumnya ditekan.
+6. Dari menu jeda, gunakan **Kembali ke Awal** atau kembali ke pos yang telah dibuka untuk mencari barang yang terlewat. Pos yang belum dilewati tetap terkunci. Perjalanan tidak perlu diulang dari nol.
+7. Melodi klasik dimulai setelah menekan **Mulai Petualangan**, jika browser mengizinkan audio. Gunakan **Matikan Suara** / **Nyalakan Suara** sesuai kebutuhan. Musik dan efek berhenti saat jeda atau keluar.
+8. Capai Rumah Gadang di titik akhir setelah mengumpulkan **10 perlengkapan** dan melewati ketiga pos. Jika belum lengkap, petunjuk barang yang kurang ditampilkan; pemain tetap bisa kembali mencarinya.
+9. Lihat ringkasan perlengkapan, pos, waktu aktif, dan penjelasan barang. **Akhiri Perjalanan** dari menu jeda juga menghasilkan ringkasan yang ramah tanpa hadiah XP.
+10. Untuk pengguna yang login, hasil dan detail checkpoint disimpan ke PostgreSQL saat perjalanan ditamatkan atau diakhiri. Penyelesaian pertama setiap hari memberi **20 XP** (Asia/Makassar); pengulangan dan pengiriman hasil bersamaan tidak menggandakan hadiah. Penyimpanan yang gagal bisa diulang lewat **Coba Simpan Lagi**.
+11. Pilih **Main Lagi** atau **Lihat Pohon Harapan**. Tamu bisa memainkan seluruh jalur; login sebelum sesi berikutnya untuk menyimpan hasil. Checkpoint mempertahankan progres selama halaman sesi tetap terbuka, bukan pemulihan otomatis setelah menutup atau memuat ulang tab.
+
+| Aksi | Laptop / PC | HP / tablet |
+| :--- | :--- | :--- |
+| Bergerak kiri | Panah kiri / A | Tahan **◀** |
+| Bergerak kanan | Panah kanan / D | Tahan **▶** |
+| Melompat | Spasi / panah atas / W | Ketuk **Lompat** |
+| Jeda / lanjut | Esc atau tombol di layar | Tombol **Jeda** / **Lanjutkan** |
+
+Tombol arah berada di kiri dan lompat di kanan, mendukung dua jari sekaligus. Pelepasan, pembatalan sentuhan, dan kehilangan pointer capture membersihkan input agar karakter tidak terus berjalan. Kamera tidak diperlukan.
+
+Task implementasi Siaga Minang:
+
+- [x] Nama dan bahasa Indonesia konsisten pada halaman dan kartu Game Center.
+- [x] Pertahankan identitas klasik merah–hitam–emas dan melodi game lama; gambar ulang karakter, perlengkapan, serta Rumah Gadang dengan bentuk dan detail yang lebih rapi.
+- [x] Animasi sendi tangan/kaki, transisi diam–lari–lompat, kedipan, gerak mendarat, dan bayangan karakter.
+- [x] Interpolasi posisi antar-tick fisika agar pergerakan halus pada layar dengan refresh rate tinggi; perpindahan checkpoint langsung menuju pos.
+- [x] Latar pegunungan berlapis, terasering, kelapa, langit, serta tekstur rumput dan platform; dukungan pengurangan animasi mengikuti pengaturan perangkat.
+- [x] Ilustrasi halaman pembuka, panel dan tombol senada, serta bar progres perlengkapan.
+- [x] Arena layar penuh dengan HUD dan tombol yang menyesuaikan desktop, HP tegak, serta HP mendatar.
+- [x] Jalur terencana, 10 perlengkapan dari empat jenis, papan kayu, tiga checkpoint, dan petunjuk barang yang kurang.
+- [x] Gerakan dengan timestep tetap, lompatan yang dapat diulang, serta pergerakan layar halus.
+- [x] Kontrol keyboard dan tombol layar besar dengan dukungan multi-sentuh.
+- [x] Checkpoint, jeda otomatis, pilihan kembali ke pos, serta musik dan efek yang bisa dimatikan.
+- [x] Ringkasan hasil, penyimpanan sesi, serta hadiah maksimal 20 XP/hari.
+- [x] Tes logika membuktikan jalur bisa ditamatkan dan progres terjaga saat jatuh.
+- [x] Tes integrasi kepemilikan, validasi hasil, metadata sesi, hadiah bersamaan, dan pergantian hari.
+- [x] Uji browser HP/desktop: tamat lewat kontrol asli, dua jari, pembatalan sentuhan, checkpoint, jeda/perpindahan tab, suara opsional, penyimpanan ulang, dan progres dashboard.
+- [x] Uji gambar dan tata letak pada lima ukuran layar; simulasi frame 60/120/144 Hz memeriksa kecepatan yang konsisten, interpolasi posisi, serta gambar yang berhenti saat jeda.
+
+Sebelum menjalankan versi ini pada database lain, jalankan `pnpm db:deploy` untuk menambahkan kolom metadata sesi, lalu `pnpm db:generate` agar Prisma Client sesuai skema. Migration mempertahankan sesi lama dengan metadata kosong.
+
+#### Walkthrough Sigap Bencana
+
+1. Buka **Sigap Bencana** di Game Center (`/game-quake`), baca petunjuk, lalu tekan **Mulai Latihan**. Tamu bisa memainkan seluruh jalur; login sebelum mulai untuk menyimpan hasil.
+2. Bergerak ke kanan di rumah simulasi. Datangi penanda **1** di ruang tamu untuk membaca situasi ketika guncangan terasa. Permainan dan waktu aktif berhenti selama pertanyaan terbuka.
+3. Pilih jawaban. Pilihan yang keliru menampilkan penjelasan dan bisa dicoba lagi; pilihan tepat membuka **Lanjutkan Perjalanan**. Tidak ada pengurangan XP karena mencoba kembali.
+4. Lanjutkan melewati kotak kayu dengan tombol **Lompat**. Kunjungi penanda **2** di koridor untuk mempelajari pilihan setelah guncangan berhenti, lalu penanda **3** dekat pintu untuk mempelajari titik kumpul. Melompat adalah kontrol petualangan virtual; materi respons gempa dijelaskan pada pertanyaan.
+5. Gunakan **Jeda** atau **Esc** untuk beristirahat. Perpindahan tab atau jendela juga menjeda perjalanan. Menu jeda menyediakan **Kembali ke Ruang Terakhir** tanpa menghapus langkah yang sudah dipelajari, serta **Akhiri Latihan** untuk selesai lebih awal tanpa hadiah penyelesaian.
+6. Musik mati saat awal. Gunakan **Nyalakan Suara** / **Matikan Suara** sesuai kebutuhan. Musik berhenti selama jeda, pertanyaan, hasil, atau setelah meninggalkan halaman.
+7. Setelah ketiga pertanyaan selesai, capai pintu bertanda **KELUAR**. Ringkasan menampilkan langkah yang dipelajari, waktu aktif, dan penjelasan materi. Pengguna yang login menyimpan jawaban, ruangan, jumlah percobaan keliru, dan hasil ke PostgreSQL.
+8. Penyelesaian pertama setiap hari memperoleh **20 XP** untuk Pohon Harapan (Asia/Makassar). Pengulangan atau pengiriman hasil bersamaan tidak menggandakan hadiah. Jika koneksi gagal, gunakan **Coba Simpan Lagi**. Pilih **Main Lagi** atau **Lihat Pohon Harapan** setelah selesai.
+
+| Aksi | Laptop / PC | HP / tablet |
+| :--- | :--- | :--- |
+| Bergerak | A/D atau panah kiri/kanan | Tahan tombol arah kiri bawah |
+| Melompat | Spasi, W, atau panah atas | Ketuk **Lompat** di kanan bawah |
+| Menjawab | Klik pilihan, atau Tab lalu Enter | Ketuk pilihan |
+| Jeda / lanjut | Esc atau tombol layar | **Jeda** / **Lanjutkan** |
+
+Tombol layar mendukung dua jari dan membersihkan input saat sentuhan dibatalkan atau pointer capture hilang. Langkah yang dipelajari dipertahankan selama sesi halaman terbuka; memuat ulang halaman memulai perjalanan baru. Materi mengacu pada [Antisipasi Gempa Bumi BMKG](https://www.bmkg.go.id/gempabumi/mitigasi/antisipasi-gempabumi) dan [Materi Edukasi InaEEWS BMKG](https://inaeews.bmkg.go.id/materi-edukasi).
+
+Task implementasi Sigap Bencana:
+
+- [x] Perbaiki titik pertanyaan dan pintu keluar yang tidak terjangkau pada implementasi lama.
+- [x] Bangun jalur rumah dengan ruang tamu, koridor, area pintu, serta rintangan kayu yang dapat dilewati.
+- [x] Karakter beranimasi, kamera mengikuti dengan halus, dan dukungan pengurangan animasi.
+- [x] Tiga pertanyaan berurutan dengan penjelasan, percobaan ulang, serta ringkasan materi.
+- [x] Kontrol keyboard/sentuh, jeda otomatis, pilihan kembali ke ruang terakhir, dan musik opsional.
+- [x] Simpan sesi, periksa jawaban dan durasi di server, serta batasi hadiah 20 XP/hari.
+- [x] Samakan nama dan deskripsi game di dashboard dan landing page.
+- [x] Tes jalur sampai tamat, pertanyaan tidak bisa dilewati, kontrol, kepemilikan sesi, hasil parsial, dan hadiah bersamaan.
+- [x] Uji browser sampai tamat, dua jari, pembatalan input, jeda, penyimpanan ulang, dan progres dashboard.
+- [x] Uji musik saat jeda/pertanyaan/navigasi, lompatan lewat Enter, serta perubahan ukuran layar tanpa mengulang sesi.
 
 ## 3. Panduan Fitur Layanan Backend API (`apps/api`)
 
@@ -242,8 +399,8 @@ Selain antarmuka web di atas, PERMATA memiliki layanan backend komprehensif (`ap
 | `/ai-companion` | AI Mental Support Companion | `apps/web/src/components/pages/AiCompanion.tsx` |
 | `/mood-food` | Mood + Food AI Analyzer | `apps/web/src/components/pages/MoodFoodAnalyzer.tsx` |
 | `/game-quake` | Game Sigap Bencana (Phaser 3) | `apps/web/src/components/pages/GameQuake.tsx` |
-| `/game-healing` | Game Pick & Drop Emergency Bag | `apps/web/src/components/pages/GameHealing.tsx` |
-| `/game-breath` | Game Breathing Calm | `apps/web/src/components/pages/GameBreathing.tsx` |
+| `/game-healing` | Tas Siaga Bencana (Pick & Drop) | `apps/web/src/components/pages/GameHealing.tsx` |
+| `/game-breath` | Napas Tenang (Breathing Calm) | `apps/web/src/components/pages/GameBreathing.tsx` |
 | `/game-siagaminang` | Game Siaga Minang | `apps/web/src/components/pages/GameSiagaMinang.tsx` |
 | `/game-adventure` | Game Adventure Budaya | `apps/web/src/components/pages/GameAdventure.tsx` |
 | `/roleplay` | Roleplay Psikoedukasi | `apps/web/src/components/pages/RoleplayPsy.tsx` |
@@ -254,6 +411,11 @@ Selain antarmuka web di atas, PERMATA memiliki layanan backend komprehensif (`ap
 | :--- | :--- | :--- |
 | `POST /api/chat` | Endpoint chatbot AI Mental Support Companion | `apps/web/src/app/api/chat/route.ts` |
 | `POST /api/mood-food` | Endpoint analisis multimodal Mood + Food | `apps/web/src/app/api/mood-food/route.ts` |
+| `POST /api/games/emergency-bag` | Memulai sesi (`action: start`) atau menyimpan hasil Tas Siaga (`action: finish`); membutuhkan login | `apps/web/src/app/api/games/emergency-bag/route.ts` |
+| `POST /api/games/breathing` | Memulai sesi Napas Tenang (`action: start`, `mode: gentle:5`, `gentle:8`, `steady:5`, atau `steady:8`) dan menyimpan durasi aktif (`action: finish`, `attemptId`, `activeMs`); membutuhkan login | `apps/web/src/app/api/games/breathing/route.ts` |
+| `POST /api/games/siaga-minang` | Memulai sesi (`action: start`, `mode: practice`) dan menyimpan hasil perjalanan (`action: finish`, `attemptId`, `items`, `checkpoints`, `reachedGoal`, `falls`, `activeMs`); hadiah dihitung server | `apps/web/src/app/api/games/siaga-minang/route.ts` |
+| `POST /api/games/sigap-bencana` | Memulai sesi (`action: start`, `mode: practice`) dan menyimpan hasil (`action: finish`, `attemptId`, `answers`, `rooms`, `reachedExit`, `mistakes`, `activeMs`); jawaban, durasi, serta hadiah 20 XP/hari diperiksa server | `apps/web/src/app/api/games/sigap-bencana/route.ts` |
+| `POST /api/journal/breathe` | Menandai latihan napas yang dilaporkan dari dashboard, berbagi batas hadiah harian dengan Napas Tenang | `apps/web/src/app/api/journal/breathe/route.ts` |
 
 ### Grup Endpoint Backend Utama (`apps/api` - Port `4000`)
 

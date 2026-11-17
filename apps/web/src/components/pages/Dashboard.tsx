@@ -234,9 +234,9 @@ export default function Dashboard({
         if (data.treeStats) {
           setTreeStats(data.treeStats);
         }
-        setGoalFeedback(
-          "Latihan napas tercatat. +15 XP ditambahkan ke Pohon Harapan.",
-        );
+        setGoalFeedback(data.message || "Latihan napas hari ini sudah tercatat.");
+      } else {
+        setGoalFeedback(data.error || "Latihan belum tercatat. Coba lagi, ya.");
       }
     } catch {
       setGoalFeedback("Gagal mencatat latihan napas. Coba lagi nanti.");
@@ -875,7 +875,7 @@ export default function Dashboard({
                         </span>
                       </div>
                       <p className="text-xs text-fg-muted leading-relaxed">
-                        Latihan pernapasan tenang dengan teknik 4-4-6.
+                        Ikuti panduan tarik dan hembuskan napas sesuai kenyamananmu.
                       </p>
                       <Link
                         href="/game-breath"
@@ -987,7 +987,7 @@ export default function Dashboard({
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="px-2.5 py-0.5 rounded-full bg-tint text-fg-brand text-xs font-semibold">
-                          Phaser 3 Game
+                          Jelajah &amp; Belajar
                         </span>
                         <span className="text-xs text-fg-subtle">Mitigasi</span>
                       </div>
@@ -1003,14 +1003,14 @@ export default function Dashboard({
                           Sigap Bencana
                         </h3>
                         <p className="text-xs text-fg-muted mt-1 leading-relaxed">
-                          Edukasi respon cepat: Berlutut, Berlindung, dan Bertahan
-                          saat gempa bumi.
+                          Jelajahi rumah, pelajari tiga langkah siaga, dan
+                          temukan pintu keluar. Kontrol keyboard atau sentuhan.
                         </p>
                       </div>
                     </div>
                     <div className="pt-4 mt-3 border-t border-line flex items-center justify-between gap-2">
                       <span className="text-xs text-fg-subtle">
-                        Simulasi Evakuasi
+                        Tiga langkah · +20 XP/hari
                       </span>
                       <Link
                         href="/game-quake"
@@ -1023,13 +1023,13 @@ export default function Dashboard({
                   </div>
                 </AnimatedCard>
 
-                {/* Game 2: Pinch and Drop */}
+                {/* Game 2: Tas Siaga Bencana */}
                 <AnimatedCard index={11} ready={ready} reducedMotion={prefersReducedMotion} className="h-full">
                   <div className="h-full rounded-lg bg-surface border border-line p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="px-2.5 py-0.5 rounded-full bg-sunken border border-line text-fg-muted text-xs font-semibold">
-                          Tantangan Cepat
+                          Latihan &amp; Tantangan
                         </span>
                         <span className="text-xs text-fg-subtle">
                           Ketangkasan
@@ -1044,24 +1044,24 @@ export default function Dashboard({
                       </div>
                       <div>
                         <h3 className="text-base font-semibold text-fg">
-                          Pinch and Drop
+                          Tas Siaga Bencana
                         </h3>
                         <p className="text-xs text-fg-muted mt-1 leading-relaxed">
-                          Pilih perlengkapan esensial ke dalam Tas Siaga sebelum
-                          bencana terjadi.
+                          Kenali enam perlengkapan utama. Mainkan dengan sentuhan
+                          atau mouse; kamera tersedia sebagai pilihan.
                         </p>
                       </div>
                     </div>
                     <div className="pt-4 mt-3 border-t border-line flex items-center justify-between gap-2">
                       <span className="text-xs text-fg-subtle">
-                        Persiapan Siaga
+                        ±2 menit · +20 XP/hari
                       </span>
                       <Link
                         href="/game-healing"
                         prefetch={false}
                         className={`inline-flex items-center justify-center min-h-11 px-4 rounded-md bg-sunken hover:bg-tint text-fg-brand text-xs font-semibold transition-colors ${focusRing}`}
                       >
-                        Mulai
+                        Mainkan
                       </Link>
                     </div>
                   </div>
@@ -1115,7 +1115,7 @@ export default function Dashboard({
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="px-2.5 py-0.5 rounded-full bg-surface text-fg text-xs font-semibold">
-                          Direkomendasikan
+                          Latihan Empati
                         </span>
                         <span className="text-xs text-white/85">
                           Psikoedukasi
@@ -1171,14 +1171,14 @@ export default function Dashboard({
                           Siaga Minang
                         </h3>
                         <p className="text-xs text-fg-muted mt-1 leading-relaxed">
-                          Studi struktur Rumah Gadang tahan gempa dan simulasi
-                          evakuasi cepat.
+                          Jelajahi tiga pos, kumpulkan 10 perlengkapan, dan
+                          berlatih melompat. Bisa dimainkan lewat keyboard atau sentuhan.
                         </p>
                       </div>
                     </div>
                     <div className="pt-4 mt-3 border-t border-line flex items-center justify-between gap-2">
                       <span className="text-xs text-fg-subtle">
-                        Latihan Tangkas
+                        Tiga pos · +20 XP/hari
                       </span>
                       <Link
                         href="/game-siagaminang"
@@ -1197,7 +1197,7 @@ export default function Dashboard({
                     <div className="space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="px-2.5 py-0.5 rounded-full bg-sunken border border-line text-fg-muted text-xs font-semibold">
-                          Biofeedback
+                          Panduan Visual
                         </span>
                         <span className="text-xs text-fg-subtle">Relaksasi</span>
                       </div>
@@ -1206,16 +1206,16 @@ export default function Dashboard({
                       </div>
                       <div>
                         <h3 className="text-base font-semibold text-fg">
-                          Breathing Calm
+                          Napas Tenang
                         </h3>
                         <p className="text-xs text-fg-muted mt-1 leading-relaxed">
-                          Panduan pernapasan terukur untuk meredakan degup jantung
-                          cemas.
+                          Ikuti lingkaran napas, jeda kapan saja. Kamera opsional
+                          sebagai cermin latihan.
                         </p>
                       </div>
                     </div>
                     <div className="pt-4 mt-3 border-t border-line flex items-center justify-between gap-2">
-                      <span className="text-xs text-fg-subtle">Ritme Tenang</span>
+                      <span className="text-xs text-fg-subtle">30–64 detik · +15 XP/hari</span>
                       <Link
                         href="/game-breath"
                         prefetch={false}
@@ -1308,6 +1308,9 @@ export default function Dashboard({
               </div>
 
               {/* Stats 2x2 Grid */}
+              <p className="text-xs text-fg-muted">
+                Kontribusi Game Center: {treeStats?.gameXp ?? 0} XP
+              </p>
               <div className="p-4 rounded-lg bg-sunken border border-line grid grid-cols-2 gap-3 text-left">
                 <div>
                   <span className="text-xs text-fg-muted block">

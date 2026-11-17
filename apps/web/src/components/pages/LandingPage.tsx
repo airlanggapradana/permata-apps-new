@@ -390,26 +390,26 @@ const DURATIONS = [
 const GAMES: { icon: IconName; title: string; desc: string; href: string }[] = [
   {
     icon: "backpack",
-    title: "Simulasi tas siaga bencana",
-    desc: "Memilah kebutuhan penting untuk 72 jam pertama evakuasi dengan drag-and-drop.",
+    title: "Tas Siaga Bencana",
+    desc: "Kenali enam perlengkapan utama lewat latihan santai atau tantangan. Kontrol sentuh, mouse, dan kamera opsional.",
     href: "/game-healing",
   },
   {
     icon: "pin",
-    title: "Evakuasi cepat Minang",
-    desc: "Mengenali sirine tsunami di pesisir Sumatera Barat dan titik perbukitan yang aman.",
+    title: "Siaga Minang",
+    desc: "Petualangan klasik tiga pos dengan 10 perlengkapan siaga, kontrol keyboard/sentuh, dan kesempatan mencoba lagi dari checkpoint.",
     href: "/game-siagaminang",
   },
   {
     icon: "wind",
-    title: "Breathing Calm",
-    desc: "Latihan napas untuk menurunkan ritme panik, dengan metafora mekarnya bunga Jeumpa.",
+    title: "Napas Tenang",
+    desc: "Ikuti lingkaran napas sesuai kenyamananmu. Bisa dijeda kapan saja, dengan kamera opsional sebagai cermin.",
     href: "/game-breath",
   },
   {
     icon: "users",
-    title: "Meuseuraya puzzle siaga",
-    desc: "Membersihkan puing sekolah bersama-sama secara gotong royong, berhadiah Hope XP.",
+    title: "Sigap Bencana",
+    desc: "Jelajahi rumah simulasi, pelajari tiga langkah siaga melalui pertanyaan interaktif, lalu capai pintu keluar.",
     href: "/game-quake",
   },
 ];

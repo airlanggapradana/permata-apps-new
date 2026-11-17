@@ -302,6 +302,7 @@ export async function getUserTreeStats(
     screeningCountRes,
     moodFoodCountRes,
     wateredTodayRes,
+    gameXpRes,
   ] = await Promise.all([
     sql`
       SELECT COUNT(*)::int AS count
@@ -345,9 +346,16 @@ export async function getUserTreeStats(
         AND "action" = 'WATER_HOPE_TREE'
         AND "createdAt" >= CURRENT_DATE;
     `,
+    sql`
+      SELECT COALESCE(SUM(r."xp"), 0)::int AS xp
+      FROM "GameDailyReward" r
+      JOIN "GameAttempt" a ON a."id" = r."attemptId"
+      WHERE r."userId" = ${userId} AND a."childId" = ${childId};
+    `,
   ]);
 
   return calculateTreeStats({
+    gameXp: (gameXpRes[0] as { xp: number } | undefined)?.xp || 0,
     journalCount: (entriesCountRes[0] as { count: number } | undefined)?.count || 0,
     waterCount: (waterCountRes[0] as { count: number } | undefined)?.count || 0,
     breatheCount: (breatheCountRes[0] as { count: number } | undefined)?.count || 0,

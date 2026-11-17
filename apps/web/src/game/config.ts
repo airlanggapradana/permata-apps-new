@@ -1,22 +1,21 @@
 import * as Phaser from "phaser";
-import BootScene from "./scenes/BootScene";
-import MenuScene from "./scenes/MenuScene";
 import GameScene from "./scenes/GameScene";
-import ResultScene from "./scenes/ResultScene";
+import type { QuakeBridge } from "./quakeBridge";
 
-const config: Phaser.Types.Core.GameConfig = {
-  type: Phaser.AUTO,
-  width: 900,
-  height: 600,
-  parent: "game-container",
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { x: 0, y: 900 },
-      debug: false,
-    },
-  },
-  scene: [BootScene, MenuScene, GameScene, ResultScene],
-};
-
-export default config;
+export default function quakeConfig(
+  parent: HTMLElement,
+  bridge: QuakeBridge,
+): Phaser.Types.Core.GameConfig {
+  return {
+    type: Phaser.AUTO,
+    parent,
+    width: parent.clientWidth || 900,
+    height: parent.clientHeight || 620,
+    backgroundColor: "#dce3cf",
+    scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH },
+    render: { antialias: true, roundPixels: false },
+    audio: { noAudio: true },
+    input: { keyboard: false, mouse: false, touch: false },
+    scene: [new GameScene(bridge)],
+  };
+}

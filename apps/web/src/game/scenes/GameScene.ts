@@ -1,141 +1,190 @@
 import * as Phaser from "phaser";
+import {
+  createQuakeState,
+  stepQuake,
+  quakeSnapshot,
+  QUAKE_WIDTH,
+  QUAKE_HEIGHT,
+  QUAKE_SPEED,
+  QUAKE_LESSONS,
+} from "@/lib/games/sigapBencana";
+import { drawQuakeHero, drawQuakeHouse } from "@/components/games/quakePainter";
+import type { MinangPose } from "@/components/games/minangPainter";
+import type { QuakeBridge } from "../quakeBridge";
 
 export default class GameScene extends Phaser.Scene {
-  private bgm!: Phaser.Sound.BaseSound;
-  private quakeSound!: Phaser.Sound.BaseSound;
-  private player!: Phaser.Physics.Arcade.Sprite;
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private fire!: Phaser.GameObjects.Rectangle;
-  private hitFire: boolean = false;
-
-  constructor() {
-    super("GameScene");
+  private bridge: QuakeBridge;
+  private hero!: Phaser.GameObjects.Image;
+  private shadow!: Phaser.GameObjects.Ellipse;
+  private heroTexture!: Phaser.Textures.CanvasTexture;
+  private markers: Phaser.GameObjects.Text[] = [];
+  private accumulator = 0;
+  private previousX = 100;
+  private previousY = 452;
+  private renderedX = 100;
+  private renderedY = 452;
+  private cameraX = 0;
+  private lastUpdate = -Infinity;
+  private pose: MinangPose = {
+    gait: 0,
+    run: 0,
+    air: 0,
+    lean: 0,
+    landing: 0,
+    facing: 1,
+    time: 0,
+  };
+  constructor(bridge: QuakeBridge) {
+    super("SigapBencana");
+    this.bridge = bridge;
   }
-
   create() {
-    /* ===============================
-       AUDIO
-    =============================== */
-    this.bgm = this.sound.add("bgm", { loop: true, volume: 0.4 });
-    this.quakeSound = this.sound.add("quake", { loop: true, volume: 0.6 });
-
-    this.bgm.play();
-    this.quakeSound.play();
-
-    /* ===============================
-       TILEMAP
-    =============================== */
-    const map = this.make.tilemap({ key: "houseMap" });
-
-    const tilesets = map.tilesets.map((tileset) =>
-      map.addTilesetImage(tileset.name, tileset.name),
-    );
-
-    // LAYERS (NAMA ASLI DARI TILED)
-    const floorLayer = map.createLayer(
-      "Floor",
-      tilesets as Phaser.Tilemaps.Tileset[],
-    );
-    const wallLayer = map.createLayer(
-      "Walls",
-      tilesets as Phaser.Tilemaps.Tileset[],
-    );
-
-    // DECOR (NO COLLISION)
-    map.createLayer("Windows", tilesets as Phaser.Tilemaps.Tileset[]);
-    map.createLayer("Boxes", tilesets as Phaser.Tilemaps.Tileset[]);
-    map.createLayer("Objects1", tilesets as Phaser.Tilemaps.Tileset[]);
-    map.createLayer("Objects2", tilesets as Phaser.Tilemaps.Tileset[]);
-    map.createLayer("Tile Layer 6", tilesets as Phaser.Tilemaps.Tileset[]);
-
-    // COLLISION
-    if (floorLayer) floorLayer.setCollisionByProperty({ collides: true });
-    if (wallLayer) wallLayer.setCollisionByProperty({ collides: true });
-
-    /* ===============================
-       WORLD & CAMERA
-    =============================== */
-    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    this.cameras.main.shake(1200, 0.01);
-
-    /* ===============================
-       PLAYER
-    =============================== */
-    this.player = this.physics.add.sprite(100, 300, "__DEFAULT");
-    this.player.setDisplaySize(32, 48);
-    this.player.setTint(0x38bdf8);
-    this.player.setCollideWorldBounds(true);
-
-    if (floorLayer) this.physics.add.collider(this.player, floorLayer);
-    if (wallLayer) this.physics.add.collider(this.player, wallLayer);
-
-    /* ===============================
-       FIRE (QUIZ TRIGGER)
-    =============================== */
-    const fire = this.add.rectangle(600, 400, 48, 48, 0xef4444);
-    this.physics.add.existing(fire, true);
-    this.fire = fire;
-    this.hitFire = false;
-
-    this.physics.add.overlap(this.player, fire, () => {
-      if (this.hitFire) return;
-      this.hitFire = true;
-      this.scene.pause();
-      this.scene.launch("UIScene", { parent: this });
-    });
-
-    /* ===============================
-       EXIT
-    =============================== */
-    const exit = this.add.rectangle(
-      map.widthInPixels - 100,
-      400,
-      64,
-      96,
-      0x22c55e,
-    );
-    this.physics.add.existing(exit, true);
-
-    this.physics.add.overlap(this.player, exit, () => {
-      (this.bgm as Phaser.Sound.WebAudioSound).stop();
-      (this.quakeSound as Phaser.Sound.WebAudioSound).stop();
-      this.scene.start("ResultScene", { win: true });
-    });
-
-    /* ===============================
-       CAMERA FOLLOW
-    =============================== */
-    this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
-
-    /* ===============================
-       INPUT
-    =============================== */
-    this.cursors = this.input.keyboard!.createCursorKeys();
-  }
-
-  update() {
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-200);
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(200);
-    } else {
-      this.player.setVelocityX(0);
+    this.cameras.main.setOrigin(0, 0);
+    this.bridge.stateRef.current = createQuakeState();
+    const room = this.textures.createCanvas("sigap-room", QUAKE_WIDTH, 1800);
+    if (!room) throw new Error("Gambar rumah belum tersedia.");
+    drawQuakeHouse(room.getContext());
+    room.refresh();
+    this.add.image(0, -800, "sigap-room").setOrigin(0);
+    for (let i = 0; i < QUAKE_LESSONS.length; i++) {
+      const lesson = QUAKE_LESSONS[i];
+      this.add.circle(lesson.x, 388, 19, 0x31675f).setStrokeStyle(2, 0xf1d69b);
+      this.add
+        .text(lesson.x, 388, String(i + 1), {
+          fontFamily: "sans-serif",
+          fontSize: "18px",
+          fontStyle: "bold",
+          color: "#fff0c3",
+        })
+        .setOrigin(0.5);
+      const label = this.add
+        .text(lesson.x, 340, lesson.room, {
+          fontFamily: "sans-serif",
+          fontSize: "12px",
+          color: "#fff5d8",
+          backgroundColor: "#28524d",
+          padding: { x: 12, y: 8 },
+        })
+        .setOrigin(0.5);
+      this.markers.push(label);
     }
-
-    if (this.cursors.up.isDown && this.player.body?.blocked.down) {
-      this.player.setVelocityY(-420);
-    }
+    this.shadow = this.add.ellipse(100, 503, 36, 7, 0x304d3c, 0.2);
+    const heroTexture = this.textures.createCanvas("sigap-hero", 192, 280);
+    if (!heroTexture) throw new Error("Karakter belum tersedia.");
+    this.heroTexture = heroTexture;
+    this.heroTexture.getContext().setTransform(2, 0, 0, 2, 0, 0);
+    this.hero = this.add
+      .image(100, 500, "sigap-hero")
+      .setOrigin(0.5, 132 / 140)
+      .setScale(0.41);
+    this.game.canvas.setAttribute(
+      "aria-label",
+      "Area permainan Sigap Bencana. Gunakan A D atau panah untuk berjalan dan Spasi untuk melompat.",
+    );
+    this.game.canvas.tabIndex = 0;
+    this.game.canvas.style.outlineColor = "#eccb8e";
+    this.bridge.onReady();
+    this.bridge.onUpdate(quakeSnapshot(this.bridge.stateRef.current));
   }
-
-  resumeGame(correct: boolean) {
-    if (correct) {
-      this.fire.destroy();
-      this.scene.resume();
+  update(time: number, delta: number) {
+    const state = this.bridge.stateRef.current;
+    if (!state || !this.hero) return;
+    const elapsed = Math.min(0.1, Math.max(0, delta / 1000));
+    if (this.bridge.inputRef.current.enabled && !state.won) {
+      this.accumulator += elapsed;
+      while (this.accumulator >= 1 / 60) {
+        this.previousX = state.x;
+        this.previousY = state.y;
+        const wasGrounded = state.grounded;
+        const events = stepQuake(state, this.bridge.inputRef.current);
+        if (!wasGrounded && state.grounded) this.pose.landing = 1;
+        this.accumulator -= 1 / 60;
+        for (const event of events) {
+          if (event.type === "question" && event.id) {
+            this.bridge.inputRef.current.enabled = false;
+            this.bridge.onQuestion(event.id);
+          }
+          if (event.type === "exit") {
+            this.bridge.inputRef.current.enabled = false;
+            this.bridge.onFinish(quakeSnapshot(state));
+          }
+        }
+        if (!this.bridge.inputRef.current.enabled) {
+          this.accumulator = 0;
+          break;
+        }
+      }
     } else {
-      (this.bgm as Phaser.Sound.WebAudioSound).stop();
-      (this.quakeSound as Phaser.Sound.WebAudioSound).stop();
-      this.scene.start("ResultScene", { win: false });
+      this.accumulator = 0;
+      state.jumpHeld = false;
+      state.jumpBuffer = 0;
+    }
+    const teleported = Math.abs(state.x - this.renderedX) > 100;
+    if (teleported || !this.bridge.inputRef.current.enabled) {
+      this.previousX = state.x;
+      this.previousY = state.y;
+    }
+    const alpha = this.bridge.inputRef.current.enabled
+      ? this.accumulator * 60
+      : 1;
+    const x = this.previousX + (state.x - this.previousX) * alpha;
+    const y = this.previousY + (state.y - this.previousY) * alpha;
+    if (this.bridge.inputRef.current.enabled) {
+      const blend = 1 - Math.exp(-elapsed / 0.08);
+      this.pose.gait += (teleported ? 0 : Math.abs(x - this.renderedX)) * 0.115;
+      this.pose.run +=
+        (Math.min(1, Math.abs(state.vx) / QUAKE_SPEED) - this.pose.run) * blend;
+      this.pose.air += ((state.grounded ? 0 : 1) - this.pose.air) * blend;
+      this.pose.lean += (state.vx / QUAKE_SPEED - this.pose.lean) * blend;
+      this.pose.facing +=
+        (state.facing - this.pose.facing) * (1 - Math.exp(-elapsed / 0.045));
+      this.pose.landing *= Math.exp(-elapsed / 0.07);
+      this.pose.time = state.elapsed / 1000;
+    }
+    if (this.bridge.reducedMotionRef.current)
+      Object.assign(this.pose, {
+        gait: 0,
+        run: 0,
+        air: 0,
+        lean: 0,
+        landing: 0,
+        facing: state.facing,
+        time: 0,
+      });
+    this.renderedX = x;
+    this.renderedY = y;
+    drawQuakeHero(this.heroTexture.getContext(), this.pose);
+    this.heroTexture.refresh();
+    this.hero.setPosition(x, y + 48);
+    this.shadow
+      .setPosition(x, 503)
+      .setScale(Math.max(0.3, 1 - Math.max(0, 452 - y) / 230), 1);
+    const width = this.scale.width,
+      height = this.scale.height;
+    const viewport = Math.min(1000, Math.max(440, width)),
+      zoom = width / viewport;
+    const target = Math.min(
+      QUAKE_WIDTH - viewport,
+      Math.max(0, x - viewport * 0.32),
+    );
+    if (teleported || this.bridge.reducedMotionRef.current)
+      this.cameraX = target;
+    else if (this.bridge.inputRef.current.enabled)
+      this.cameraX += (target - this.cameraX) * (1 - Math.exp(-elapsed / 0.09));
+    const bottom = window.matchMedia("(pointer: coarse)").matches ? 80 : 24;
+    this.cameras.main
+      .setZoom(zoom)
+      .setScroll(this.cameraX, QUAKE_HEIGHT - height / zoom + bottom / zoom);
+    for (let i = 0; i < this.markers.length; i++)
+      this.markers[i].setAlpha(i < state.answers.length ? 0.5 : 1);
+    const canvas = this.game.canvas;
+    canvas.dataset.playerX = state.x.toFixed(2);
+    canvas.dataset.playerY = state.y.toFixed(2);
+    canvas.dataset.visualX = x.toFixed(3);
+    canvas.dataset.grounded = String(state.grounded);
+    if (time - this.lastUpdate >= 100 && this.bridge.inputRef.current.enabled) {
+      this.bridge.onUpdate(quakeSnapshot(state));
+      this.lastUpdate = time;
     }
   }
 }
