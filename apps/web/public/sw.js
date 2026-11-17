@@ -86,8 +86,13 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Never cache dynamic API endpoints as survival content
-  if (url.pathname.startsWith("/api/")) return;
+  // Never cache dynamic API or Vercel Analytics endpoints as survival content
+  if (
+    url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/_vercel/")
+  ) {
+    return;
+  }
 
   // Page navigation: network first, fallback to cached route or /offline-survival
   if (request.mode === "navigate") {

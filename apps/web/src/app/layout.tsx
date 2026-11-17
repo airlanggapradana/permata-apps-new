@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next";
 import { CultureProvider } from "@/context/CultureContext";
 import { AuthProvider } from "@/context/AuthContext";
 import ThemedContent from "@/components/ThemedContent";
@@ -47,6 +48,7 @@ export default function RootLayout({
             <ThemedContent>{children}</ThemedContent>
           </AuthProvider>
         </CultureProvider>
+        <Analytics />
       </body>
     </html>
   );
