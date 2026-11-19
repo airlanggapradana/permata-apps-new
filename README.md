@@ -256,5 +256,5 @@ Repositori ini dikonfigurasi untuk men-deploy **Frontend (`apps/web`)** dan **Ba
 ## Dokumentasi Tambahan
 
 - [GUIDE.md](GUIDE.md) — Panduan penggunaan fitur antarmuka web dan modul backend secara rinci.
-- [PRD Permata.md](PRD%20Permata.md) — Dokumen _Product Requirements_ sistem PERMATA.
+- [docs/PRD Permata.md](docs/PRD%20Permata.md) — Dokumen _Product Requirements_ sistem PERMATA.
 - [packages/ui](packages/ui) dan [packages/config-tailwind](packages/config-tailwind) — Komponen UI dan konfigurasi visual bersama.

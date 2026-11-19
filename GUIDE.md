@@ -333,7 +333,7 @@ Task implementasi Sigap Bencana:
 
 ## 3. Panduan Fitur Layanan Backend API (`apps/api`)
 
-Selain antarmuka web di atas, PERMATA memiliki layanan backend komprehensif (`apps/api`) yang mengimplementasikan seluruh spesifikasi teknis di dalam `PRD Permata.md`. Dokumentasi penuh skema request/response dapat diuji langsung melalui **Swagger UI** di `http://localhost:4000/api/docs`.
+Selain antarmuka web di atas, PERMATA memiliki layanan backend komprehensif (`apps/api`) yang mengimplementasikan seluruh spesifikasi teknis di dalam `docs/PRD Permata.md`. Dokumentasi penuh skema request/response dapat diuji langsung melalui **Swagger UI** di `http://localhost:4000/api/docs`.
 
 ### 3.1. Autentikasi, RBAC, & Persetujuan Orang Tua (`/api/v1/auth`, `/api/v1/children`)
 - **7 Peran Pengguna (*Role-Based Access Control*)**:

@@ -6,16 +6,18 @@ PERMATA is a mental resilience / psychosocial support monorepo for disaster cont
 Read first / deeper docs (do not duplicate long content here):
 - `README.md` — overview, setup, deploy notes
 - `GUIDE.md` — feature/route walkthroughs, game/task details
-- `PRD Permata.md` — product requirements
+- `docs/PRD Permata.md` — product requirements
 - `apps/web/AGENTS.md` — Next.js-specific agent rules for work inside `apps/web` (follow it; do not replace/edit casually)
-- `AI_Rules.txt` — additional guidance if relevant
+- `docs/AI_Rules.txt` — additional guidance if relevant
+- `docs/rag/` — curated knowledge corpus for web chat RAG (indexed via `pnpm rag:index`)
 
 ## Repository map (top-level)
 Major paths:
 - `apps/` — application workspaces (`apps/web`, `apps/api`)
 - `packages/` — shared packages (`packages/ui`, `packages/config-tailwind`)
+- `docs/` — product/misc docs and curated RAG corpus (`docs/rag/`)
 - Root config/docs: `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.json`, `vercel.json`, `.env.example`, `.gitignore`, `.vscode/`, `.kilo/`
-- Reference docs: `README.md`, `GUIDE.md`, `PRD Permata.md`, `AI_Rules.txt`
+- Reference docs: `README.md`, `GUIDE.md`, `docs/PRD Permata.md`, `docs/AI_Rules.txt`
 
 Tooling notes:
 - pnpm workspaces (`apps/*`, `packages/*`); Turborepo orchestrates tasks (`turbo.json`).
