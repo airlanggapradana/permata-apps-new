@@ -87,7 +87,14 @@ permata-apps-new/
 ├── packages/
 │   ├── ui/                           # Shared UI library (@permata/ui)
 │   └── config-tailwind/              # Shared Tailwind config (@permata/config-tailwind)
+├── docs/
+│   ├── rag/                          # Korpus pengetahuan terkurasi untuk RAG chat web
+│   ├── AI_Rules.txt                  # Panduan/guardrails AI
+│   └── PRD Permata.md                # Dokumen kebutuhan produk
+├── scripts/
+│   └── rag-index.mjs                 # Indeks idempotent korpus RAG ke pgvector (`pnpm rag:index`)
 ├── .env.example                      # Template environment variables monorepo
+├── compose.dev.yml                   # PostgreSQL lokal (pgvector) & pgAdmin untuk pengembangan
 ├── pnpm-workspace.yaml               # Definisi workspace pnpm
 ├── turbo.json                        # Pipeline task Turborepo
 ├── vercel.json                       # Konfigurasi deployment 1 proyek Vercel Services
@@ -132,6 +139,7 @@ Variabel utama yang perlu diisi:
 | `GEMINI_API_KEY`                          | `apps/web/.env.local`                   | API key Google Gemini untuk rute `/api/chat` & `/api/mood-food`                                                |
 | `AI_PROVIDER` / `AI_API_KEY` / `AI_MODEL` | `apps/api/.env`                         | Konfigurasi AI backend (`gemini`, API key, `gemini-2.5-flash`)                                                 |
 | `NEXT_PUBLIC_API_URL` / `BACKEND_API_URL` | `apps/web/.env.local`                   | Opsional di lokal; saat development `next.config.ts` otomatis mem-proxy `/api/v1/*` ke `http://localhost:4000` |
+| `RAG_EMBEDDING_MODEL` / `RAG_EMBEDDING_DIM` / `RAG_TOP_K` | `.env`, `apps/web/.env.local`, `apps/api/.env` | Konfigurasi RAG AI Companion (default `gemini-embedding-001`, `768`, `4`) |
 
 ### Contoh PostgreSQL Lokal
 
@@ -160,6 +168,14 @@ pnpm db:seed
 ```
 
 _(Gunakan `pnpm db:migrate` jika ingin membuat/menjalankan migrasi development secara bertahap.)_
+
+Untuk **RAG AI Companion** (`/api/chat`), gunakan PostgreSQL dengan ekstensi pgvector (lokal: `docker compose -f compose.dev.yml up -d` memakai image `pgvector/pgvector:pg18`). Setelah migrasi diterapkan, indeks korpus terkurasi `docs/rag/`:
+
+```bash
+pnpm rag:index
+```
+
+Perintah ini idempotent dan membutuhkan `DATABASE_URL` serta `GEMINI_API_KEY`/`AI_API_KEY`. Jika tabel pgvector/korpus belum tersedia, chat tetap berjalan dengan fallback aman tanpa konteks RAG.
 
 ### 4. Menjalankan Aplikasi
 
@@ -202,6 +218,7 @@ Akses setelah berjalan:
 | `pnpm db:push`                         | Sinkronisasi skema Prisma ke database (`prisma db push`) |
 | `pnpm db:deploy`                       | Menerapkan migrasi produksi (`prisma migrate deploy`)    |
 | `pnpm db:seed`                         | Mengisi data awal database melalui `prisma/seed.ts`      |
+| `pnpm rag:index`                       | Mengindeks korpus `docs/rag/` ke pgvector (idempotent)  |
 
 ---
 
