@@ -760,13 +760,13 @@ export default function OfflineSurvival() {
               {/* Cultural Wisdom Anchor */}
               <div className="bg-accent-50 border border-accent-200 rounded-lg p-5 space-y-1.5">
                 <p className="text-xs font-semibold uppercase tracking-[0.06em] text-fg-accent">
-                  {culture === "sumbar"
-                    ? "Penguat Budaya: Mambangkik Batang Tarandam"
+                  {culture === "kalimantan"
+                    ? "Penguat Budaya: Kearifan Handep Dayak"
                     : "Penguat Budaya: Kearifan Meuseuraya"}
                 </p>
                 <p className="text-sm text-fg leading-relaxed">
-                  {culture === "sumbar"
-                    ? "Reaksi takut, gemetar, atau menangis setelah bencana adalah respon wajar tubuh untuk bertahan. Pelan-pelan kita pulih bersama sanak saudara dan lingkungan sekitar."
+                  {culture === "kalimantan"
+                    ? "Reaksi takut, gemetar, atau menangis setelah bencana adalah respon wajar tubuh untuk bertahan. Di bawah lindungan Betang, pelan-pelan kita pulih dan bangkit bersama."
                     : "Dalam kebersamaan Meuseuraya, rasa cemas tidak perlu dipikul sendirian. Menemani anak dengan tutur lembut adalah langkah awal pemulihan."}
                 </p>
               </div>
@@ -937,8 +937,8 @@ export default function OfflineSurvival() {
                               </div>
 
                               <p className="text-xs text-fg-muted bg-accent-50 border border-accent-200 rounded-sm px-3 py-2">
-                                {culture === "sumbar"
-                                  ? sc.culturalNoteSumbar
+                                {culture === "kalimantan"
+                                  ? sc.culturalNoteKalimantan
                                   : sc.culturalNoteAceh}
                               </p>
                             </div>

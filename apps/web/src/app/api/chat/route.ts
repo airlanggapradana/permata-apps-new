@@ -31,9 +31,9 @@ function getFallbackReply(message: string, culture: string): string {
     } else {
       return (
         "Terima kasih sudah sangat berani menceritakan rasa takut ini. Merasa waspada, cemas, dan dada berdebar setelah bencana adalah reaksi yang wajar dan alami dari tubuhmu untuk melindungi diri. Kamu tidak sendirian.\n\n" +
-        "🏛️ Falsafah Mambangkik Batang Tarandam:\n" +
-        "“Batang kayu yang terendam air lambat laun akan timbul kembali.”\n" +
-        "Rasa cemas ini adalah fase awal pemulihan. Kamu memiliki daya lentur batin untuk bangkit kembali bersama sanak saudara dan teman-teman.\n\n" +
+        "🌿 Falsafah Handep Kalimantan:\n" +
+        "“Bapakat kita bagawi, bapasang kita basanding; saperti ulin teguh di tanah rimba.”\n" +
+        "Rasa cemas ini adalah fase awal pemulihan. Sebagaimana keluarga di Rumah Betang yang saling menopang, kamu memiliki ketangguhan laksana kayu ulin untuk bangkit kembali bersama keluarga dan kawan-kawan.\n\n" +
         "Mari kita tenangkan debaran dadamu bersama-sama sejenak: tarik napas perlahan lewat hidung (4 detik)... tahan 3 detik... lalu hembuskan lembut lewat mulut (5 detik). Kamu aman saat ini."
       );
     }
@@ -49,7 +49,7 @@ function getFallbackReply(message: string, culture: string): string {
       "Rasa rindu pada rumah, kamar, dan teman sekolah adalah perasaan yang sangat tulus dan manusiawi. Kehilangan rasa nyaman yang biasa kita rasakan memang berat bagi siapapun, apalagi bagi pejuang hebat sepertimu.\n\n" +
       (isAceh
         ? "Di posko ini, semangat Meuseuraya hadir agar kita bisa saling berbagi tawa dan kehangatan. Langkah kecilmu hari ini adalah bekal untuk membangun kembali hari esok yang lebih cerah."
-        : "Falsafah Minangkabau mengajarkan bahwa di mana pun bumi dipijak, langit harapan tetap kita junjung bersama. Kamu punya kekuatan untuk menciptakan kenangan baik baru bersama teman-teman di sekitar.") +
+        : "Kearifan Dayak mengajarkan bahwa di bawah atap Rumah Betang, duka dipikul bersama dan suka dirawat bersama. Kamu punya kekuatan untuk menciptakan kenangan baik baru bersama teman-teman di sekitar.") +
       "\n\nApakah ada cerita atau kenangan indah dari rumah yang paling ingin kamu bagikan denganku hari ini?"
     );
   }
@@ -58,7 +58,7 @@ function getFallbackReply(message: string, culture: string): string {
     "Aku mendengarkanmu dengan sungguh-sungguh. Setiap perasaan yang kamu rasakan valid, nyata, dan kamu berharga. " +
     (isAceh
       ? "Dalam semangat Meuseuraya, kita saling merangkul dan menguatkan di setiap langkah pemulihan jiwa."
-      : "Sebagaimana falsafah Mambangkik Batang Tarandam, perlahan kita akan bangkit bersama melewati masa sulit ini.") +
+      : "Sebagaimana filosofi Handep dan keteguhan ulin Borneo, perlahan kita akan bangkit bersama melewati masa sulit ini.") +
     "\n\nCeritakan apa yang sedang terpikirkan di hatimu, atau jika kamu merasa lelah, kita bisa latihan napas tenang bersama-sama."
   );
 }

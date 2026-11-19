@@ -42,20 +42,20 @@
   --card-border: #e2e8f0;
 }
 
-[data-culture="sumbar"] {
-  --brand-50:  #fbf3f1;
-  --brand-100: #f6e2de;
-  --brand-200: #ebc1b9;
-  --brand-300: #dc9a8e;
-  --brand-400: #c86a5b;
-  --brand-500: #ae4234;
-  --brand-600: #9c2a22;
-  --brand-700: #7b0000;
-  --brand-800: #5c0000;
-  --brand-900: #3d0000;
-  --accent-500: #d97706;
-  --canvas:     #fcf8f6;
-  --card-border: #e2e8f0;
+[data-culture="kalimantan"] {
+  --brand-50:  #fdf3f2;
+  --brand-100: #f9dedb;
+  --brand-200: #f4c0bb;
+  --brand-300: #eb948a;
+  --brand-400: #db6152;
+  --brand-500: #c54032;
+  --brand-600: #a62b1f; /* Merah Dayak: primary, tombol */
+  --brand-700: #852218;
+  --brand-800: #54110a;
+  --brand-900: #1f1a17; /* Hitam Ulin: teks */
+  --accent-500: #d9a21b; /* Kuning Kunyit: aksen */
+  --canvas:     #f6f0e4; /* Putih Tulang: background */
+  --card-border: #e4dbc9;
 }
 
 :root {

@@ -1,14 +1,21 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
 import Particles from "@/components/ui-kit/Particle/Particles"; // React Bits: Backgrounds/Particles
 import acehBackground from "@/assets/localization/aceh/background.png";
+import kalimantanBackground from "@/assets/localization/Kalimantan/background.jpg";
 // Ilustrasi modul. Modul tanpa gambar otomatis memakai ikon sebagai placeholder.
 import jurnalIllustration from "@/assets/localization/aceh/JurnalHikmah.png";
 import screeningIllustration from "@/assets/localization/aceh/ScreeningTriase.png"; // ganti ekstensi dari .jfif, lihat catatan
 import hutanPinus from "@/assets/image/HutanPinus.avif";
+// Ornamen budaya Aceh (bungong jeumpa). Hanya alpha-nya yang dipakai (sebagai mask), warna asli file diabaikan.
+import acehTile from "@/assets/localization/Aceh/aceh-bungong-jeumpa-tile.svg";
+// Ornamen budaya Kalimantan (Dayak): pilin = spiral/ukiran, manik = pita manik-manik. Varian *-gold.svg tidak dipakai (mask hanya membaca alpha).
+import kalimantanPilin from "@/assets/localization/Kalimantan/kalimantan-dayak-pilin-tile.svg";
+import kalimantanManik from "@/assets/localization/Kalimantan/kalimantan-dayak-manik-border.svg";
 import { useTiltSurface } from "@/components/ui-kit/TiltSurfaces/TiltSurfaces";
 import type { TransitionPhase } from "@/components/PageTransitionOverlay";
 
@@ -35,7 +42,12 @@ type IconName =
   | "chevron"
   | "seed"
   | "seedling"
-  | "sapling";
+  | "sapling"
+  | "home"
+  | "compass"
+  | "idcard"
+  | "smile"
+  | "zap";
 
 const ICONS: Record<IconName, React.ReactNode> = {
   book: (
@@ -65,7 +77,7 @@ const ICONS: Record<IconName, React.ReactNode> = {
   ),
   arrow: <path d="M14 5l7 7m0 0l-7 7m7-7H3" />,
   chevron: <path d="M6 9l6 6 6-6" />,
-  // Tahap pertumbuhan Hope Tree: benih â†’ tunas â†’ pohon kecil â†’ pohon besar tunggal
+  // Tahap pertumbuhan Hope Tree: benih → tunas → pohon kecil → pohon besar tunggal
   seed: (
     <>
       <ellipse cx="12" cy="13" rx="3.2" ry="4.6" transform="rotate(35 12 13)" />
@@ -143,6 +155,34 @@ const ICONS: Record<IconName, React.ReactNode> = {
   ),
   star: (
     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+  ),
+  home: (
+    <>
+      <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+      <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    </>
+  ),
+  compass: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z" />
+    </>
+  ),
+  idcard: (
+    <>
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <circle cx="9" cy="11" r="2" />
+      <path d="M6.17 15a3 3 0 0 1 5.66 0M16 10h2M16 14h2" />
+    </>
+  ),
+  smile: (
+    <>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" />
+    </>
+  ),
+  zap: (
+    <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
   ),
   bowl: (
     <>
@@ -263,7 +303,7 @@ function FooterLink({
   );
 }
 
-/* Ambang XP: 0â€“999 L2, 1.000â€“2.499 L3, 2.500â€“4.999 L4, 5.000+ L5 */
+/* Ambang XP: 0–999 L2, 1.000–2.499 L3, 2.500–4.999 L4, 5.000+ L5 */
 type Level = {
   min: number;
   next: number | null;
@@ -277,7 +317,7 @@ const LEVELS: Level[] = [
   {
     min: 0,
     next: 1000,
-    name: "Level 2 â€¢ Tunas Muda",
+    name: "Level 2 • Tunas Muda",
     icon: "seed",
     status: "Mulai Menstabilkan Emosi",
     readiness: "74 / 100 (Cukup Siap)",
@@ -285,7 +325,7 @@ const LEVELS: Level[] = [
   {
     min: 1000,
     next: 2500,
-    name: "Level 3 â€¢ Tunas Mekar",
+    name: "Level 3 • Tunas Mekar",
     icon: "seedling",
     status: "Bertumbuh Positif Pascabencana",
     readiness: "84 / 100 (Sigap)",
@@ -293,7 +333,7 @@ const LEVELS: Level[] = [
   {
     min: 2500,
     next: 5000,
-    name: "Level 4 â€¢ Pohon Rindang Bertunas",
+    name: "Level 4 • Pohon Rindang Bertunas",
     icon: "sapling",
     status: "Adaptif & Resiliensi Tinggi",
     readiness: "92 / 100 (Sangat Sigap)",
@@ -301,85 +341,198 @@ const LEVELS: Level[] = [
   {
     min: 5000,
     next: null,
-    name: "Level 5 â€¢ Rimba Resiliensi Mandiri",
+    name: "Level 5 • Rimba Resiliensi Mandiri",
     icon: "pine",
     status: "Sangat Tangguh & Agen PFA Cilik",
     readiness: "98 / 100 (Paling Sigap)",
   },
 ];
 
+const ABOUT_POINTS = [
+  "Dukungan darurat tanpa kuota / sinyal",
+  "Privasi data anak terproteksi ketat",
+];
+
+const AUDIENCES: { icon: IconName; title: string; desc: string }[] = [
+  {
+    icon: "smile",
+    title: "Untuk anak",
+    desc: "Belajar kesiapsiagaan lewat simulasi game yang seru, latihan olah napas penenang, dan teman curhat AI tanpa rasa takut.",
+  },
+  {
+    icon: "home",
+    title: "Untuk orang tua",
+    desc: "Membuat Paspor Keselamatan keluarga seperti titik kumpul & kontak darurat serta memantau kestabilan emosi anak di rumah/tenda.",
+  },
+  {
+    icon: "landmark",
+    title: "Untuk guru & sekolah",
+    desc: "Materi psikoedukasi terstruktur dan simulasi evakuasi mandiri di kelas guna membangun sekolah tanggap bencana.",
+  },
+  {
+    icon: "users",
+    title: "Untuk relawan & posko",
+    desc: "Panduan PFA lapangan, triase cepat kondisi psikologis anak, dan panduan menu dapur darurat penstabil suasana hati.",
+  },
+];
+
+const PHASES: {
+  icon: IconName;
+  tag: string;
+  badge?: string;
+  title: string;
+  desc: React.ReactNode;
+  points: { label: string; text: string }[];
+}[] = [
+    {
+      icon: "shield",
+      tag: "Fase 1 • Pra-bencana",
+      title: "Pencegahan & kesiapsiagaan",
+      desc: "Membangun kesiapan mental anak dan keluarga sebelum marabahaya terjadi. Menanamkan kebiasaan mitigasi secara rekreatif tanpa rasa panik.",
+      points: [
+        {
+          label: "Game Mitigasi Interaktif",
+          text: "Simulasi gempa & tas siaga bencana.",
+        },
+        {
+          label: "Safety Passport",
+          text: "Pendataan kontak darurat & titik kumpul keluarga.",
+        },
+        {
+          label: "Emotional Readiness",
+          text: "Pemetaan kesiapan emosi awal anak.",
+        },
+      ],
+    },
+    {
+      icon: "zap",
+      tag: "Fase 2 • Saat bencana",
+      title: "Tanggap darurat & SafeConnect",
+      desc: "Memberikan pertolongan pertama psikologis (PFA) saat anak mengalami histeria, cemas akut, atau kebingungan di posko pengungsian.",
+      points: [
+        {
+          label: "Offline Survival Mode (PWA)",
+          text: "Berjalan tanpa internet & tanpa login.",
+        },
+        {
+          label: "Teknik Grounding Cepat",
+          text: "Panduan olah napas penenang detak jantung.",
+        },
+        {
+          label: "Akses Cepat Hotline 119",
+          text: "Jalur rujukan medis darurat terpadu.",
+        },
+      ],
+    },
+    {
+      icon: "sprout",
+      tag: "Fase 3 • Pasca-bencana",
+      title: "Pemulihan & pertumbuhan jiwa",
+      desc: (
+        <>
+          Mendampingi proses <em>Post-Traumatic Growth</em> agar anak tidak
+          terjebak dalam rasa trauma yang berkepanjangan dan mampu bangkit
+          berdaya.
+        </>
+      ),
+      points: [
+        {
+          label: "Hope Tree (Pohon Harapan)",
+          text: "Pantau resiliensi harian tanpa sistem penalti.",
+        },
+        {
+          label: "AI Jurnal Hikmah",
+          text: "Menemukan makna positif dari kearifan lokal Nusantara.",
+        },
+        {
+          label: "Care Circle",
+          text: "Lingkaran dukungan kolaboratif orang tua dan guru.",
+        },
+      ],
+    },
+  ];
+
 const MODULES: {
   icon: IconName;
   iconBoxClass: string;
   image?: { src: string; alt: string };
-  tag: string;
+  badge?: string;
   title: string;
+  tag: string;
   desc: string;
+  note: string;
   href: string;
   cta: string;
 }[] = [
-  {
-    icon: "book",
-    iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
-    image: {
-      src: jurnalIllustration.src,
-      alt: "Anak menulis jurnal ditemani maskot AI pendamping",
+    {
+      icon: "signal",
+      iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
+      title: "Offline Survival Mode",
+      tag: "Akses mandiri tanpa sinyal & login",
+      desc: "Saat gempa melumpuhkan pemancar seluler, modul ini tetap terbuka di browser HP. Berisi panduan pertolongan pertama fisik, teknik peredam histeria anak, nomor darurat, dan ekspor Paspor Keselamatan offline.",
+      note: "Tersedia di PWA",
+      href: "/offline-survival",
+      cta: "Buka panduan offline",
     },
-    tag: "Refleksi harian",
-    title: "AI Jurnal Hikmah",
-    desc: "Ruang aman bagi anak untuk menuliskan perasaan harian dan menemukan makna dari pengalaman sulit, berlandaskan kearifan Meuseuraya dan Mambangkik Batang Tarandam.",
-    href: "/jurnal",
-    cta: "Buka jurnal",
-  },
-  {
-    icon: "shield",
-    iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
-    image: {
-      src: screeningIllustration.src,
-      alt: "Ilustrasi skrining kesehatan mental dan triase anak",
+    {
+      icon: "idcard",
+      iconBoxClass: "bg-teal-50 text-teal-700 ring-1 ring-teal-200/70",
+      title: "Safety Passport",
+      tag: "Kartu keselamatan darurat anak",
+      desc: "Memudahkan orang tua mencatat identitas anak, kontak darurat wali, titik kumpul evakuasi terdekat, serta kebutuhan obat-obatan khusus yang dapat diakses cepat jika terpisah saat bencana.",
+      note: "Privasi terjaga",
+      href: "/safety-passport",
+      cta: "Kelola paspor",
     },
-    tag: "Deteksi dini",
-    title: "Skrining & triase",
-    desc: "Mendeteksi dini depresi, kecemasan, dan stres pada anak, lengkap dengan rekomendasi rujukan.",
-    href: "/tele-screening",
-    cta: "Mulai skrining",
-  },
-  {
-    icon: "heart",
-    iconBoxClass: "bg-teal-50 text-teal-700 ring-1 ring-teal-200/70",
-    tag: "Teman bicara",
-    title: "Pendamping AI",
-    desc: "Teman bicara yang empatik, dengan pengaman bawaan untuk melindungi anak.",
-    href: "/ai-companion",
-    cta: "Buka pendamping",
-  },
-  {
-    icon: "gamepad",
-    iconBoxClass: "bg-amber-50 text-amber-600 ring-1 ring-amber-200/70",
-    tag: "Latihan siaga",
-    title: "Game resiliensi",
-    desc: "Belajar siaga gempa dan tsunami lewat permainan, sambil melatih napas untuk menenangkan diri.",
-    href: "#game-showcase",
-    cta: "Lihat permainan",
-  },
-];
-
-const STEPS = [
-  {
-    title: "Kenali kondisi emosi",
-    desc: "Anak mengisi kuesioner DASS-21 dan mencatat suasana hati harian di Jurnal Hikmah.",
-  },
-  {
-    title: "Tenangkan diri",
-    desc: "Latihan napas terpandu, permainan simulasi gempa, dan afirmasi dari tradisi lokal.",
-  },
-  {
-    title: "Tumbuh bersama",
-    desc: "Perkembangan anak terpantau lewat Hope Tree, dengan dukungan berkala orang tua dan guru serta jalur darurat bila dibutuhkan.",
-  },
-];
-
-const STEP_ICONS: IconName[] = ["book", "wind", "sprout"];
+    {
+      icon: "book",
+      iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
+      image: {
+        src: jurnalIllustration.src,
+        alt: "Anak menulis jurnal ditemani maskot AI pendamping",
+      },
+      title: "AI Jurnal Hikmah",
+      tag: "Refleksi berakar budaya Nusantara",
+      desc: "Ruang pribadi yang aman bagi anak untuk menuliskan perasaan takut dan sedih, lalu diarahkan menemukan makna ketabahan lewat filosofi lokal seperti Meuseuraya dan Handep Dayak.",
+      note: "Refleksi harian",
+      href: "/jurnal",
+      cta: "Tulis refleksi",
+    },
+    {
+      icon: "shield",
+      iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
+      image: {
+        src: screeningIllustration.src,
+        alt: "Ilustrasi skrining kesehatan mental dan triase anak",
+      },
+      title: "Tele-Screening & Triase",
+      tag: "Instrumen terstandar DASS-21",
+      desc: "Mendeteksi tingkat stres, kecemasan, dan indikasi depresi anak melalui 21 pertanyaan psikologis yang disederhanakan, disertai rekomendasi apakah cukup pendampingan keluarga atau butuh rujukan profesional.",
+      note: "Bukan diagnosa klinis",
+      href: "/tele-screening",
+      cta: "Mulai skrining",
+    },
+    {
+      icon: "heart",
+      iconBoxClass: "bg-teal-50 text-teal-700 ring-1 ring-teal-200/70",
+      title: "Sahabat AI Pendamping",
+      tag: "Didukung Google Gemini & Safety Guard",
+      desc: "Teman mengobrol yang sabar dan empatik untuk mendengarkan keluh kesah anak. Dilengkapi sensor otomatis terhadap ancaman bahaya, privasi data (PII), dan larangan memberikan diagnosa medis sembarangan.",
+      note: "Guardrails etis",
+      href: "/ai-companion",
+      cta: "Mulai percakapan",
+    },
+    {
+      icon: "bowl",
+      iconBoxClass: "bg-amber-50 text-amber-600 ring-1 ring-amber-200/70",
+      title: "Mood + Food Analyzer",
+      tag: "Analisis foto menu dapur umum",
+      desc: "Memindai foto makanan darurat dengan kecerdasan buatan untuk menganalisis ketersediaan mikronutrien (Omega-3, zinc, rempah) yang bermanfaat menenangkan ketegangan saraf anak di lokasi bencana.",
+      note: "Multimodal AI",
+      href: "/mood-food",
+      cta: "Analisis menu",
+    },
+  ];
 
 const DURATIONS = [
   { v: 4, label: "4 minggu", sub: "1 bulan awal" },
@@ -387,32 +540,69 @@ const DURATIONS = [
   { v: 24, label: "24 minggu", sub: "6 bulan" },
 ];
 
-const GAMES: { icon: IconName; title: string; desc: string; href: string }[] = [
-  {
-    icon: "backpack",
-    title: "Tas Siaga Bencana",
-    desc: "Kenali enam perlengkapan utama lewat latihan santai atau tantangan. Kontrol sentuh, mouse, dan kamera opsional.",
-    href: "/game-healing",
-  },
-  {
-    icon: "pin",
-    title: "Siaga Minang",
-    desc: "Petualangan klasik tiga pos dengan 10 perlengkapan siaga, kontrol keyboard/sentuh, dan kesempatan mencoba lagi dari checkpoint.",
-    href: "/game-siagaminang",
-  },
-  {
-    icon: "wind",
-    title: "Napas Tenang",
-    desc: "Ikuti lingkaran napas sesuai kenyamananmu. Bisa dijeda kapan saja, dengan kamera opsional sebagai cermin.",
-    href: "/game-breath",
-  },
-  {
-    icon: "users",
-    title: "Sigap Bencana",
-    desc: "Jelajahi rumah simulasi, pelajari tiga langkah siaga melalui pertanyaan interaktif, lalu capai pintu keluar.",
-    href: "/game-quake",
-  },
-];
+const GAMES: {
+  icon: IconName;
+  title: string;
+  tag: string;
+  desc: React.ReactNode;
+  meta: string;
+  href: string;
+}[] = [
+    {
+      icon: "home",
+      title: "Sigap Bencana",
+      tag: "Simulasi evakuasi rumah 2D (Phaser 3)",
+      desc: (
+        <>
+          Jelajahi simulasi rumah saat gempa tiba. Latih refleks{" "}
+          <em>Drop, Cover, and Hold On</em>, matikan kompor, dan temukan pintu
+          keluar dengan selamat.
+        </>
+      ),
+      meta: "Hadiah: 20 XP/hari",
+      href: "/game-quake",
+    },
+    {
+      icon: "backpack",
+      title: "Tas Siaga Bencana",
+      tag: "Mengenal perlengkapan survival",
+      desc: "Latihan seru memasukkan 6 barang wajib (air, senter, peluit, P3K, dokumen, makanan) ke dalam tas siaga sebelum hitungan 60 detik berakhir.",
+      meta: "Hadiah: 20 XP/hari",
+      href: "/game-healing",
+    },
+    {
+      icon: "wind",
+      title: "Napas Tenang",
+      tag: "Relaksasi penurun panik",
+      desc: "Latihan pernapasan terpandu visual bunga mekar-kuncup. Membantu anak yang ketakutan atau histeris kembali tenang dalam hitungan menit.",
+      meta: "Hadiah: 15 XP/hari",
+      href: "/game-breath",
+    },
+    {
+      icon: "landmark",
+      title: "Siaga Minang",
+      tag: "Petualangan mitigasi Ranah Minang",
+      desc: "Petualangan klasik melintasi 3 pos mitigasi gempa & tsunami. Belajar filosofi rumah panggung tahan gempa dan 10 perlengkapan keselamatan.",
+      meta: "Hadiah: 20 XP/hari",
+      href: "/game-siagaminang",
+    },
+    {
+      icon: "compass",
+      title: "Adventure Budaya",
+      tag: "Simulasi naratif mitigasi",
+      desc: "Petualangan cerita bergambar yang mengajarkan anak bagaimana para leluhur Nusantara membaca tanda alam (smong/tsunami, gempa) untuk evakuasi cepat.",
+      meta: "Naratif interaktif",
+      href: "/game-adventure",
+    },
+    {
+      icon: "users",
+      title: "Roleplay Psikoedukasi",
+      tag: "Latihan pengambilan keputusan",
+      desc: "Skenario interaktif bermain peran untuk membantu anak mengenali emosi temannya yang sedang berduka serta belajar cara saling menopang di pengungsian.",
+      meta: "Kecerdasan sosial",
+      href: "/roleplay",
+    },
+  ];
 
 const NUTRITION = [
   { title: "Omega-3 & seng", desc: "Meredam kecemasan akut pascagempa" },
@@ -429,28 +619,28 @@ const NUTRITION = [
 const STORIES = [
   {
     quote:
-      "â€œAnak-anak di tenda darurat menyambut latihan pernapasan dan AI Jurnal Hikmah dengan ceria. Konsep Meuseuraya membuat mereka saling menguatkan alih-alih larut dalam kesedihan.â€",
+      "“Anak-anak di posko darurat langsung antusias saat diajak bermain game pernapasan dan menulis Jurnal Hikmah. Nilai Meuseuraya membuat mereka saling menguatkan, bukan merasa terasing dalam duka.”",
     initials: "RA",
     tag: "Relawan PFA",
-    highlight: "saling menguatkan alih-alih larut dalam kesedihan",
+    highlight: "saling menguatkan, bukan merasa terasing dalam duka",
     name: "Rahmatiah, S.Psi.",
-    role: "Relawan PFA & Psikososial Posko Pidie Aceh",
+    role: "Relawan PFA & Psikososial Posko Pidie, Aceh",
   },
   {
     quote:
-      "â€œFilosofi Mambangkik Batang Tarandam menumbuhkan harga diri anak-anak sekolah dasar pasca gempa Pasaman. Mereka belajar bahwa musibah adalah awal kebangkitan karakter.â€",
-    initials: "BS",
+      "“Filosofi Handep dan Rumah Betang membangkitkan kebersamaan anak-anak pascabencana. Mereka belajar saling menopang dan tangguh laksana pohon ulin di tanah Borneo.”",
+    initials: "DY",
     tag: "Pendidik",
-    highlight: "musibah adalah awal kebangkitan karakter",
-    name: "Bundo Salma",
-    role: "Guru Pendamping SD Pasaman Barat, Sumbar",
+    highlight: "saling menopang dan tangguh laksana pohon ulin",
+    name: "Dayang Kumala",
+    role: "Guru Pendamping SD Kutai Kartanegara, Kalimantan Timur",
   },
   {
     quote:
-      "â€œKami bisa mengenali anak yang menunjukkan tanda depresi berat lebih cepat dan merujuknya tepat waktu, sebelum terlambat.â€",
+      "“Adanya mode darurat offline dan skrining DASS-21 sangat krusial. Kami bisa memilah anak yang butuh rujukan medis darurat lebih cepat sebelum trauma menetap.”",
     initials: "FW",
     tag: "Tenaga medis",
-    highlight: "merujuknya tepat waktu, sebelum terlambat",
+    highlight: "rujukan medis darurat lebih cepat",
     name: "dr. Fadli Wijaya",
     role: "Koordinator Medis SafeConnect Hotline 119",
   },
@@ -459,6 +649,7 @@ const STORIES = [
 const FOOTER_MODULES = [
   { label: "AI Jurnal Hikmah", href: "/jurnal" },
   { label: "Skrining DASS-21", href: "/tele-screening" },
+  { label: "Safety Passport", href: "/safety-passport" },
   { label: "Game Center", href: "#game-showcase" },
   { label: "Hope Tree", href: "#calculator" },
   { label: "Mood + Food Analyzer", href: "/mood-food" },
@@ -475,12 +666,64 @@ const FOOTER_SERVICES = [
 
 // Gambar hero per tema daerah. Kunci harus sama dengan nilai `culture` di CultureContext.
 // Daerah yang belum terdaftar otomatis memakai tema Aceh.
-const HERO_THEMES: Record<string, { src: string; alt: string }> = {
+// `label` = nama lokasi yang tampil di layar transisi saat ganti lokasi.
+const HERO_THEMES: Record<string, { src: string; alt: string; label: string }> =
+{
   aceh: {
     src: acehBackground.src,
     alt: "Anak-anak Aceh merangkul di zona rekonstruksi pascabencana",
+    label: "Aceh",
+  },
+  kalimantan: {
+    src: kalimantanBackground.src,
+    alt: "Hutan hujan tropis Kalimantan berkabut dan asri",
+    label: "Kalimantan",
   },
 };
+
+// Daerah yang belum terdaftar di HERO_THEMES memakai nama dari nilai `culture`.
+const locationLabel = (key: string) =>
+  HERO_THEMES[key]?.label ?? key.charAt(0).toUpperCase() + key.slice(1);
+
+// Ornamen dekoratif per tema daerah. Kunci sama dengan HERO_THEMES / `culture`.
+// Daerah yang belum terdaftar otomatis tanpa ornamen; tambahkan entri di sini bila motifnya sudah ada.
+// tile      = pola kotak berulang (kotak ikon + lingkaran panah + tombol bila `pill` kosong).
+// tileSize  = ukuran satu tile di kotak ikon (default 240px). tilePos = posisi tile di kotak ikon (default "-9px -9px").
+// pill      = pola khusus tombol pil (opsional); pillSize/pillRepeat mengatur skala & pengulangannya.
+type Ornament = {
+  tile: string;
+  tileSize?: string;
+  tilePos?: string;
+  tileHole?: string; // "dalam luar": radius lubang transparan di tengah kotak ikon (default "7px 13px")
+  tileBoost?: number; // pengali opacity kotak ikon (default 1); naikkan bila garis motif tipis
+  pill?: string;
+  pillSize?: string;
+  pillRepeat?: string;
+};
+const ORNAMENTS: Record<string, Ornament> = {
+  aceh: { tile: acehTile.src },
+  kalimantan: {
+    tile: kalimantanPilin.src,
+    tileSize: "96px 96px", // kotak ikon hanya 44px: jarak antar spiral 24px agar 4 spiral + 4 wajik terlihat penuh
+    tilePos: "center", // spiral kecil di tengah tile jatuh di lubang kotak ikon
+    tileHole: "6px 10px",
+    tileBoost: 1.5,
+    pill: kalimantanManik.src,
+    pillSize: "auto 100%", // pita manik mengikuti tinggi tombol
+    pillRepeat: "repeat-x",
+  },
+};
+
+// Urutan transisi ganti lokasi (ms): layar transisi menutup -> tema diganti di baliknya -> layar terbuka.
+// Ubah angka di sini untuk mengatur kecepatan; durasi animasi di CSS ikut lewat variabel --pm-loc-in dan --pm-loc-out.
+type SwapPhase = "idle" | "cover" | "reveal";
+const SWAP_COVER_IN_MS = 500; // layar memudar masuk sampai hitam penuh
+const SWAP_COVER_MIN_MS = 1400; // lama minimum layar tampil, dihitung sejak mulai menutup
+const SWAP_REVEAL_MS = 700; // layar memudar keluar
+const SWAP_VARS = {
+  "--pm-loc-in": `${SWAP_COVER_IN_MS}ms`,
+  "--pm-loc-out": `${SWAP_REVEAL_MS}ms`,
+} as React.CSSProperties;
 
 const HERO_STATS: { icon: IconName; value: string; label: string }[] = [
   { icon: "book", value: "100%", label: "Kearifan Nusantara" },
@@ -709,7 +952,7 @@ html { scrollbar-gutter: stable; }
   .pm-hero-actions a { padding-top: .5rem; padding-bottom: .5rem; }
 }
 
-/* â”€â”€ Alur 3 langkah: masuk/keluar (dua arah, mengikuti viewport) + idle (hanya saat terlihat) â”€â”€ */
+/* ── Alur 3 langkah: masuk/keluar (dua arah, mengikuti viewport) + idle (hanya saat terlihat) ── */
 .pm-flow-head > * { opacity: 0; transform: translateY(18px);
   transition: opacity 450ms ease, transform 450ms ease, background-color 300ms, color 300ms; }
 .pm-flow[data-show="true"] .pm-flow-head > * { opacity: 1; transform: none;
@@ -729,23 +972,77 @@ html { scrollbar-gutter: stable; }
 .pm-seg-fill { position: absolute; inset: 0; background: linear-gradient(180deg, #2f7a5a, #6fd0a0); transform: scaleY(0); transform-origin: top; transition: transform 170ms ease; }
 .pm-flow[data-show="true"] .pm-seg-fill { transform: scaleY(1); transition: transform 450ms cubic-bezier(.65,0,.35,1) calc(var(--d,0ms) * .5 + 250ms); }
 
+/* Titik cahaya yang berjalan di konektor antar fase (animasi idle). Muncul setelah garis terisi. */
+.pm-seg-dot { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,.9), transparent) 0 -50% / 100% 30% no-repeat;
+  transition: opacity 600ms ease calc(var(--d,0ms) * .5 + 800ms); }
+.pm-flow[data-show="true"] .pm-seg-dot { opacity: 1; }
+
 @media (min-width: 768px) {
   .pm-seg { left: 2.25rem; right: -1.25rem; top: -1px; bottom: auto; width: auto; height: 2px; }
   .pm-seg-fill { background: linear-gradient(90deg, #2f7a5a, #6fd0a0); transform: scaleX(0); transform-origin: left; }
   .pm-flow[data-show="true"] .pm-seg-fill { transform: scaleX(1); }
   .pm-seg-dot { background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent) -50% 0 / 30% 100% no-repeat; }
-  .pm-flow[data-show="true"] .pm-seg-dot { animation-name: pm-travel-x; }
 }
 
 
 
 
 
-/* Seluruh animasi idle berulang dinonaktifkan; animasi transisi satu kali tetap aktif. */
-.pm-badge::after, .pm-seg-dot, .pm-tile, .pm-ico, .pm-ghost, .pm-arrow,
-.pm-sim-tile::after, .pm-sim-blob, .pm-bar::after, .pm-gico, .pm-mod-float {
-  animation: none !important;
-}
+/* Animasi idle section selain hero (Tentang, Fase bencana, Modul, Simulator, Game).
+   Gerak pelan dan berulang; hanya jalan saat section tampil (play-state di bawah) dan mati saat prefers-reduced-motion.
+   Memakai properti translate/rotate/scale yang terpisah dari transform, supaya tidak bentrok dengan hover dan efek 3D.
+   Jeda awal diacak lewat --d / --i milik tiap item, jadi kartu tidak bergerak serempak. */
+@keyframes pm-halo        { 0% { transform: scale(1); opacity: .45; } 65%, 100% { transform: scale(1.55); opacity: 0; } }
+@keyframes pm-ico-bob     { 0%, 100% { translate: 0 0; } 50% { translate: 0 -2px; } }
+@keyframes pm-ghost-soft  { 0%, 100% { opacity: .55; translate: 0 0; } 50% { opacity: 1; translate: 0 3px; } }
+@keyframes pm-mod-breathe { 0%, 100% { translate: 0 0; scale: 1; } 50% { translate: 0 -4px; scale: 1.025; } }
+@keyframes pm-travel-x    { from { background-position: -50% 0; } 60%, to { background-position: 150% 0; } }
+@keyframes pm-travel-y    { from { background-position: 0 -50%; } 60%, to { background-position: 0 150%; } }
+@keyframes pm-g-sway      { 0%, 100% { rotate: -4deg; } 50% { rotate: 4deg; } }
+@keyframes pm-g-drift     { 0%, 100% { translate: -1.5px 0; } 50% { translate: 1.5px 0; } }
+@keyframes pm-g-tremor    { 0%, 62%, 100% { translate: 0 0; } 66% { translate: -1px 0; } 70% { translate: 1px 0; } 74% { translate: -1px 0; } 78% { translate: 1px 0; } 82% { translate: 0 0; } }
+@keyframes pm-g-seek      { 0%, 100% { rotate: -12deg; } 50% { rotate: 12deg; } }
+@keyframes pm-g-breathe   { 0%, 100% { scale: 1; } 50% { scale: 1.08; } }
+
+/* Ikon di dalam kotak: melayang tipis */
+.pm-ico { animation: pm-ico-bob 5s ease-in-out infinite; animation-delay: calc(var(--d, 0ms) * -2); }
+
+/* Tentang: cincin tipis memudar keluar dari kotak ikon */
+#about .pm-tile::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none; opacity: 0;
+  border: 1px solid rgba(47,122,90,.55); animation: pm-halo 5.5s ease-out infinite; animation-delay: calc(var(--d, 0ms) * -5); }
+
+/* Fase bencana: cincin di lencana nomor, titik cahaya di konektor, angka latar bernapas */
+.pm-badge::after { content: ""; position: absolute; inset: 0; border-radius: 999px; pointer-events: none; opacity: 0;
+  border: 2px solid rgba(47,122,90,.5); animation: pm-halo 4.2s ease-out infinite; animation-delay: calc(var(--d, 0ms) * -3); }
+.pm-seg-dot { animation: pm-travel-y 4.6s ease-in-out infinite; animation-delay: calc(var(--d, 0ms) * -2); }
+@media (min-width: 768px) { .pm-seg-dot { animation-name: pm-travel-x; } }
+.pm-ghost { animation: pm-ghost-soft 8s ease-in-out infinite; animation-delay: calc(var(--d, 0ms) * -3); }
+
+/* Modul: ilustrasi bernapas pelan dari dasar bingkai */
+.pm-mod-float { transform-origin: 50% 100%; animation: pm-mod-breathe 6.5s ease-in-out infinite; animation-delay: calc(var(--d, 0ms) * -4); }
+
+/* Simulator Hope Tree: kilap lewat di kotak pohon, kilap di bar progres, cincin di level aktif */
+.pm-sim-tile { overflow: hidden; }
+.pm-sim-tile::after { content: ""; position: absolute; inset: 0; pointer-events: none; transform: translateX(-100%);
+  background: linear-gradient(105deg, transparent 30%, rgba(47,122,90,.16) 50%, transparent 70%); animation: pm-shimmer 6s ease-in-out infinite; }
+.pm-bar::after { animation: pm-shimmer 3.4s ease-in-out infinite; }
+.pm-lvl::after { content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none; opacity: 0; }
+.pm-lvl[data-state="now"]::after { border: 2px solid #2f7a5a; animation: pm-halo 3.4s ease-out infinite; }
+
+/* Game siaga bencana: gerak ikon mengikuti maknanya */
+.pm-gico { animation: pm-ico-bob 5s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -1.1s); }
+[data-g="backpack"] .pm-gico { transform-origin: 50% 12%; animation-name: pm-g-sway; animation-duration: 4.6s; }
+[data-g="wind"] .pm-gico     { animation-name: pm-g-drift; animation-duration: 4s; }
+[data-g="landmark"] .pm-gico { animation-name: pm-g-tremor; animation-duration: 6s; }
+[data-g="compass"] .pm-gico  { animation-name: pm-g-seek; animation-duration: 7s; }
+[data-g="users"] .pm-gico    { animation-name: pm-g-breathe; animation-duration: 5s; }
+
+/* Idle hanya jalan saat section tampil */
+.pm-flow :is(.pm-ico, .pm-gico, .pm-ghost, .pm-mod-float, .pm-seg-dot),
+.pm-flow :is(.pm-tile, .pm-badge, .pm-sim-tile, .pm-bar, .pm-lvl)::after { animation-play-state: paused; }
+.pm-flow[data-show="true"] :is(.pm-ico, .pm-gico, .pm-ghost, .pm-mod-float, .pm-seg-dot),
+.pm-flow[data-show="true"] :is(.pm-tile, .pm-badge, .pm-sim-tile, .pm-bar, .pm-lvl)::after { animation-play-state: running; }
 
 /* Hero: keluar saat scroll naik dan masuk saat scroll turun. */
 @keyframes pm-out      { from { opacity: 1; transform: none; filter: none; } to { opacity: 0; transform: translateY(-26px); filter: blur(4px); } }
@@ -759,6 +1056,28 @@ html { scrollbar-gutter: stable; }
 #home[data-hero="back"] .pm-fade[data-play="true"] { animation: pm-fade 1200ms ease-out forwards; animation-delay: calc(var(--d,0ms) * .25); }
 #home[data-hero="back"] .pm-hero-bg[data-play="true"] {
   animation: pm-bg-in 1200ms cubic-bezier(.22,1,.36,1) forwards; }
+
+/* Ganti lokasi: layar hitam memudar masuk, isinya muncul pelan bergantian, lalu keduanya memudar keluar.
+   Hanya opacity/transform, jadi berjalan di compositor dan tidak patah-patah. */
+@keyframes pm-loc-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pm-loc-out { to { opacity: 0; } }
+@keyframes pm-loc-item-in { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes pm-loc-breathe { 0%, 100% { scale: 1; opacity: .65; } 50% { scale: 1.12; opacity: 1; } }
+.pm-loc { position: fixed; inset: 0; z-index: 100; will-change: opacity; touch-action: none; overscroll-behavior: contain; display: flex; align-items: center; justify-content: center; color: #fff;
+  background: #000; }
+.pm-loc[data-phase="cover"]  { animation: pm-loc-in var(--pm-loc-in, 500ms) cubic-bezier(.4,0,.2,1) both; }
+.pm-loc[data-phase="reveal"] { animation: pm-loc-out var(--pm-loc-out, 700ms) cubic-bezier(.4,0,.2,1) forwards; pointer-events: none; }
+.pm-loc-stack { display: flex; flex-direction: column; align-items: center; gap: .85rem; padding: 1.5rem; text-align: center; }
+.pm-loc-logo { position: relative; display: flex; align-items: center; justify-content: center; width: 7rem; height: 7rem; }
+.pm-loc-logo img { position: relative; width: 4.5rem; height: 4.5rem; object-fit: contain; filter: brightness(0) invert(1); }
+.pm-loc-ring { position: absolute; inset: 0; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.04);
+  animation: pm-loc-breathe 3.4s ease-in-out infinite; }
+.pm-loc-brand { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; letter-spacing: .18em; padding-left: .18em; line-height: 1; }
+.pm-loc-place { display: inline-flex; align-items: center; gap: .4rem; font-size: 1rem; font-weight: 500; color: rgba(255,255,255,.78); }
+.pm-loc[data-phase="cover"] .pm-loc-item { animation: pm-loc-item-in 600ms cubic-bezier(.22,1,.36,1) both; animation-delay: calc(var(--i, 0) * 100ms + 250ms); }
+/* Saat layar terbuka, isinya memudar lebih dulu (sedikit terangkat) supaya tidak tertinggal di atas hero */
+@keyframes pm-loc-item-out { to { opacity: 0; transform: translateY(-8px); } }
+.pm-loc[data-phase="reveal"] .pm-loc-item { animation: pm-loc-item-out 300ms cubic-bezier(.4,0,1,1) both; animation-delay: calc(var(--i, 0) * 40ms); }
 
 /* Simulator Hope Tree: masuk/keluar, hitung naik, idle (hanya saat terlihat) */
 .pm-sim-in { opacity: 0; transform: translateY(20px); transition: opacity 450ms ease, transform 450ms ease; }
@@ -954,12 +1273,52 @@ html { scrollbar-gutter: stable; }
 .pm-flow :is(.pm-aura-l, .pm-hz-l, .pm-bowl, .pm-float), .pm-flow .pm-nut::after { animation-play-state: paused; }
 .pm-flow[data-show="true"] :is(.pm-aura-l, .pm-hz-l, .pm-bowl, .pm-float), .pm-flow[data-show="true"] .pm-nut::after { animation-play-state: running; }
 
+/* Ornamen budaya (Aceh: bungong jeumpa, Kalimantan: pilin & manik Dayak) sebagai tekstur tipis di permukaan kecil.
+   SVG dipakai sebagai mask, warnanya mengikuti currentColor / variabel tombol, jadi satu file cukup untuk semua varian.
+   --orn-tile dan --orn-a diisi dari LandingPage sesuai tema daerah; --orn-a = 0 (tema tanpa ornamen) membuat semua lapisan ini tak terlihat. */
+
+/* Kotak ikon (Tentang & Fase bencana): satu kuntum di tengah kotak, bagian tengahnya dikosongkan agar ikon tetap bersih */
+.pm-tile { isolation: isolate; }
+.pm-tile::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: currentColor; opacity: calc(.22 * var(--orn-a, 0) * var(--orn-tile-k, 1)); transition: opacity 300ms ease;
+  -webkit-mask-image: var(--orn-tile, none), radial-gradient(circle, transparent var(--orn-hole-in, 7px), #000 var(--orn-hole-out, 13px));
+          mask-image: var(--orn-tile, none), radial-gradient(circle, transparent var(--orn-hole-in, 7px), #000 var(--orn-hole-out, 13px));
+  -webkit-mask-size: var(--orn-tile-size, 240px 240px), 100% 100%;
+          mask-size: var(--orn-tile-size, 240px 240px), 100% 100%;
+  -webkit-mask-position: var(--orn-tile-pos, -9px -9px), center;
+          mask-position: var(--orn-tile-pos, -9px -9px), center;
+  -webkit-mask-repeat: repeat, no-repeat;
+          mask-repeat: repeat, no-repeat;
+  -webkit-mask-composite: source-in;
+          mask-composite: intersect;
+}
+.group:hover .pm-tile::before { opacity: calc(.3 * var(--orn-a, 0) * var(--orn-tile-k, 1)); }
+
+/* Tombol utama: pil glow (.pm-gl-face), pil footer (.pm-orn), dan lingkaran panah (.pm-ab-fill) */
+.pm-gl-face, .pm-orn { position: relative; isolation: isolate; overflow: hidden; }
+.pm-ab-fill { isolation: isolate; overflow: hidden; }
+.pm-gl-face::before, .pm-orn::before, .pm-ab-fill::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: currentColor; opacity: calc(.12 * var(--orn-a, 0)); transition: opacity 300ms ease;
+  -webkit-mask: var(--orn-tile, none) 0 0 / 160px 160px repeat;
+          mask: var(--orn-tile, none) 0 0 / 160px 160px repeat;
+}
+/* Lingkaran panah: warna fill-nya sama dengan warna teks tombol, jadi pola memakai warna panah agar kelihatan */
+.pm-ab-fill::before { background: var(--ab-arrow); }
+/* Tombol pil (.pm-gl-face, .pm-orn) memakai --orn-pill bila tema menyediakannya (mis. pita manik Kalimantan); selain itu tetap --orn-tile */
+.pm-gl-face::before, .pm-orn::before {
+  -webkit-mask: var(--orn-pill, var(--orn-tile, none)) 0 0 / var(--orn-pill-size, 160px 160px) var(--orn-pill-repeat, repeat);
+          mask: var(--orn-pill, var(--orn-tile, none)) 0 0 / var(--orn-pill-size, 160px 160px) var(--orn-pill-repeat, repeat);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pm-logo-in, .pm-letter { animation: none !important; opacity: 1; }
   .pm-ring    { animation: none !important; opacity: 0; }
   .pm-enter   { animation: none !important; opacity: 1; }
   #home[data-hero] .pm-enter, #home[data-hero] .pm-fade, #home[data-hero] .pm-hero-bg { animation: none !important; opacity: 1; }
   .pm-hero-bg { animation: none !important; transform: none; }
+  .pm-loc, .pm-loc-item, .pm-loc-ring { animation: none !important; }
   .pm-fade { animation: none !important; opacity: 1; }
   .pm-breathe { animation: none; opacity: .25; transform: none; }
   .pm-bob { animation: none; }
@@ -975,7 +1334,7 @@ html { scrollbar-gutter: stable; }
   .pm-gico { animation: none !important; }
   .pm-sim-in, .pm-sim-card { opacity: 1 !important; transform: none !important; transition: none !important; }
   .pm-lvl, .pm-lvl-line, .pm-range::-webkit-slider-thumb { transition: none !important; }
-  .pm-sim-tile::after, .pm-sim-blob, .pm-swap, .pm-swap-text, .pm-lvl::after, .pm-bar::after { animation: none !important; }
+  .pm-sim-tile::after, .pm-sim-blob, .pm-swap, .pm-swap-text, .pm-lvl::after, .pm-bar::after, #about .pm-tile::after { animation: none !important; }
   .pm-sim-blob { opacity: .25; }
   .pm-3d-card, .pm-3d-pop, .pm-3d-z1, .pm-3d-z2 { transition: none !important; transform: none !important; }
   .pm-aura-l { transform: none !important; }
@@ -990,17 +1349,19 @@ html { scrollbar-gutter: stable; }
   .pm-gl-in::before, .pm-gl-in::after { animation: none !important; opacity: 0; }
   .pm-gl-face, .pm-gl-ico { transition: none !important; }
   .pm-gl:hover .pm-gl-ico { transform: none; }
+  .pm-tile::before, .pm-gl-face::before, .pm-orn::before, .pm-ab-fill::before { transition: none !important; }
 }
 `;
 
-/* â”€â”€ Scrollbar "Pohon Harapan" â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ── Scrollbar "Pohon Harapan" ──────────────────────────────────────────
    Batang (vertikal di desktop, horizontal di bawah layar pada HP & tablet) tumbuh mengikuti scroll; tiap bagian halaman punya daun yang
    mekar saat dilewati. Bisa diseret, dan daunnya bisa diklik untuk loncat ke bagian itu.
    Posisi daun dibagi rata; kemajuan di antara dua daun mengikuti jarak scroll nyata. */
 const TREE_SECTIONS = [
   { id: "home", label: "Beranda" },
+  { id: "about", label: "Tentang" },
+  { id: "fase-bencana", label: "Fase bencana" },
   { id: "programs", label: "Modul" },
-  { id: "how-it-works", label: "Alur pemulihan" },
   { id: "calculator", label: "Simulasi Hope Tree" },
   { id: "game-showcase", label: "Game & Mood" },
   { id: "stories", label: "Suara lapangan" },
@@ -1235,7 +1596,7 @@ function StoryQuote({
   highlight: string;
 }) {
   // Tanda kutip dilepas dari teks (diganti ikon kutip di kartu); frasa kunci diberi stabilo hijau tipis
-  const text = quote.replace(/^[â€œ"]|[â€"]$/g, "");
+  const text = quote.replace(/^[“"]|[”"]$/g, "");
   const at = text.indexOf(highlight);
   if (at === -1) return <>{text}</>;
   return (
@@ -1315,16 +1676,149 @@ function useAuraPointer(
   }, [ref, stageSelector]);
 }
 
+// Layar transisi ganti lokasi: logo, tulisan PERMATA, lalu nama lokasi. Dirender lewat portal agar menutup seluruh layar.
+function LocationTransition({
+  phase,
+  label,
+}: {
+  phase: "cover" | "reveal";
+  label: string;
+}) {
+  return createPortal(
+    <div
+      className="pm-loc"
+      data-phase={phase}
+      role="status"
+      aria-live="polite"
+      style={SWAP_VARS}
+    >
+      <div className="pm-loc-stack">
+        <div className="pm-loc-item pm-loc-logo" style={idx(0)}>
+          <span className="pm-loc-ring" aria-hidden="true" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/permata-logo.webp" alt="" width={72} height={72} />
+        </div>
+        <p className="pm-loc-item pm-loc-brand" style={idx(1)}>
+          PERMATA
+        </p>
+        <p className="pm-loc-item pm-loc-place" style={idx(2)}>
+          <Icon name="pin" className="w-4 h-4" />
+          <span>{label}</span>
+        </p>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+export interface LandingPageProps {
+  transitionPhase?: TransitionPhase;
+  onHeroReady?: () => void;
+  onHeroReadyAction?: () => void;
+}
+
 export default function LandingPage({
   transitionPhase = "idle",
   onHeroReady,
-}: {
-  transitionPhase?: TransitionPhase;
-  onHeroReady?: () => void;
-}) {
+  onHeroReadyAction,
+}: LandingPageProps) {
+  const handleHeroReady = onHeroReadyAction ?? onHeroReady;
   const { culture } = useCulture();
-  const heroTheme = HERO_THEMES[String(culture)] ?? HERO_THEMES.aceh;
-  const [flowRef, flowShow] = useInView<HTMLDivElement>();
+  const cultureKey = String(culture);
+  // Tema tujuan (langsung ikut `culture`) dipakai untuk preload; tema yang tampil baru diganti di balik layar transisi.
+  const targetTheme = HERO_THEMES[cultureKey] ?? HERO_THEMES.aceh;
+
+  // Ganti lokasi: layar transisi menutup -> tema diganti di baliknya -> layar terbuka.
+  const [shownCulture, setShownCulture] = useState(cultureKey);
+  const [swapPhase, setSwapPhase] = useState<SwapPhase>("idle");
+  const [heroReset, setHeroReset] = useState(false); // true selama layar menutup penuh: hero di baliknya di-reset
+  const [heroPhase, setHeroPhase] = useState<"init" | "out" | "back">("init");
+  const shownRef = useRef(cultureKey);
+  const phaseRef = useRef<SwapPhase>("idle");
+  const isFirstMountRef = useRef(true);
+  const heroTheme = HERO_THEMES[shownCulture] ?? HERO_THEMES.aceh;
+  const orn = ORNAMENTS[shownCulture];
+
+  useEffect(() => {
+    // Pada initial render / refresh halaman, sinkronkan shownRef tanpa memicu animasi transisi ganti lokasi
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      shownRef.current = cultureKey;
+      setShownCulture(cultureKey);
+      return;
+    }
+    const timers: number[] = [];
+    let cancelled = false;
+    const later = (fn: () => void, ms: number) =>
+      void timers.push(window.setTimeout(fn, ms));
+    const go = (p: SwapPhase) => {
+      phaseRef.current = p;
+      setSwapPhase(p);
+    };
+    const toTop = () =>
+      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }); // abaikan scroll-behavior: smooth
+    const reveal = () => {
+      go("reveal");
+      setHeroReset(false); // hero masuk lagi bersamaan dengan layar yang terbuka
+      later(() => go("idle"), SWAP_REVEAL_MS);
+    };
+    const cleanup = () => {
+      cancelled = true;
+      timers.forEach((id) => window.clearTimeout(id));
+    };
+
+    // Kembali ke lokasi yang sedang tampil (A -> B -> A sebelum sempat diganti): buka layar lagi
+    if (cultureKey === shownRef.current) {
+      if (phaseRef.current !== "idle") reveal();
+      return cleanup;
+    }
+
+    const swap = () => {
+      shownRef.current = cultureKey;
+      setShownCulture(cultureKey);
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      swap();
+      return cleanup;
+    }
+
+    // Layar terbuka setelah durasi minimum lewat DAN gambar tema baru sudah siap (dimuat + di-decode)
+    let imgReady = false;
+    let minDone = false;
+    const tryReveal = () => {
+      if (cancelled || !imgReady || !minDone) return;
+      if (window.scrollY > 0) toTop(); // halaman sempat bergeser selagi tertutup
+      reveal();
+    };
+    const img = new Image();
+    img.src = (HERO_THEMES[cultureKey] ?? HERO_THEMES.aceh).src;
+    const ready = () => {
+      imgReady = true;
+      tryReveal();
+    };
+    img.decode().then(ready, ready);
+
+    const cover = () => {
+      go("cover");
+      later(() => {
+        // Layar sudah menutup penuh: ganti tema, reset hero, kembali ke atas
+        swap();
+        setHeroReset(true);
+        setHeroPhase("init"); // masuk dengan jeda penuh, sama seperti pertama kali tampil
+        toTop();
+      }, SWAP_COVER_IN_MS + 100);
+      later(() => {
+        minDone = true;
+        tryReveal();
+      }, SWAP_COVER_MIN_MS);
+    };
+    // Layar masih terbuka: tunggu selesai dulu agar tidak terpotong mendadak
+    if (phaseRef.current === "reveal") later(cover, SWAP_REVEAL_MS);
+    else cover();
+    return cleanup;
+  }, [cultureKey]);
+  const [aboutRef, aboutShow] = useInView<HTMLDivElement>();
+  const [flowRef, flowShow] = useInView<HTMLDivElement>(0.1);
   const [modHeadRef, modHeadShow] = useInView<HTMLDivElement>();
   const [storyRef, storyShow] = useInView<HTMLDivElement>(0.15);
   const [moodInRef, moodShow] = useInView<HTMLDivElement>(0.15);
@@ -1333,16 +1827,18 @@ export default function LandingPage({
 
   const heroLogoRef = useRef<HTMLImageElement>(null);
   const heroRef = useRef<HTMLElement>(null);
-  const [heroPhase, setHeroPhase] = useState<"init" | "out" | "back">("init");
-  const play = transitionPhase === "exiting" || transitionPhase === "idle";
+  // Begitu layar transisi menutup penuh (heroReset), play dimatikan: elemen hero kembali ke posisi awal di baliknya
+  // dan masuk lagi begitu layar terbuka
+  const play =
+    (transitionPhase === "exiting" || transitionPhase === "idle") && !heroReset;
 
   // Preload gambar hero agar siap sebelum curtain transisi terbuka
   useEffect(() => {
-    if (!onHeroReady) return;
+    if (!handleHeroReady) return;
     const img = new Image();
-    img.onload = img.onerror = () => onHeroReady();
-    img.src = heroTheme.src;
-  }, [heroTheme.src, onHeroReady]);
+    img.onload = img.onerror = () => handleHeroReady();
+    img.src = targetTheme.src;
+  }, [targetTheme.src, handleHeroReady]);
 
   // Hero keluar saat hampir tidak terlihat (di-reset di luar layar), lalu masuk lagi
   // dari awal setiap kali kembali terlihat, baik dari scroll naik maupun turun/anchor.
@@ -1388,7 +1884,7 @@ export default function LandingPage({
     return () => window.removeEventListener("resize", fit);
   }, []);
 
-  // Simulator Hope Tree (nilai awal sengaja di tengah rentang: 40 Ã— 3 Ã— 12 = 1.440 XP)
+  // Simulator Hope Tree (nilai awal sengaja di tengah rentang: 40 × 3 × 12 = 1.440 XP)
   const [cause, setCause] = useState<number>(40);
   const [frequencyInput, setFrequencyInput] = useState<string>("3");
   const [duration, setDuration] = useState<number>(12);
@@ -1433,7 +1929,7 @@ export default function LandingPage({
       ? 100
       : Math.round(((totalXP - level.min) / (level.next - level.min)) * 100);
   const progressText = nextLevel
-    ? `${progress}% menuju ${nextLevel.name.split(" â€¢ ")[0]}`
+    ? `${progress}% menuju ${nextLevel.name.split(" • ")[0]}`
     : "Level maksimal tercapai";
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
@@ -1444,7 +1940,23 @@ export default function LandingPage({
   };
 
   return (
-    <div className="w-full bg-white text-slate-800 selection:bg-brand-500 selection:text-white">
+    <div
+      className="w-full bg-white text-slate-800 selection:bg-brand-500 selection:text-white"
+      style={
+        {
+          "--orn-tile": orn ? `url("${orn.tile}")` : "none",
+          "--orn-a": orn ? 1 : 0,
+          "--orn-tile-size": orn?.tileSize,
+          "--orn-tile-pos": orn?.tilePos,
+          "--orn-hole-in": orn?.tileHole?.split(" ")[0],
+          "--orn-hole-out": orn?.tileHole?.split(" ")[1],
+          "--orn-tile-k": orn?.tileBoost,
+          "--orn-pill": orn?.pill ? `url("${orn.pill}")` : undefined,
+          "--orn-pill-size": orn?.pillSize,
+          "--orn-pill-repeat": orn?.pillRepeat,
+        } as React.CSSProperties
+      }
+    >
       <style>{SPLASH_CSS}</style>
       <HopeScrollbar visible={transitionPhase === "idle"} />
 
@@ -1543,7 +2055,7 @@ export default function LandingPage({
             style={delay(1150)}
           >
             <GlowLink
-              href="#programs"
+              href="#fase-bencana"
               variant="light"
               className="text-sm sm:text-base"
             >
@@ -1579,14 +2091,14 @@ export default function LandingPage({
           </ul>
         </div>
 
-        {/* Petunjuk gulir */}
+        {/* Petunjuk swipe */}
         <a
-          href="#programs"
+          href="#about"
           className={`pm-fade absolute bottom-6 left-1/2 z-10 -translate-x-1/2 hidden lg:flex flex-col items-center text-sm text-white/70 hover:text-white transition-colors ${focusRing}`}
           data-play={play}
           style={delay(1900)}
         >
-          Gulir
+          Swipe
           <span className="pm-bob block">
             <Icon name="chevron" className="w-6 h-6" />
           </span>
@@ -1594,34 +2106,196 @@ export default function LandingPage({
       </section>
       {/* END: Hero */}
 
+      {/* BEGIN: Tentang */}
+      <section className="py-20 bg-white border-b border-slate-100" id="about">
+        <div className="max-w-7xl mx-auto px-6">
+          <div
+            ref={aboutRef}
+            data-show={aboutShow}
+            className="pm-flow grid grid-cols-1 lg:grid-cols-12 gap-10 items-center"
+          >
+            <div className="pm-flow-head lg:col-span-6 space-y-4">
+              <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
+                Aplikasi Ekosistem Resiliensi Anak
+              </h2>
+              <p className="text-base text-slate-600 leading-relaxed">
+                Di daerah rawan bencana, trauma pada anak kerap terlambat
+                ditangani karena keterbatasan psikolog dan minimnya sinyal
+                internet.{" "}
+                <strong className="font-semibold text-slate-900">
+                  PERMATA
+                </strong>{" "}
+                hadir sebagai jembatan yang menghubungkan anak, keluarga, guru,
+                dan relawan melalui panduan psikososial yang mudah dipahami,
+                ramah anak, dan tetap berfungsi walau jaringan telekomunikasi
+                terputus.
+              </p>
+              <ul className="flex flex-col gap-3 pt-2 sm:flex-row sm:gap-6">
+                {ABOUT_POINTS.map((p) => (
+                  <li key={p} className="flex items-center gap-3">
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700 ring-1 ring-brand-100">
+                      <Icon
+                        name="check"
+                        className="h-4 w-4"
+                        strokeWidth={2.5}
+                      />
+                    </span>
+                    <span className="text-sm font-medium text-slate-700">
+                      {p}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <ul className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {AUDIENCES.map((a, i) => (
+                <li
+                  key={a.title}
+                  className="pm-step"
+                  style={delay(200 + i * 150)}
+                >
+                  <div className="group relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_18px_36px_-16px_rgba(15,45,33,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+                    <span className="pm-tile relative mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700 transition-colors duration-300 group-hover:border-brand-700 group-hover:bg-brand-700 group-hover:text-white">
+                      <Icon name={a.icon} className="pm-ico w-5 h-5" />
+                    </span>
+                    <h3 className="relative text-lg font-semibold text-slate-900">
+                      {a.title}
+                    </h3>
+                    <p className="relative mt-2 text-sm text-slate-600 leading-relaxed">
+                      {a.desc}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+      {/* END: Tentang */}
+
+      {/* BEGIN: Fase bencana */}
+      <section className="py-20 bg-white" id="fase-bencana">
+        <div
+          ref={flowRef}
+          data-show={flowShow}
+          className="pm-flow max-w-7xl mx-auto px-6"
+        >
+          <div className="pm-flow-head max-w-3xl space-y-4 mb-14">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
+              Mendampingi di setiap tahap bencana
+            </h2>
+            <p className="text-base text-slate-600 leading-relaxed">
+              Penanganan bencana tidak dimulai saat sirine berbunyi, dan tidak
+              selesai ketika air surut. PERMATA membagi perlindungan ke dalam
+              tiga fase utama.
+            </p>
+            <ArrowLink href="#calculator" className="text-sm">
+              Coba simulasi Hope Tree
+            </ArrowLink>
+          </div>
+
+          <ol className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 md:pt-4">
+            {PHASES.map((p, i) => (
+              <li
+                key={p.title}
+                className="pm-step relative pl-12 md:pl-0 md:pt-8"
+                style={delay(200 + i * 350)}
+              >
+                {i < PHASES.length - 1 && (
+                  <span className="pm-seg" aria-hidden="true">
+                    <span className="pm-seg-fill" />
+                    <span className="pm-seg-dot" />
+                  </span>
+                )}
+                <span className="pm-badge absolute left-0 top-0 md:-top-4 inline-flex w-8 h-8 items-center justify-center rounded-full bg-brand-700 text-white text-sm font-semibold ring-4 ring-white">
+                  {i + 1}
+                </span>
+                <div
+                  className={`group relative flex h-full flex-col overflow-hidden rounded-2xl border bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_18px_36px_-16px_rgba(15,45,33,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${p.badge ? "border-brand-300" : "border-slate-200"}`}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="pm-ghost pointer-events-none absolute right-4 top-2 select-none text-6xl font-bold leading-none text-brand-100/70"
+                  >
+                    0{i + 1}
+                  </span>
+                  <span className="pm-tile relative mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700 transition-colors duration-300 group-hover:border-brand-700 group-hover:bg-brand-700 group-hover:text-white">
+                    <Icon name={p.icon} className="pm-ico w-5 h-5" />
+                  </span>
+                  <p className="relative flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-brand-700">
+                    {p.tag}
+                    {p.badge && (
+                      <span className="rounded-full bg-brand-700 px-2.5 py-0.5 text-xs font-semibold text-white">
+                        {p.badge}
+                      </span>
+                    )}
+                  </p>
+                  <h3 className="relative mt-1 text-lg font-semibold text-slate-900">
+                    {p.title}
+                  </h3>
+                  <p className="relative mt-2 mb-6 flex-1 text-sm text-slate-600 leading-relaxed">
+                    {p.desc}
+                  </p>
+                  <ul className="relative space-y-3 border-t border-slate-100 pt-5">
+                    {p.points.map((pt) => (
+                      <li
+                        key={pt.label}
+                        className="flex items-start gap-2.5 text-sm text-slate-600 leading-relaxed"
+                      >
+                        <Icon
+                          name="check"
+                          className="mt-0.5 h-4 w-4 shrink-0 text-brand-600"
+                          strokeWidth={2.5}
+                        />
+                        <span>
+                          <strong className="font-semibold text-slate-900">
+                            {pt.label}:
+                          </strong>{" "}
+                          {pt.text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+      {/* END: Fase bencana */}
+
       {/* BEGIN: Modul */}
       <section
-        className="py-20 bg-white border-y border-slate-100"
+        className="py-20 bg-white border-t border-slate-100"
         id="programs"
       >
         <div className="max-w-7xl mx-auto px-6">
           <div
             ref={modHeadRef}
             data-show={modHeadShow}
-            className="pm-flow max-w-2xl mb-12"
+            className="pm-flow max-w-3xl mb-12"
           >
             <div className="pm-flow-head">
               <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight">
-                Empat modul pendampingan resiliensi anak
+                Alat praktis untuk keseharian dan situasi kritis
               </h2>
               <p className="mt-3 text-base text-slate-600 leading-relaxed">
-                Gabungan psikologi klinis, permainan kesiapsiagaan bencana, dan
-                kearifan lokal yang ramah anak.
+                Dirancang dengan tampilan sederhana yang mudah dipahami
+                anak-anak, tetapi memiliki fondasi psikologis dan keamanan data
+                yang kuat untuk para profesional.
               </p>
             </div>
           </div>
 
-          <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {MODULES.map((m, i) => (
               <ModuleItem key={m.title} d={i * 120}>
-                <div className="group relative flex h-full flex-col rounded-[1.75rem] bg-white p-3 shadow-[0_10px_30px_-14px_rgba(15,45,33,0.28)] ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_44px_-16px_rgba(15,45,33,0.35)] focus-within:ring-2 focus-within:ring-brand-500 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+                <div
+                  className={`group relative flex h-full flex-col rounded-[1.75rem] bg-white p-3 shadow-[0_10px_30px_-14px_rgba(15,45,33,0.28)] ring-1 transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_44px_-16px_rgba(15,45,33,0.35)] focus-within:ring-2 focus-within:ring-brand-500 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${m.badge ? "ring-2 ring-brand-300" : "ring-slate-900/5"}`}
+                >
                   {/* Ilustrasi masuk ke dalam bingkai putih kartu */}
-                  <div className="relative flex aspect-square items-end justify-center overflow-hidden rounded-[1.25rem] bg-white">
+                  <div className="relative flex aspect-[4/3] items-end justify-center overflow-hidden rounded-[1.25rem] bg-white">
                     {m.image ? (
                       <span className="pm-mod-float flex h-full w-full items-end justify-center">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1661,6 +2335,16 @@ export default function LandingPage({
                   </div>
 
                   <div className="flex flex-1 flex-col px-2 pb-1 pt-4">
+                    {m.badge && (
+                      <span className="mb-3 inline-flex items-center gap-1.5 self-start rounded-full bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-800">
+                        <Icon
+                          name="signal"
+                          className="h-3.5 w-3.5"
+                          strokeWidth={2.2}
+                        />
+                        {m.badge}
+                      </span>
+                    )}
                     <h3 className="text-xl font-semibold tracking-tight text-slate-900">
                       {m.title}
                     </h3>
@@ -1669,13 +2353,23 @@ export default function LandingPage({
                       {m.desc}
                     </p>
 
-                    {/* Link meregang: seluruh kartu bisa diklik, fokus keyboard tetap di satu link */}
-                    <ArrowLink
-                      href={m.href}
-                      className="mt-auto w-full text-sm after:absolute after:inset-0 after:rounded-[1.75rem]"
-                    >
-                      {m.cta}
-                    </ArrowLink>
+                    <div className="mt-auto">
+                      <p className="mb-4 flex items-center gap-1.5 text-sm font-medium text-slate-600">
+                        <Icon
+                          name="check"
+                          className="h-4 w-4 shrink-0 text-brand-600"
+                          strokeWidth={2.5}
+                        />
+                        {m.note}
+                      </p>
+                      {/* Link meregang: seluruh kartu bisa diklik, fokus keyboard tetap di satu link */}
+                      <ArrowLink
+                        href={m.href}
+                        className="w-full text-sm after:absolute after:inset-0 after:rounded-[1.75rem]"
+                      >
+                        {m.cta}
+                      </ArrowLink>
+                    </div>
                   </div>
                 </div>
               </ModuleItem>
@@ -1684,68 +2378,6 @@ export default function LandingPage({
         </div>
       </section>
       {/* END: Modul */}
-
-      {/* BEGIN: Alur */}
-      <section className="py-20 bg-white" id="how-it-works">
-        <div
-          ref={flowRef}
-          data-show={flowShow}
-          className="pm-flow max-w-7xl mx-auto px-6"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="pm-flow-head lg:col-span-4 space-y-4">
-              <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight leading-tight">
-                Tiga langkah pemulihan dan resiliensi
-              </h2>
-              <p className="text-base text-slate-600 leading-relaxed">
-                Dari mengenali tanda trauma awal, menenangkan emosi, hingga
-                membentuk karakter anak yang tangguh dan berakar pada budaya.
-              </p>
-              <ArrowLink href="#calculator" className="text-sm">
-                Coba simulasi Hope Tree
-              </ArrowLink>
-            </div>
-
-            <ol className="lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 md:pt-4">
-              {STEPS.map((s, i) => (
-                <li
-                  key={s.title}
-                  className="pm-step relative pl-12 md:pl-0 md:pt-8"
-                  style={delay(200 + i * 350)}
-                >
-                  {i < STEPS.length - 1 && (
-                    <span className="pm-seg" aria-hidden="true">
-                      <span className="pm-seg-fill" />
-                      <span className="pm-seg-dot" />
-                    </span>
-                  )}
-                  <span className="pm-badge absolute left-0 top-0 md:-top-4 inline-flex w-8 h-8 items-center justify-center rounded-full bg-brand-700 text-white text-sm font-semibold ring-4 ring-white">
-                    {i + 1}
-                  </span>
-                  <div className="group relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_18px_36px_-16px_rgba(15,45,33,0.3)] motion-reduce:transition-none motion-reduce:hover:translate-y-0">
-                    <span
-                      aria-hidden="true"
-                      className="pm-ghost pointer-events-none absolute right-4 top-2 select-none text-6xl font-bold leading-none text-brand-100/70"
-                    >
-                      0{i + 1}
-                    </span>
-                    <span className="pm-tile relative mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700 transition-colors duration-300 group-hover:border-brand-700 group-hover:bg-brand-700 group-hover:text-white">
-                      <Icon name={STEP_ICONS[i]} className="pm-ico w-5 h-5" />
-                    </span>
-                    <h3 className="relative text-lg font-semibold text-slate-900">
-                      {s.title}
-                    </h3>
-                    <p className="relative mt-2 text-sm text-slate-600 leading-relaxed">
-                      {s.desc}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-      </section>
-      {/* END: Alur */}
 
       {/* BEGIN: Simulator Hope Tree */}
       <section
@@ -1838,13 +2470,13 @@ export default function LandingPage({
                         className="text-sm font-medium text-white"
                         htmlFor="frequency-input"
                       >
-                        Frekuensi mingguan (1â€“14 sesi)
+                        Frekuensi mingguan (1–14 sesi)
                       </label>
                       <output
                         htmlFor="frequency-input"
                         className="rounded-full bg-white px-2.5 py-0.5 text-xs font-semibold tabular-nums text-brand-900"
                       >
-                        {frequency}Ã— / minggu
+                        {frequency}× / minggu
                       </output>
                     </div>
                     <input
@@ -1895,11 +2527,10 @@ export default function LandingPage({
                             className="peer sr-only"
                           />
                           <span
-                            className={`block rounded-lg px-2 py-2 text-center transition-colors duration-300 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white ${
-                              duration === d.v
-                                ? "text-brand-900"
-                                : "text-white/85 hover:text-white"
-                            }`}
+                            className={`block rounded-lg px-2 py-2 text-center transition-colors duration-300 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white ${duration === d.v
+                              ? "text-brand-900"
+                              : "text-white/85 hover:text-white"
+                              }`}
                           >
                             <span className="block text-sm font-semibold">
                               {d.label}
@@ -1947,7 +2578,7 @@ export default function LandingPage({
                           {xpShown.toLocaleString("id-ID")} XP
                         </p>
                         <p className="mt-2 inline-flex rounded-full bg-brand-50 px-3 py-1 text-xs font-medium tabular-nums text-brand-800">
-                          {cause} XP Ã— {frequency} sesi Ã— {duration} minggu
+                          {cause} XP × {frequency} sesi × {duration} minggu
                         </p>
                       </div>
                       <div className="pm-sim-tile relative flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700">
@@ -2095,13 +2726,12 @@ export default function LandingPage({
             <div className="lg:col-span-5 space-y-4 lg:pt-2">
               <div className="pm-sim-in" style={idx(0)}>
                 <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight">
-                  Belajar siaga bencana lewat permainan
+                  Belajar siap siaga bencana lewat permainan interaktif
                 </h2>
                 <p className="mt-4 text-base text-slate-600 leading-relaxed">
-                  Dengan pendekatan <em>serious gaming</em>, anak dilatih
-                  mengenali jalur evakuasi, menyusun tas siaga, dan menenangkan
-                  denyut nadi sendiri, sehingga lebih siap dan tidak panik saat
-                  gempa terjadi.
+                  Menggunakan pendekatan <em>serious gaming</em> ramah anak.
+                  Anak belajar mengenali bahaya gempa, rute evakuasi, dan
+                  menstabilkan pernapasan tanpa merasa ditakut-takuti.
                 </p>
               </div>
               <p
@@ -2111,7 +2741,7 @@ export default function LandingPage({
                 <span className="pm-gico-pill inline-flex">
                   <Icon name="gamepad" className="pm-ico h-4 w-4" />
                 </span>
-                {GAMES.length} permainan siaga
+                {GAMES.length} modul edukasi
               </p>
             </div>
 
@@ -2141,15 +2771,21 @@ export default function LandingPage({
                     <span className="relative block text-base font-semibold text-slate-900">
                       {g.title}
                     </span>
+                    <span className="relative mt-0.5 block text-sm text-slate-500">
+                      {g.tag}
+                    </span>
                     <span className="relative mt-1.5 block text-sm text-slate-600 leading-relaxed">
                       {g.desc}
                     </span>
-                    <span className="relative mt-auto flex items-center gap-1.5 pt-5 text-sm font-semibold text-brand-700">
-                      Mainkan
-                      <Icon
-                        name="arrow"
-                        className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
-                      />
+                    <span className="relative mt-auto flex items-center justify-between gap-3 pt-5">
+                      <span className="flex items-center gap-1.5 text-sm font-semibold text-brand-700">
+                        Mainkan
+                        <Icon
+                          name="arrow"
+                          className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
+                        />
+                      </span>
+                      <span className="text-xs text-slate-500">{g.meta}</span>
                     </span>
                   </Link>
                 </li>
@@ -2236,8 +2872,10 @@ export default function LandingPage({
                     className="pm-sim-in text-sm text-brand-100 leading-relaxed mb-4"
                     style={idx(6)}
                   >
-                    Analisis bahan makanan darurat yang tersedia untuk memenuhi
-                    kebutuhan mikronutrien anak.
+                    Memindai foto makanan darurat dengan kecerdasan buatan untuk
+                    menganalisis ketersediaan mikronutrien (Omega-3, zinc,
+                    rempah) yang bermanfaat menenangkan ketegangan saraf anak di
+                    lokasi bencana.
                   </p>
                   <div className="pm-sim-in" style={idx(8)}>
                     <ArrowLink
@@ -2245,7 +2883,7 @@ export default function LandingPage({
                       variant="light"
                       className="text-sm"
                     >
-                      Buka katalog Mood + Food
+                      Analisis menu
                     </ArrowLink>
                   </div>
                 </div>
@@ -2265,11 +2903,11 @@ export default function LandingPage({
         >
           <div className="pm-sim-in max-w-2xl mb-10" style={idx(0)}>
             <h2 className="text-3xl sm:text-4xl font-semibold text-slate-900 tracking-tight">
-              Suara dari lapangan
+              Kata mereka yang mendampingi di lapangan
             </h2>
             <p className="mt-3 text-base text-slate-600 leading-relaxed">
-              Cerita relawan PFA, pendidik, dan koordinator pengungsian yang
-              mendampingi anak di garis depan bencana.
+              Pendekatan ramah anak dan kearifan budaya terbukti memudahkan
+              proses pendampingan psikososial saat kondisi darurat.
             </p>
           </div>
 
@@ -2365,8 +3003,9 @@ export default function LandingPage({
                   className="pm-sim-in text-base text-brand-100 max-w-xl leading-relaxed"
                   style={idx(3)}
                 >
-                  Bergabunglah bersama relawan PFA, posko darurat, dan
-                  fasilitator sekolah dalam ekosistem PERMATA Nusantara.
+                  Akses gratis untuk keluarga, guru, posko darurat, dan relawan
+                  kemanusiaan di seluruh Indonesia. Mari bersama rawat senyum
+                  dan masa depan mereka.
                 </p>
               </div>
 
@@ -2377,14 +3016,14 @@ export default function LandingPage({
                     variant="light"
                     className="text-base"
                   >
-                    Masuk ke dashboard
+                    Masuk ke dashboard resiliensi
                   </ArrowLink>
                 </div>
                 <span
                   className="pm-sim-in text-sm text-brand-100"
                   style={idx(5)}
                 >
-                  Gratis untuk relawan, guru, dan orang tua
+                  Akses gratis • Privasi & perlindungan data anak terjamin
                 </span>
               </div>
             </div>
@@ -2426,11 +3065,11 @@ export default function LandingPage({
                 Platform pendidikan resiliensi mental dan pendampingan anak
                 dalam konteks kebencanaan. Memadukan Psychological First Aid
                 (PFA), skrining DASS-21, serta kearifan budaya Aceh (Meuseuraya)
-                dan Minangkabau (Mambangkik Batang Tarandam).
+                dan Kalimantan (Handep Dayak &amp; Rumah Betang).
               </p>
               <a
                 href="tel:119"
-                className={`inline-flex items-center gap-2.5 min-h-11 px-4 rounded-full border border-brand-200 bg-brand-50 text-sm font-medium text-brand-900 hover:bg-brand-100 transition-colors duration-200 ${focusRing}`}
+                className={`pm-orn inline-flex items-center gap-2.5 min-h-11 px-4 rounded-full border border-brand-200 bg-brand-50 text-sm font-medium text-brand-900 hover:bg-brand-100 transition-colors duration-200 ${focusRing}`}
               >
                 Terhubung ke Hotline 119
               </a>
@@ -2508,7 +3147,7 @@ export default function LandingPage({
                     />
                     <button
                       type="submit"
-                      className={`group inline-flex items-center justify-center gap-2 min-h-11 rounded-full bg-brand-900 px-5 text-sm font-semibold text-white hover:bg-brand-950 transition-colors duration-200 ${focusRing}`}
+                      className={`pm-orn group inline-flex items-center justify-center gap-2 min-h-11 rounded-full bg-brand-900 px-5 text-sm font-semibold text-white hover:bg-brand-950 transition-colors duration-200 ${focusRing}`}
                     >
                       Daftar buletin
                       <Icon
@@ -2576,6 +3215,13 @@ export default function LandingPage({
         </div>
       </footer>
       {/* END: Footer */}
+
+      {(swapPhase === "cover" || swapPhase === "reveal") && (
+        <LocationTransition
+          phase={swapPhase}
+          label={locationLabel(cultureKey)}
+        />
+      )}
     </div>
   );
 }

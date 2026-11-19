@@ -35,30 +35,30 @@ function getFallbackInsight(culture: string, mood: number) {
   if (isLowMood) {
     empathy = isAceh
       ? "Perasaan sedih dan cemas yang kamu rasakan adalah reaksi yang sepenuhnya wajar setelah menghadapi musibah. Di posko ini, semangat 'Meuseuraya' merangkulmu agar kamu tidak pernah merasa sendirian. Langkah kecilmu menulis hari ini adalah wujud keberanian yang luar biasa."
-      : "Rasa duka dan gundah adalah bagian dari proses pemulihan. Mengingat falsafah 'Mambangkik Batang Tarandam', dari dalam lumpur duka inilah tunas ketangguhan baru akan tumbuh kembali perlahan bersama kasih orang-orang terdekat.";
+      : "Rasa duka dan cemas adalah bagian dari proses pemulihan. Mengingat falsafah kebersamaan 'Handep' dan ketangguhan kayu ulin di rimba Kalimantan, di tengah ujian inilah ketangguhan baru akan tumbuh kembali perlahan bersama orang-orang terkasih.";
   } else {
     empathy = isAceh
       ? "Kamu telah berhasil melangkah melewati hari yang penuh tantangan. Perasaan tenang dan syukur yang kamu miliki saat berada di posko bersama adik dan teman adalah bibit ketangguhan yang sangat berharga. Kekhawatiran pada suara keras pascabencana adalah hal yang sepenuhnya wajar dialami oleh pejuang kecil sepertimu."
-      : "Keteguhan hatimu untuk tetap melihat sisi baik dan bersyukur adalah perwujudan nyata dari 'Mambangkik Batang Tarandam'. Daya lentur jiwamu menginspirasi teman-teman di sekitar posko untuk terus bangkit bersama.";
+      : "Keteguhan hatimu untuk tetap melihat sisi baik dan bersyukur mencerminkan keteguhan pohon ulin dan semangat Rumah Betang. Rasa saling menguatkan ini memberi kehangatan bagi teman-teman di sekitarmu.";
   }
 
   const proverb = isAceh
     ? "“Bungoeng jeumpa meugisa meutaloe, saboh hatee peugot gampong.”"
-    : "“Dima bumi dipijak, di sinan langik dijunjuang; Mambangkik batang tarandam, bangkik marwah kito basamo.”";
+    : "“Adat diturut, pusaka dijaga; bapakat kita bagawi, teguh laksana ulin di rimba.”";
 
   const proverbTradition = isAceh
     ? "Kearifan Tradisi Meuseuraya (Aceh)"
-    : "Kearifan Tradisi Batang Tarandam (Minang)";
+    : "Kearifan Tradisi Handep Betang (Kalimantan)";
 
   const meaning = isAceh
     ? "Bunga yang mekar saling bertaut erat, satu hati membangun kembali masa depan bersama. Kesediaanmu berbagi tawa dan membantu orang lain di posko adalah perwujudan nyata dari jiwa tangguh yang menyembuhkan luka."
-    : "Mengangkat kembali batang kayu yang terendam air; simbol kebangkitan karakter dan harga diri. Ujian dan musibah bukanlah akhir, melainkan awal pemulihan jiwa yang lebih tangguh bersama keluarga dan komunitas.";
+    : "Semangat gotong royong dan keteguhan bersama di bawah satu naungan Rumah Betang. Cobaan dihadapi bahu-membahu, melahirkan daya lentur batin yang kokoh seperti pohon ulin.";
 
   const tag = isLowMood
     ? "Respon Normal Distres"
     : isAceh
       ? "Meuseuraya Gotong Royong"
-      : "Nilai Badunsanak";
+      : "Handep Gotong Royong";
 
   return { empathy, proverb, proverbTradition, meaning, tag };
 }
@@ -404,7 +404,7 @@ Hasilkan respons dalam JSON sesuai instruksi.`;
       VALUES (
         ${entryId},
         ${session.childId},
-        ${`Refleksi ${culture === "sumbar" ? "Batang Tarandam" : "Meuseuraya"}`},
+        ${`Refleksi ${culture === "kalimantan" ? "Handep Betang" : "Meuseuraya"}`},
         ${content.trim()},
         ${mood},
         ${dbPrivacy}::"JournalPrivacy",

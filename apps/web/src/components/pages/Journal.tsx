@@ -145,18 +145,18 @@ export default function Journal() {
   } | null>(null);
 
   const defaultProverb =
-    culture === "sumbar"
-      ? "“Dima bumi dipijak, di sinan langik dijunjuang; Mambangkik batang tarandam, bangkik marwah kito basamo.”"
+    culture === "kalimantan"
+      ? "“Adat diturut, pusaka dijaga; bapakat kita bagawi, teguh laksana ulin di rimba.”"
       : "“Bungoeng jeumpa meugisa meutaloe, saboh hatee peugot gampong.”";
 
   const defaultTradition =
-    culture === "sumbar"
-      ? "Kearifan Tradisi Batang Tarandam (Minang)"
+    culture === "kalimantan"
+      ? "Kearifan Tradisi Handep Betang (Kalimantan)"
       : "Kearifan Tradisi Meuseuraya (Aceh)";
 
   const defaultMeaning =
-    culture === "sumbar"
-      ? "Mengangkat kembali batang kayu yang terendam air; simbol kebangkitan karakter dan harga diri. Ujian dan musibah bukanlah akhir, melainkan awal pemulihan jiwa yang lebih tangguh bersama keluarga dan komunitas."
+    culture === "kalimantan"
+      ? "Semangat gotong royong dan keteguhan bersama di bawah satu naungan Rumah Betang. Cobaan dihadapi bahu-membahu, melahirkan daya lentur batin yang kokoh seperti pohon ulin."
       : "Bunga yang mekar saling bertaut erat, satu hati membangun kembali masa depan bersama. Kesediaanmu berbagi tawa dan membantu orang lain di posko adalah perwujudan nyata dari jiwa tangguh yang menyembuhkan luka.";
 
   const defaultEmpathy =
@@ -405,8 +405,8 @@ export default function Journal() {
       }
 
       showToast(
-        culture === "sumbar"
-          ? "Refleksi tersimpan di database PostgreSQL & Makna Batang Tarandam diperbarui! (+50 XP)"
+        culture === "kalimantan"
+          ? "Refleksi tersimpan di database PostgreSQL & Makna Handep Betang diperbarui! (+50 XP)"
           : "Refleksi tersimpan di database PostgreSQL & Makna Meuseuraya diperbarui! (+50 XP)",
       );
     } catch (err) {
@@ -797,8 +797,8 @@ export default function Journal() {
                       <span className="material-symbols-outlined text-[15px]">
                         diversity_3
                       </span>
-                      {culture === "sumbar"
-                        ? "Filosofi Mambangkik Batang Tarandam"
+                      {culture === "kalimantan"
+                        ? "Filosofi Handep & Rumah Betang"
                         : "Filosofi Meuseuraya (Aceh)"}
                     </span>
                   </div>
@@ -917,13 +917,13 @@ export default function Journal() {
                     </div>
                     <div className="flex flex-col">
                       <h3 className="font-headline-sm text-headline-sm text-[#012d1d]">
-                        {culture === "sumbar"
-                          ? "Mambangkik Batang Tarandam"
+                        {culture === "kalimantan"
+                          ? "Kearifan Handep & Rumah Betang"
                           : "Kearifan Meuseuraya & Beumulia Jamee"}
                       </h3>
                       <p className="font-body-sm text-body-sm text-[#414844] max-w-lg">
-                        {culture === "sumbar"
-                          ? "Falsafah Minangkabau tentang mengangkat kembali batang kayu yang terendam air; simbol kebangkitan martabat, ketahanan mental anak, dan daya lentur pascabencana alam."
+                        {culture === "kalimantan"
+                          ? "Falsafah masyarakat Dayak tentang persaudaraan serumah betang, gotong royong handep, serta ketangguhan ulin menghadapi tantangan pascabencana."
                           : "Semangat gotong royong dan saling menguatkan dalam persaudaraan masyarakat Aceh; merawat duka bencana secara bersama tanpa meninggalkan seorang pun di belakang."}
                       </p>
                     </div>
@@ -1152,8 +1152,8 @@ export default function Journal() {
                               </div>
                               <span className="px-2 py-0.5 rounded-full bg-[#c1ecd4] text-[#274e3d] font-label-sm text-label-sm">
                                 {entry.tag ||
-                                  (entry.culture === "sumbar"
-                                    ? "Nilai Badunsanak"
+                                  (entry.culture === "kalimantan"
+                                    ? "Nilai Handep"
                                     : "Nilai Meuseuraya")}
                               </span>
                             </div>
@@ -1309,8 +1309,8 @@ export default function Journal() {
               </span>
               <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200">
                 {selectedEntry.tag ||
-                  (selectedEntry.culture === "sumbar"
-                    ? "Batang Tarandam"
+                  (selectedEntry.culture === "kalimantan"
+                    ? "Handep Betang"
                     : "Meuseuraya")}
               </span>
             </div>

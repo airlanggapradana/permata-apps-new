@@ -355,7 +355,7 @@ Data Masukan:
 - Mood Pengguna: ${mood}
 - Gejala Somatis Penyerta: ${Array.isArray(symptoms) ? symptoms.join(", ") : "Tidak ada"}
 - Catatan Pengguna: ${notes || "Tidak ada catatan khusus"}
-- Konteks Budaya: ${culture === "sumbar" ? "Minangkabau (Sumatera Barat)" : "Aceh"}
+- Konteks Budaya: ${culture === "kalimantan" ? "Kalimantan (Dayak & Banjar)" : "Aceh"}
 
 Periksa foto dan catatan sesuai instruksi sistem, lalu keluarkan respons JSON murni.`;
 

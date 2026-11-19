@@ -599,20 +599,20 @@ export default function TeleScreening() {
                 <div className="p-5 rounded-xl bg-gradient-to-br from-[#eceef0] to-[#f2f4f6] flex flex-col gap-2">
                   <div className="flex items-center justify-between text-xs text-[#414844] font-semibold uppercase tracking-wider">
                     <span className="text-[#006c48]">
-                      {culture === "sumbar"
-                        ? "Falsafah Minang: Mambangkik Batang Tarandam"
+                      {culture === "kalimantan"
+                        ? "Falsafah Dayak: Handep & Ketangguhan Betang"
                         : "Kearifan Aceh: Semangat Meuseuraya"}
                     </span>
                     <span>Kearifan Lokal Nusantara</span>
                   </div>
                   <blockquote className="font-headline-sm text-headline-sm text-[#012d1d] italic mt-1">
-                    {culture === "sumbar"
-                      ? "“Dima bumi dipijak, di sinan langik dijunjuang; Mambangkik batang tarandam, bangkik marwah kito basamo.”"
+                    {culture === "kalimantan"
+                      ? "“Bapakat kita bagawi, bapasang kita basanding; saperti ulin teguh di tanah rimba.”"
                       : "“Bungoeng jeumpa meugisa meutaloe, saboh hatee peugot gampong.”"}
                   </blockquote>
                   <p className="font-body-sm text-body-sm text-[#414844] mt-1">
-                    {culture === "sumbar"
-                      ? "Mengangkat kembali batang kayu yang terendam air melambangkan daya lentur jiwamu. Setiap fase pemulihan adalah proses bertahap yang membawamu tumbuh lebih kuat bersama orang-orang terkasih."
+                    {culture === "kalimantan"
+                      ? "Falsafah kebersamaan Betang dan ketangguhan pohon ulin melambangkan daya lentur jiwamu. Setiap fase pemulihan adalah proses bertahap yang membawamu tumbuh lebih kuat bersama orang-orang terkasih."
                       : "Semangat kebersamaan dan gotong royong mengajarkan bahwa duka bencana bukanlah beban yang dipikul sendirian. Jiwa yang saling bertaut akan menguatkan kembali harapan masa depan."}
                   </p>
                 </div>
@@ -1250,18 +1250,18 @@ export default function TeleScreening() {
 
                     <div className="p-4 rounded-xl bg-[#f2f4f6] flex flex-col gap-2">
                       <span className="font-label-sm text-label-sm text-[#f48c24] font-semibold uppercase tracking-wider">
-                        {culture === "sumbar"
-                          ? "Mambangkik Batang Tarandam"
+                        {culture === "kalimantan"
+                          ? "Kearifan Handep Kalimantan"
                           : "Kearifan Meuseuraya Aceh"}
                       </span>
                       <p className="font-body-sm text-body-sm text-[#191c1e] italic leading-relaxed">
-                        {culture === "sumbar"
-                          ? "“Merasakan takut dan berdebar setelah tanah berguncang adalah tanda bahwa tubuhmu sedang berusaha menjagamu tetap selamat. Kamu tidak sendiri, dan kamu berharga.”"
+                        {culture === "kalimantan"
+                          ? "“Merasakan takut dan cemas saat bencana datang adalah tanda perlindungan alami tubuhmu. Di bawah atap Rumah Betang, kamu tidak sendiri, kamu sangat berharga.”"
                           : "“Duka dan lelah ini kita pikul bersama di posko. Bunga jeumpa yang merekah saling bertaut, luka batin perlahan sembuh saat kita saling menguatkan.”"}
                       </p>
                       <p className="font-label-sm text-label-sm text-[#414844] text-right">
-                        {culture === "sumbar"
-                          ? "— Falsafah Pemulihan Minangkabau"
+                        {culture === "kalimantan"
+                          ? "— Falsafah Pemulihan Dayak"
                           : "— Falsafah Gotong Royong Aceh"}
                       </p>
                     </div>

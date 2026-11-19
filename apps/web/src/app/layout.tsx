@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { CultureProvider } from "@/context/CultureContext";
@@ -23,27 +24,32 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "PERMATA Nusantara | Ekosistem Resiliensi & PFA Ramah Anak Pascabencana",
   description:
-    "Mendampingi kesiapsiagaan darurat, Psychological First Aid (PFA), dan pertumbuhan pascatrauma (Post-Traumatic Growth) melalui kearifan lokal Aceh dan Minangkabau yang berakar kasih.",
+    "Mendampingi kesiapsiagaan darurat, Psychological First Aid (PFA), dan pertumbuhan pascatrauma (Post-Traumatic Growth) melalui kearifan lokal Aceh dan Kalimantan yang berakar kasih.",
   manifest: "/manifest.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const cultureCookie = cookieStore.get("culture")?.value;
+  const initialCulture =
+    cultureCookie === "kalimantan" ? "kalimantan" : "aceh";
+
   return (
     <html
       lang="id"
       className={`scroll-smooth ${inter.variable} ${plusJakartaSans.variable}`}
-      data-culture="aceh"
+      data-culture={initialCulture}
       suppressHydrationWarning
     >
       <body
         className="bg-canvas text-fg antialiased selection:bg-action selection:text-white"
         suppressHydrationWarning
       >
-        <CultureProvider>
+        <CultureProvider initialCulture={initialCulture}>
           <AuthProvider>
             <ThemedContent>{children}</ThemedContent>
           </AuthProvider>

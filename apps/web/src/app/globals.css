@@ -28,7 +28,7 @@
   --accent-border: #f59e0b;
 }
 
-/* ---------- 2. BUDAYA (Aceh = Hikmah Resilience Default, Sumbar = Rumah Gadang) ---------- */
+/* ---------- 2. BUDAYA (Aceh = Hikmah Resilience Default, Kalimantan = Palet Dayak) ---------- */
 :root,
 [data-culture="aceh"] {
   --brand-50:  #e8f5e9;
@@ -47,21 +47,22 @@
   --shadow-tint: 27 67 50;
 }
 
-[data-culture="sumbar"] {
-  --brand-50:  #fbf3f1;
-  --brand-100: #f6e2de;
-  --brand-200: #ebc1b9;
-  --brand-300: #dc9a8e;
-  --brand-400: #c86a5b;
-  --brand-500: #ae4234;
-  --brand-600: #9c2a22;
-  --brand-700: #7b0000;
-  --brand-800: #5c0000;
-  --brand-900: #3d0000;
-  --accent-500: #d97706;
-  --canvas:     #fcf8f6;
-  --card-border: #e2e8f0;
-  --shadow-tint: 123 0 0;
+[data-culture="kalimantan"] {
+  /* Merah Dayak #A62B1F (primary, tombol, heading), Hijau Rimba #2F5D3A (secondary, positif), Kuning Kunyit #D9A21B (aksen), Hitam Ulin #1F1A17 (teks), Putih Tulang #F6F0E4 (background) */
+  --brand-50:  #fdf3f2;
+  --brand-100: #f9dedb;
+  --brand-200: #f4c0bb;
+  --brand-300: #eb948a;
+  --brand-400: #db6152;
+  --brand-500: #c54032;
+  --brand-600: #a62b1f; /* Merah Dayak: primary, tombol */
+  --brand-700: #852218; /* Merah Dayak heading / emphasis */
+  --brand-800: #54110a;
+  --brand-900: #1f1a17; /* Hitam Ulin: teks gelap */
+  --accent-500: #d9a21b; /* Kuning Kunyit: aksen */
+  --canvas:     #f6f0e4; /* Putih Tulang: background */
+  --card-border: #e4dbc9;
+  --shadow-tint: 166 43 31;
 }
 
 /* ---------- 3. SEMANTIC ---------- */

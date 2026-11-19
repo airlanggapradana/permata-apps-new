@@ -32,7 +32,7 @@ export interface PsychologicalScenario {
   forSelf: string[];
   forChildOrPeer: string[];
   culturalNoteAceh: string;
-  culturalNoteSumbar: string;
+  culturalNoteKalimantan: string;
 }
 
 export interface GroundingStep {
@@ -293,8 +293,8 @@ export const PSYCHOLOGICAL_SCENARIOS: PsychologicalScenario[] = [
     ],
     culturalNoteAceh:
       "Dalam semangat Meuseuraya, kita tidak harus memikul rasa takut sendirian; duduk bersama keluarga atau warga gampong di posko membantu hati kembali tenang.",
-    culturalNoteSumbar:
-      "Filosofi Mambangkik Batang Tarandam mengingatkan bahwa gemetar dan takut sesaat bukanlah kelemahan, melainkan awal tubuh menata kekuatan untuk bangkit.",
+    culturalNoteKalimantan:
+      "Filosofi Handep mengingatkan bahwa rasa takut sesaat adalah wajar; di bawah atap Rumah Betang kita saling menopang dan menguatkan untuk bangkit kembali.",
   },
   {
     id: "freeze-shock",
@@ -312,8 +312,8 @@ export const PSYCHOLOGICAL_SCENARIOS: PsychologicalScenario[] = [
     ],
     culturalNoteAceh:
       "Pendekatan Peumulia Jamee dan kasih sayang keluarga di meunasah menjaga martabat anak dengan kesabaran tanpa paksaan.",
-    culturalNoteSumbar:
-      "Kehangatan rumah gadang dan tutur lembut bundo kanduang memberi ruang tenang bagi anak sampai suaranya siap kembali.",
+    culturalNoteKalimantan:
+      "Kehangatan ruang keluarga di Rumah Betang dan tutur tenang sesepuh adat memberi ruang hening yang aman bagi anak hingga siap berbicara kembali.",
   },
   {
     id: "separated-child",
@@ -331,8 +331,8 @@ export const PSYCHOLOGICAL_SCENARIOS: PsychologicalScenario[] = [
     ],
     culturalNoteAceh:
       "Tradisi meuseuraya memastikan setiap anak di gampong dijaga bersama oleh komunitas sampai berkumpul lagi dengan orang tuanya.",
-    culturalNoteSumbar:
-      "Semangat badunsanak menguatkan rasa saling menjaga di posko agar anak merasa tetap berada di tengah keluarga besar yang melindunginya.",
+    culturalNoteKalimantan:
+      "Semangat persaudaraan Betang memastikan setiap anak diperlakukan layaknya keluarga sendiri, dilindungi bersama oleh komunitas hingga bertemu orang tuanya.",
   },
   {
     id: "aftershock-insomnia",
@@ -351,8 +351,8 @@ export const PSYCHOLOGICAL_SCENARIOS: PsychologicalScenario[] = [
     ],
     culturalNoteAceh:
       "Sebagaimana pepatah Aceh 'Peugah hal nyang na, peubuet nyang baik', kejujuran yang menenangkan membantu anak memahami situasi tanpa ketakutan berlebih.",
-    culturalNoteSumbar:
-      "Dalam kebersamaan nagari, saling bercerita dengan nada tenang membantu meringankan beban pikiran yang menumpuk di malam hari.",
+    culturalNoteKalimantan:
+      "Dalam ketenangan alam Borneo dan lingkaran kebersamaan, saling bercerita dengan nada tenang membantu mengurai beban pikiran di malam hari.",
   },
 ];
 

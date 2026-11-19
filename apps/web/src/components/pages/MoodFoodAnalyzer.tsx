@@ -62,16 +62,16 @@ const ACEH_RECOMMENDATIONS = [
   },
 ];
 
-const SUMBAR_RECOMMENDATIONS = [
+const KALIMANTAN_RECOMMENDATIONS = [
   {
-    title: "Seduhan Jahe Temulawak Hangat",
-    desc: "Senyawa gingerol menurunkan denyut jantung tegang dan menghangatkan ulu hati yang gelisah.",
+    title: "Seduhan Jahe Merah & Pasak Bumi",
+    desc: "Herbal hangat khas Borneo untuk meredakan ketegangan saraf, melancarkan peredaran darah, dan mengembalikan energi tubuh.",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuA0T264vQFqSzBhnbpB3tTnXHlOaAj9rRrbrCQ2ot7AzNBxKevUlENNdGiGSr4CIEW83xHCJijaS8fkciarGe1O6S_Bp4KUAqrbZ07bxe6lxtrlZWv0hQdFoklCTh6U5Hm4tMgrJGwClHHrPxP7NoMotyAPwV1JuRRongfwctUI8R2sjpQtIZ_wIaCJxP31WbnK1NV7ySLJSBri-Z-J8T8bsJHJGAW1DTgMO4phmgQ",
   },
   {
-    title: "Teh Talua Minang (Asam Amino)",
-    desc: "Kandungan kolin dan protein bioaktif mengembalikan stamina fisik yang terkuras akibat letupan emosi.",
+    title: "Sup Ikan Baung Bumbu Kuning Kunyit",
+    desc: "Kaya kurkuminoid dan protein asam amino esensial untuk memulihkan stamina fisik dan menenangkan poros gut-brain.",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuDXzK6-yVOQqlKZdYc5B4-kaXRbJwbRMkWnCk4lDLTYcFAERIuOYgzcAGGXJ77-Adz0FBt2HdcXUl6eNnapc7MVWTBChJmCnAdN_YBHneDu4eaNIQ66iXInG3fPPjzk2EgWhQIxTFyXtC6xptbu6HfDY8G9IsZPAEbXUyYajsMOfCUp61j3zOieo1s7fZvwVsYJ77Bhkvdm2aDwRbPu54LBBC9Ph2Fi1i6YnuPhkBM",
   },
@@ -325,8 +325,8 @@ export default function MoodFoodAnalyzer() {
   const activeRecommendations =
     analysisResult?.recommendations && analysisResult.recommendations.length > 0
       ? analysisResult.recommendations
-      : culture === "sumbar"
-        ? SUMBAR_RECOMMENDATIONS
+      : culture === "kalimantan"
+        ? KALIMANTAN_RECOMMENDATIONS
         : ACEH_RECOMMENDATIONS;
 
   // Handle file selection from local device
@@ -1346,9 +1346,9 @@ export default function MoodFoodAnalyzer() {
                           </h4>
                           <span className="text-xs text-[#006c48] font-semibold">
                             Kearifan{" "}
-                            {culture === "sumbar"
-                              ? "Minangkabau"
-                              : "Aceh & Minangkabau"}
+                            {culture === "kalimantan"
+                              ? "Kalimantan"
+                              : "Aceh & Kalimantan"}
                           </span>
                         </div>
 
@@ -1509,8 +1509,8 @@ export default function MoodFoodAnalyzer() {
 
                             <div className="pt-2 border-t border-slate-200/40 flex items-center justify-between">
                               <span className="text-[10px] text-[#717973] uppercase font-bold tracking-wider">
-                                {record.culture === "sumbar"
-                                  ? "Minangkabau"
+                                {record.culture === "kalimantan"
+                                  ? "Kalimantan"
                                   : "Aceh"}
                               </span>
 
@@ -1710,26 +1710,26 @@ export default function MoodFoodAnalyzer() {
 
                   <div className="p-4 rounded-xl bg-[#f2f4f6] space-y-3 border border-slate-200/50">
                     <div className="text-[#012d1d] italic text-xs sm:text-sm font-semibold">
-                      {culture === "sumbar"
-                        ? "“Nan lamak di awak, katuju di urang. Makan bajamba maubek duto.”"
+                      {culture === "kalimantan"
+                        ? "“Bapakat kuman basama, rasa tra belas; duka lenyap di bawah bumbungan Betang.”"
                         : "“Ubat hatee, ubat badan. Lam saboh mangkok, teuka seunang.”"}
                     </div>
                     <p className="text-xs text-[#414844] leading-relaxed">
-                      {culture === "sumbar"
-                        ? "Kearifan Minangkabau mengajarkan kebersamaan menyantap makanan mengobati luka batin dan memulihkan rasa aman keluarga."
+                      {culture === "kalimantan"
+                        ? "Kearifan Dayak mengajarkan makan bersama di beranda Betang mengembalikan rasa aman, mengusir kecemasan, dan menguatkan jiwa."
                         : "Pepatah Aceh menegaskan bahwa makanan yang disiapkan penuh keikhlasan di dapur umum posko adalah obat bagi batin yang sedang berduka."}
                     </p>
                   </div>
 
                   <div className="space-y-1.5 pt-1">
                     <span className="text-xs text-[#012d1d] font-bold block">
-                      {culture === "sumbar"
-                        ? "Filosofi Makan Bajamba Pangan:"
+                      {culture === "kalimantan"
+                        ? "Filosofi Handep Pangan Rimba:"
                         : "Filosofi Meuseuraya Pangan:"}
                     </span>
                     <p className="text-xs text-[#414844] leading-relaxed">
-                      {culture === "sumbar"
-                        ? "Makan bajamba (berkelompok dalam satu nampan) memulihkan kehangatan sosial dan menurunkan hormon stres kortisol serta memicu rasa aman komunal."
+                      {culture === "kalimantan"
+                        ? "Tradisi berbagi pangan dan rempah rimpang hutan menenangkan saraf yang tegang serta menurunkan hormon stres kortisol melalui rasa aman kebersamaan."
                         : "Makan bersama dalam lingkar komunal posko terbukti menurunkan hormon stres kortisol sebesar 24% dibandingkan menyantap makanan sendirian di tenda pengungsian."}
                     </p>
                   </div>

@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preview Materi Baru Landing Page - PERMATA Nusantara</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- TOP BANNER PREVIEW INFO -->
+  <aside class="sticky top-0 z-50 bg-slate-900 text-white border-b border-brand-500/30 px-4 py-2.5 text-xs sm:text-sm shadow-md flex items-center justify-between">
+    <div class="flex items-center gap-2 mx-auto">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+      <span><strong>PRATINJAU MATERI BARU:</strong> Struktur konten disesuaikan langsung dengan dokumen PRD &amp; fitur nyata aplikasi agar orang awam langsung paham.</span>
+    </div>
+    <span class="hidden md:inline-block bg-brand-500/20 text-brand-300 px-2 py-0.5 rounded font-mono text-xs">V2 Full PRD</span>
+  </aside>
+
+  <!-- ======================================================== -->
+  <!-- 1. HERO SECTION (DIPERTAHANKAN SESUAI PERMINTAAN)       -->
+  <!-- ======================================================== -->
+  <section class="relative bg-slate-950 text-white py-24 px-6 overflow-hidden border-b border-slate-800">
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/90 to-brand-950/40 opacity-95"></div>
+    <div class="max-w-4xl mx-auto text-center relative z-10 space-y-6">
+      <div class="inline-flex items-center gap-2 bg-brand-950/80 border border-brand-500/40 text-brand-300 text-xs px-3.5 py-1.5 rounded-full font-medium">
+        <span class="w-2 h-2 rounded-full bg-brand-400"></span>
+        Hero Section (Dipertahankan Sesuai Arahan)
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight">
+        Pulihkan Senyum & Resiliensi Jiwa Anak Pascabencana
+      </h1>
+      <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-300 leading-relaxed">
+        Platform pendampingan psikososial berbasis kearifan budaya lokal untuk mengembalikan harapan dan keceriaan anak.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 pt-2">
+        <a href="#fase-bencana" class="bg-brand-500 hover:bg-brand-400 text-slate-950 font-semibold px-6 py-3 rounded-full transition shadow-lg shadow-brand-500/25 text-sm sm:text-base">
+          Mulai Pemulihan
+        </a>
+        <a href="#hope-tree" class="border border-white/30 hover:bg-white/10 text-white font-semibold px-6 py-3 rounded-full transition text-sm sm:text-base">
+          Simulasi Hope Tree
+        </a>
+      </div>
+
+      <!-- Stats Pill -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-slate-800 text-left sm:text-center mt-10">
+        <div class="p-3 bg-white/5 rounded-xl border border-white/10">
+          <p class="text-xl font-bold text-brand-400">100%</p>
+          <p class="text-xs text-slate-400 mt-0.5">Kearifan Nusantara</p>
+        </div>
+        <div class="p-3 bg-white/5 rounded-xl border border-white/10">
+          <p class="text-xl font-bold text-brand-400">DASS-21</p>
+          <p class="text-xs text-slate-400 mt-0.5">Skrining Terstandar</p>
+        </div>
+        <div class="p-3 bg-white/5 rounded-xl border border-white/10">
+          <p class="text-xl font-bold text-brand-400">AI Guard</p>
+          <p class="text-xs text-slate-400 mt-0.5">Sensor PII & Etis</p>
+        </div>
+        <div class="p-3 bg-white/5 rounded-xl border border-white/10">
+          <p class="text-xl font-bold text-brand-400">Offline PWA</p>
+          <p class="text-xs text-slate-400 mt-0.5">Ready di Pengungsian</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 2. RINGKASAN: APA ITU PERMATA & UNTUK SIAPA?             -->
+  <!-- ======================================================== -->
+  <section class="py-16 bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div class="lg:col-span-6 space-y-4">
+          <div class="badge-pill bg-emerald-100 text-emerald-800">
+            Mengenal PERMATA
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            Bukan Sekadar Aplikasi Darurat, Ini Ekosistem Resiliensi Anak
+          </h2>
+          <p class="text-base text-slate-600 leading-relaxed">
+            Di daerah rawan bencana, trauma pada anak kerap terlambat ditangani karena keterbatasan psikolog dan minimnya sinyal internet. <strong>PERMATA</strong> hadir sebagai jembatan yang menghubungkan anak, keluarga, guru, dan relawan melalui panduan psikososial yang mudah dipahami, ramah anak, dan tetap berfungsi walau jaringan telekomunikasi terputus.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 pt-2">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">✓</span>
+              <span class="text-sm font-medium text-slate-700">Dukungan Darurat Tanpa Kuota / Sinyal</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">✓</span>
+              <span class="text-sm font-medium text-slate-700">Privasi Data Anak Terproteksi Ketat</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Pilar Pengguna (Anak, Orang Tua, Guru, Relawan) -->
+        <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-brand-500 hover:bg-white transition duration-200">
+            <div class="text-2xl mb-2">🧒</div>
+            <h3 class="font-bold text-slate-900 text-base">Untuk Anak</h3>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              Belajar kesiapsiagaan lewat simulasi game yang seru, latihan olah napas penenang, dan teman curhat AI tanpa rasa takut.
+            </p>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-brand-500 hover:bg-white transition duration-200">
+            <div class="text-2xl mb-2">👨‍👩‍👧</div>
+            <h3 class="font-bold text-slate-900 text-base">Untuk Orang Tua</h3>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              Membuat Paspor Keselamatan keluarga (titik kumpul &amp; kontak darurat) serta memantau kestabilan emosi anak di rumah/tenda.
+            </p>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-brand-500 hover:bg-white transition duration-200">
+            <div class="text-2xl mb-2">🏫</div>
+            <h3 class="font-bold text-slate-900 text-base">Untuk Guru &amp; Sekolah</h3>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              Materi psikoedukasi terstruktur dan simulasi evakuasi mandiri di kelas guna membangun sekolah tanggap bencana.
+            </p>
+          </div>
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 hover:border-brand-500 hover:bg-white transition duration-200">
+            <div class="text-2xl mb-2">🤝</div>
+            <h3 class="font-bold text-slate-900 text-base">Untuk Relawan &amp; Posko</h3>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              Panduan PFA lapangan, triase cepat kondisi psikologis anak, dan panduan menu dapur darurat penstabil suasana hati.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 3. TIGA FASE KEBENCANAAN (STRUKTUR INTI PRD)             -->
+  <!-- ======================================================== -->
+  <section class="py-20 bg-slate-900 text-white" id="fase-bencana">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+        <div class="badge-pill bg-brand-500/20 text-brand-300 border border-brand-500/40">
+          Siklus Kesiapsiagaan Menyeluruh
+        </div>
+        <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight">
+          Mendampingi di Setiap Tahap Bencana
+        </h2>
+        <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
+          Penanganan bencana tidak dimulai saat sirine berbunyi, dan tidak selesai ketika air surut. PERMATA membagi perlindungan ke dalam tiga fase utama:
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Fase 1: Prevention -->
+        <div class="rounded-3xl bg-slate-800/80 border border-slate-700/80 p-7 flex flex-col relative overflow-hidden group hover:border-emerald-500/80 transition duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl font-bold mb-5 border border-emerald-500/30">
+            🛡️
+          </div>
+          <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Fase 1 &bull; Pra-Bencana</span>
+          <h3 class="text-xl font-bold text-white mt-1 mb-3">Pencegahan &amp; Kesiapsiagaan</h3>
+          <p class="text-sm text-slate-300 leading-relaxed mb-6 flex-1">
+            Membangun kesiapan mental anak dan keluarga sebelum marabahaya terjadi. Menanamkan kebiasaan mitigasi secara rekreatif tanpa rasa panik.
+          </p>
+          
+          <div class="space-y-2.5 pt-4 border-t border-slate-700 text-xs text-slate-300">
+            <div class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Game Mitigasi Interaktif:</strong> Simulasi gempa &amp; tas siaga bencana.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Safety Passport:</strong> Pendataan kontak darurat &amp; titik kumpul keluarga.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span><strong>Emotional Readiness:</strong> Pemetaan kesiapan emosi awal anak.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fase 2: During Disaster -->
+        <div class="rounded-3xl bg-slate-800/80 border border-brand-500/50 p-7 flex flex-col relative overflow-hidden group shadow-lg shadow-brand-950/50 transition duration-300">
+          <div class="absolute top-0 right-0 bg-brand-500 text-slate-950 text-[10px] font-extrabold uppercase px-3 py-1 rounded-bl-xl tracking-wider">
+            Mode Kedaruratan
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-2xl font-bold mb-5 border border-teal-500/30">
+            ⚡
+          </div>
+          <span class="text-xs font-bold text-teal-400 uppercase tracking-widest">Fase 2 &bull; Saat Bencana</span>
+          <h3 class="text-xl font-bold text-white mt-1 mb-3">Tanggap Darurat &amp; SafeConnect</h3>
+          <p class="text-sm text-slate-300 leading-relaxed mb-6 flex-1">
+            Memberikan pertolongan pertama psikologis (PFA) saat anak mengalami histeria, cemas akut, atau kebingungan di posko pengungsian.
+          </p>
+          
+          <div class="space-y-2.5 pt-4 border-t border-slate-700 text-xs text-slate-300">
+            <div class="flex items-start gap-2">
+              <span class="text-teal-400 font-bold">✓</span>
+              <span><strong>Offline Survival Mode (PWA):</strong> Berjalan tanpa internet &amp; tanpa login.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-teal-400 font-bold">✓</span>
+              <span><strong>Teknik Grounding Cepat:</strong> Panduan olah napas penenang detak jantung.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-teal-400 font-bold">✓</span>
+              <span><strong>Akses Cepat Hotline 119:</strong> Jalur rujukan medis darurat terpadu.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fase 3: Recovery -->
+        <div class="rounded-3xl bg-slate-800/80 border border-slate-700/80 p-7 flex flex-col relative overflow-hidden group hover:border-blue-500/80 transition duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl font-bold mb-5 border border-blue-500/30">
+            🌱
+          </div>
+          <span class="text-xs font-bold text-blue-400 uppercase tracking-widest">Fase 3 &bull; Pasca-Bencana</span>
+          <h3 class="text-xl font-bold text-white mt-1 mb-3">Pemulihan &amp; Pertumbuhan Jiwa</h3>
+          <p class="text-sm text-slate-300 leading-relaxed mb-6 flex-1">
+            Mendampingi proses <em>Post-Traumatic Growth</em> agar anak tidak terjebak dalam rasa trauma yang berkepanjangan dan mampu bangkit berdaya.
+          </p>
+          
+          <div class="space-y-2.5 pt-4 border-t border-slate-700 text-xs text-slate-300">
+            <div class="flex items-start gap-2">
+              <span class="text-blue-400 font-bold">✓</span>
+              <span><strong>Hope Tree (Pohon Harapan):</strong> Pantau resiliensi harian tanpa sistem penalti.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-blue-400 font-bold">✓</span>
+              <span><strong>AI Jurnal Hikmah:</strong> Menemukan makna positif dari kearifan lokal Nusantara.</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-blue-400 font-bold">✓</span>
+              <span><strong>Care Circle:</strong> Lingkaran dukungan kolaboratif orang tua dan guru.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 4. MODUL-MODUL UTAMA APLIKASI (KARTU FITUR KONKRET)      -->
+  <!-- ======================================================== -->
+  <section class="py-20 bg-white border-b border-slate-100" id="modul-aplikasi">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="max-w-3xl mb-14 space-y-3">
+        <div class="badge-pill bg-indigo-100 text-indigo-900">
+          Fitur-Fitur Utama Aplikasi
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Alat Praktis untuk Keseharian dan Situasi Kritis
+        </h2>
+        <p class="text-base text-slate-600 leading-relaxed">
+          Dirancang dengan tampilan sederhana yang mudah dipahami anak-anak, tetapi memiliki fondasi psikologis dan keamanan data yang kuat untuk para profesional.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Kartu 1: Mode Offline PWA (Fitur Unik Kritis) -->
+        <div class="rounded-3xl border-2 border-emerald-500/40 bg-emerald-50/30 p-6 flex flex-col justify-between hover:shadow-lg transition">
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-emerald-200/80 text-emerald-900 text-xs px-2.5 py-1 rounded-full font-bold mb-4">
+              <span>📶</span> BISA DIAKSES OFFLINE
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">Offline Survival Mode</h3>
+            <p class="text-xs font-semibold text-emerald-700 mt-1 uppercase tracking-wider">Akses Mandiri Tanpa Sinyal &amp; Login</p>
+            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+              Saat gempa melumpuhkan pemancar seluler, modul ini tetap terbuka di browser HP. Berisi panduan pertolongan pertama fisik, teknik peredam histeria anak, nomor darurat, dan ekspor Paspor Keselamatan offline.
+            </p>
+          </div>
+          <div class="pt-6 mt-6 border-t border-emerald-200/60 flex items-center justify-between">
+            <span class="text-xs font-medium text-emerald-800">Tersedia di PWA</span>
+            <a href="/offline-survival" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1">
+              Buka Panduan Offline &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Kartu 2: Paspor Keselamatan Keluarga -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 flex flex-col justify-between hover:shadow-lg transition">
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-full font-semibold mb-4">
+              <span>🪪</span> Kesiapsiagaan Keluarga
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">Safety Passport</h3>
+            <p class="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Kartu Keselamatan Darurat Anak</p>
+            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+              Memudahkan orang tua mencatat identitas anak, kontak darurat wali, titik kumpul evakuasi terdekat, serta kebutuhan obat-obatan khusus yang dapat diakses cepat jika terpisah saat bencana.
+            </p>
+          </div>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">Privasi Terjaga</span>
+            <a href="/safety-passport" class="text-xs font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1">
+              Kelola Paspor &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Kartu 3: Jurnal Hikmah -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 flex flex-col justify-between hover:shadow-lg transition">
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-full font-semibold mb-4">
+              <span>📖</span> Pemulihan Emosi
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">AI Jurnal Hikmah</h3>
+            <p class="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Refleksi Berakar Budaya Nusantara</p>
+            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+              Ruang pribadi yang aman bagi anak untuk menuliskan perasaan takut dan sedih, lalu diarahkan menemukan makna ketabahan lewat filosofi lokal seperti <em>Meuseuraya</em> dan <em>Mambangkik Batang Tarandam</em>.
+            </p>
+          </div>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">Refleksi Harian</span>
+            <a href="/jurnal" class="text-xs font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1">
+              Tulis Refleksi &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Kartu 4: Skrining DASS-21 -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 flex flex-col justify-between hover:shadow-lg transition">
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-full font-semibold mb-4">
+              <span>🩺</span> Deteksi Dini
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">Tele-Screening &amp; Triase</h3>
+            <p class="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Instrumen Terstandar DASS-21</p>
+            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+              Mendeteksi tingkat stres, kecemasan, dan indikasi depresi anak melalui 21 pertanyaan psikologis yang disederhanakan, disertai rekomendasi apakah cukup pendampingan keluarga atau butuh rujukan profesional.
+            </p>
+          </div>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">Bukan Diagnosa Klinis</span>
+            <a href="/tele-screening" class="text-xs font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1">
+              Mulai Skrining &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Kartu 5: AI Companion dengan Guardrails -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 flex flex-col justify-between hover:shadow-lg transition">
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-full font-semibold mb-4">
+              <span>🤖</span> Pendamping 24/7
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">Sahabat AI Pendamping</h3>
+            <p class="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Didukung Google Gemini &amp; Safety Guard</p>
+            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+              Teman mengobrol yang sabar dan empatik untuk mendengarkan keluh kesah anak. Dilengkapi sensor otomatis terhadap ancaman bahaya, privasi data (PII), dan larangan memberikan diagnosa medis sembarangan.
+            </p>
+          </div>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">Guardrails Etis</span>
+            <a href="/ai-companion" class="text-xs font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1">
+              Mulai Percakapan &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Kartu 6: Mood + Food Analyzer -->
+        <div class="rounded-3xl border border-slate-200 bg-white p-6 flex flex-col justify-between hover:shadow-lg transition">
+          <div>
+            <div class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-700 text-xs px-2.5 py-1 rounded-full font-semibold mb-4">
+              <span>🍲</span> Nutrisi Psikologis
+            </div>
+            <h3 class="text-xl font-bold text-slate-900">Mood + Food Analyzer</h3>
+            <p class="text-xs font-semibold text-slate-500 mt-1 uppercase tracking-wider">Analisis Foto Menu Dapur Umum</p>
+            <p class="text-sm text-slate-600 mt-3 leading-relaxed">
+              Memindai foto makanan darurat dengan kecerdasan buatan untuk menganalisis ketersediaan mikronutrien (Omega-3, zinc, rempah) yang bermanfaat menenangkan ketegangan saraf anak di lokasi bencana.
+            </p>
+          </div>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-500">Multimodal AI</span>
+            <a href="/mood-food" class="text-xs font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1">
+              Analisis Menu &rarr;
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 5. HOPE TREE SIMULATOR (DI-KEEP SESUAI ARAHAN)            -->
+  <!-- ======================================================== -->
+  <section class="py-16 bg-slate-900 text-white border-b border-slate-800" id="hope-tree">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-brand-950 via-slate-900 to-brand-950 border border-brand-800/40 relative overflow-hidden">
+        <div class="max-w-xl space-y-3">
+          <div class="inline-flex items-center gap-2 bg-brand-500/20 text-brand-300 text-xs px-3 py-1 rounded-full font-semibold">
+            <span>🔒 Simulator Hope Tree (Dipertahankan Sesuai Kesepakatan)</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">Simulasi Pertumbuhan Hope Tree (Pohon Harapan)</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Menghitung akumulasi XP resiliensi anak dari konsistensi aktivitas harian, olah napas, dan jurnal refleksi tanpa sistem penalti (Level 2 Tunas Muda &rarr; Level 5 Rimba Resiliensi Mandiri).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 6. GAME CENTER RESILIENSI (LENGKAP 6 MODUL SESUAI README) -->
+  <!-- ======================================================== -->
+  <section class="py-20 bg-white border-b border-slate-100" id="game-center">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="max-w-3xl mb-12 space-y-3">
+        <div class="badge-pill bg-amber-100 text-amber-900">
+          Game Center Resiliensi (6 Modul Edukasi)
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Belajar Siap Siaga Bencana Lewat Permainan Interaktif
+        </h2>
+        <p class="text-base text-slate-600 leading-relaxed">
+          Menggunakan pendekatan <em>serious gaming</em> ramah anak. Anak belajar mengenali bahaya gempa, rute evakuasi, dan menstabilkan pernapasan tanpa merasa ditakut-takuti.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Game 1: Sigap Bencana -->
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-brand-500 hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center text-2xl mb-4">
+              🏠
+            </div>
+            <h4 class="font-bold text-slate-900 text-lg">Sigap Bencana</h4>
+            <p class="text-xs text-indigo-600 font-semibold uppercase mt-0.5">Simulasi Evakuasi Rumah 2D (Phaser 3)</p>
+            <p class="text-sm text-slate-600 mt-2.5 leading-relaxed">
+              Jelajahi simulasi rumah saat gempa tiba. Latih refleks <em>Drop, Cover, and Hold On</em>, matikan kompor, dan temukan pintu keluar dengan selamat.
+            </p>
+          </div>
+          <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400">Hadiah: 20 XP/hari</span>
+            <a href="/game-quake" class="text-xs font-bold text-brand-700 hover:underline">Mainkan &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Game 2: Tas Siaga Bencana -->
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-brand-500 hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-700 flex items-center justify-center text-2xl mb-4">
+              🎒
+            </div>
+            <h4 class="font-bold text-slate-900 text-lg">Tas Siaga Bencana</h4>
+            <p class="text-xs text-brand-600 font-semibold uppercase mt-0.5">Mengenal Perlengkapan Survival</p>
+            <p class="text-sm text-slate-600 mt-2.5 leading-relaxed">
+              Latihan seru memasukkan 6 barang wajib (air, senter, peluit, P3K, dokumen, makanan) ke dalam tas siaga sebelum hitungan 60 detik berakhir.
+            </p>
+          </div>
+          <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400">Hadiah: 20 XP/hari</span>
+            <a href="/game-healing" class="text-xs font-bold text-brand-700 hover:underline">Mainkan &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Game 3: Napas Tenang -->
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-brand-500 hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center text-2xl mb-4">
+              🌬️
+            </div>
+            <h4 class="font-bold text-slate-900 text-lg">Napas Tenang</h4>
+            <p class="text-xs text-teal-600 font-semibold uppercase mt-0.5">Relaksasi Penurun Panik</p>
+            <p class="text-sm text-slate-600 mt-2.5 leading-relaxed">
+              Latihan pernapasan terpandu visual bunga mekar-kuncup. Membantu anak yang ketakutan atau histeris kembali tenang dalam hitungan menit.
+            </p>
+          </div>
+          <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400">Hadiah: 15 XP/hari</span>
+            <a href="/game-breath" class="text-xs font-bold text-brand-700 hover:underline">Mainkan &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Game 4: Siaga Minang -->
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-brand-500 hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center text-2xl mb-4">
+              🏛️
+            </div>
+            <h4 class="font-bold text-slate-900 text-lg">Siaga Minang</h4>
+            <p class="text-xs text-amber-600 font-semibold uppercase mt-0.5">Petualangan Mitigasi Ranah Minang</p>
+            <p class="text-sm text-slate-600 mt-2.5 leading-relaxed">
+              Petualangan klasik melintasi 3 pos mitigasi gempa &amp; tsunami. Belajar filosofi rumah panggung tahan gempa dan 10 perlengkapan keselamatan.
+            </p>
+          </div>
+          <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400">Hadiah: 20 XP/hari</span>
+            <a href="/game-siagaminang" class="text-xs font-bold text-brand-700 hover:underline">Mainkan &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Game 5: Adventure Budaya -->
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-brand-500 hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-700 flex items-center justify-center text-2xl mb-4">
+              🧭
+            </div>
+            <h4 class="font-bold text-slate-900 text-lg">Adventure Budaya</h4>
+            <p class="text-xs text-orange-600 font-semibold uppercase mt-0.5">Simulasi Naratif Mitigasi</p>
+            <p class="text-sm text-slate-600 mt-2.5 leading-relaxed">
+              Petualangan cerita bergambar yang mengajarkan anak bagaimana para leluhur Nusantara membaca tanda alam (smong/tsunami, gempa) untuk evakuasi cepat.
+            </p>
+          </div>
+          <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400">Naratif Interaktif</span>
+            <a href="/game-adventure" class="text-xs font-bold text-brand-700 hover:underline">Mainkan &rarr;</a>
+          </div>
+        </div>
+
+        <!-- Game 6: Roleplay Psikoedukasi -->
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white hover:border-brand-500 hover:shadow-md transition flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center text-2xl mb-4">
+              🎭
+            </div>
+            <h4 class="font-bold text-slate-900 text-lg">Roleplay Psikoedukasi</h4>
+            <p class="text-xs text-rose-600 font-semibold uppercase mt-0.5">Latihan Pengambilan Keputusan</p>
+            <p class="text-sm text-slate-600 mt-2.5 leading-relaxed">
+              Skenario interaktif bermain peran untuk membantu anak mengenali emosi temannya yang sedang berduka serta belajar cara saling menopang di pengungsian.
+            </p>
+          </div>
+          <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400">Kecerdasan Sosial</span>
+            <a href="/roleplay" class="text-xs font-bold text-brand-700 hover:underline">Mainkan &rarr;</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 7. SUARA DARI LAPANGAN / TESTIMONI LAPANGAN              -->
+  <!-- ======================================================== -->
+  <section class="py-20 bg-slate-50 border-b border-slate-200" id="stories">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="max-w-2xl mb-12 space-y-2">
+        <div class="badge-pill bg-slate-200 text-slate-800">
+          Validasi di Garis Depan
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Kata Mereka yang Mendampingi di Lapangan
+        </h2>
+        <p class="text-base text-slate-600">
+          Pendekatan ramah anak dan kearifan budaya terbukti memudahkan proses pendampingan psikososial saat kondisi darurat.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between shadow-xs">
+          <p class="text-sm text-slate-700 leading-relaxed italic">
+            &ldquo;Anak-anak di posko darurat langsung antusias saat diajak bermain game pernapasan dan menulis Jurnal Hikmah. Nilai Meuseuraya membuat mereka saling menguatkan, bukan merasa terasing dalam duka.&rdquo;
+          </p>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs">
+              RA
+            </div>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Rahmatiah, S.Psi.</p>
+              <p class="text-xs text-slate-500">Relawan PFA &amp; Psikososial Posko Pidie, Aceh</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between shadow-xs">
+          <p class="text-sm text-slate-700 leading-relaxed italic">
+            &ldquo;Filosofi Mambangkik Batang Tarandam membangkitkan harga diri anak sekolah dasar pasca-gempa. Mereka belajar bahwa musibah adalah awal kebangkitan karakter yang lebih tabah.&rdquo;
+          </p>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
+              BS
+            </div>
+            <div>
+              <p class="text-sm font-bold text-slate-900">Bundo Salma</p>
+              <p class="text-xs text-slate-500">Guru Pendamping SD Pasaman Barat, Sumbar</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col justify-between shadow-xs">
+          <p class="text-sm text-slate-700 leading-relaxed italic">
+            &ldquo;Adanya mode darurat offline dan skrining DASS-21 sangat krusial. Kami bisa memilah anak yang butuh rujukan medis darurat lebih cepat sebelum trauma menetap.&rdquo;
+          </p>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold text-xs">
+              FW
+            </div>
+            <div>
+              <p class="text-sm font-bold text-slate-900">dr. Fadli Wijaya</p>
+              <p class="text-xs text-slate-500">Koordinator Medis SafeConnect Hotline 119</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- 8. CALL TO ACTION (CTA)                                  -->
+  <!-- ======================================================== -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="rounded-3xl bg-gradient-to-r from-brand-950 via-brand-900 to-slate-950 p-8 sm:p-14 text-white text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8 shadow-xl">
+        <div class="max-w-xl space-y-2">
+          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+            Wujudkan Generasi Anak Tangguh Bencana di Nusantara
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            Akses gratis untuk keluarga, guru, posko darurat, dan relawan kemanusiaan di seluruh Indonesia. Mari bersama rawat senyum dan masa depan mereka.
+          </p>
+        </div>
+        <div class="shrink-0 flex flex-col items-center sm:items-end gap-2">
+          <a href="/dashboard" class="bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold px-8 py-3.5 rounded-full text-base transition shadow-lg shadow-brand-500/20">
+            Masuk ke Dashboard Resiliensi &rarr;
+          </a>
+          <span class="text-xs text-brand-200">Akses Gratis &bull; Privasi &amp; Perlindungan Data Anak Terjamin</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="py-8 bg-slate-950 text-slate-500 text-xs text-center border-t border-slate-800">
+    <p>&copy; 2026 PERMATA Nusantara &bull; Platform Integrasi Pendidikan Resiliensi Mental &amp; Pendampingan Anak Kebencanaan</p>
+  </footer>
+
+</body>
+</html>

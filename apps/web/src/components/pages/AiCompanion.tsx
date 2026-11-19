@@ -50,16 +50,16 @@ export default function AiCompanion() {
       timeStr: "10:12 WIB",
       culturalWisdom: {
         title:
-          culture === "sumbar"
-            ? "Mambangkik Batang Tarandam"
+          culture === "kalimantan"
+            ? "Falsafah Handep & Rumah Betang"
             : "Kearifan Meuseuraya Aceh",
         quote:
-          culture === "sumbar"
-            ? "“Batang kayu yang terendam air lambat laun akan timbul kembali.”"
+          culture === "kalimantan"
+            ? "“Bapakat kita bagawi, bapasang kita basanding; teguh laksana ulin di rimba.”"
             : "“Bungoeng jeumpa meugisa meutaloe, saboh hatee peugot gampong.”",
         meaning:
-          culture === "sumbar"
-            ? "Rasa cemas ini adalah fase pemulihan, dan kamu punya daya lentur untuk bangkit dengan kuat bersama keluarga."
+          culture === "kalimantan"
+            ? "Rasa cemas ini adalah fase pemulihan. Sebagaimana warga di Rumah Betang yang saling menopang, kamu punya ketangguhan laksana kayu ulin untuk bangkit."
             : "Duka dan lelah ini kita pikul bersama di posko. Bunga yang saling bertaut akan menguatkan kembali asa masa depan.",
       },
       hasActionButtons: true,
@@ -308,16 +308,16 @@ export default function AiCompanion() {
         timeStr: formatCurrentTime(),
         culturalWisdom: {
           title:
-            culture === "sumbar"
-              ? "Mambangkik Batang Tarandam"
+            culture === "kalimantan"
+              ? "Kearifan Handep Kalimantan"
               : "Semangat Meuseuraya Aceh",
           quote:
-            culture === "sumbar"
-              ? "“Dima bumi dipijak, di sinan langik dijunjuang; Mambangkik batang tarandam, bangkik marwah kito basamo.”"
+            culture === "kalimantan"
+              ? "“Bapakat kita bagawi, bapasang kita basanding; saperti ulin teguh di tanah rimba.”"
               : "“Udep sare mate syahid, beusajan lam geunaseh. Badai brat ka lheueh ta lewati, singoh langet teuh glah.”",
           meaning:
-            culture === "sumbar"
-              ? "Dari kesulitan yang dialami, daya lentur jiwamu akan bangkit perlahan merawat masa depan."
+            culture === "kalimantan"
+              ? "Dari kebersamaan di bawah atap Rumah Betang, daya lentur jiwamu akan tumbuh kokoh merawat masa depan."
               : "Kebersamaan dan gotong-royong adalah obat penawar duka bencana yang paling mujarab.",
         },
         hasActionButtons: true,
@@ -408,12 +408,12 @@ export default function AiCompanion() {
     },
     {
       label:
-        culture === "sumbar"
-          ? "Petuah Batang Tarandam"
+        culture === "kalimantan"
+          ? "Petuah Handep Borneo"
           : "Petuah Meuseuraya Aceh",
       text:
-        culture === "sumbar"
-          ? "Ceritakan falsafah Mambangkik Batang Tarandam tentang bangkit dari musibah."
+        culture === "kalimantan"
+          ? "Ceritakan kearifan Handep dan Rumah Betang tentang saling menguatkan di masa sulit."
           : "Ceritakan petuah Meuseuraya Aceh tentang saling menguatkan di masa sulit.",
     },
   ];
@@ -562,15 +562,15 @@ export default function AiCompanion() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setCulture("sumbar")}
+                        onClick={() => setCulture("kalimantan")}
                         className={`px-3 py-1 rounded-lg text-label-sm font-label-sm font-medium transition-all flex items-center gap-1.5 ${
-                          culture === "sumbar"
+                          culture === "kalimantan"
                             ? "bg-white text-[#012d1d] shadow-sm font-semibold"
                             : "text-[#414844] hover:text-[#012d1d]"
                         }`}
                       >
-                        <span className="w-2 h-2 rounded-full bg-[#ffb77d]"></span>
-                        <span>Minang (Batang Tarandam)</span>
+                        <span className="w-2 h-2 rounded-full bg-[#a62b1f]"></span>
+                        <span>Kalimantan (Dayak)</span>
                       </button>
                     </div>
                     <button
@@ -697,8 +697,8 @@ export default function AiCompanion() {
                                 Pendamping AI
                               </span>
                               <span className="px-2 py-0.5 rounded-full bg-[#92f7c3]/60 text-[#005235] font-label-sm text-xs font-medium">
-                                {culture === "sumbar"
-                                  ? "Resonansi Minangkabau"
+                                {culture === "kalimantan"
+                                  ? "Resonansi Kalimantan"
                                   : "Resonansi Aceh"}
                               </span>
                               <span className="font-label-sm text-label-sm text-[#414844]">
@@ -1215,20 +1215,20 @@ export default function AiCompanion() {
                 </div>
 
                 <blockquote className="italic font-body-md text-body-md text-[#191c1e] pl-3 border-l-2 border-[#1b4332] my-1 text-sm leading-relaxed">
-                  {culture === "sumbar"
-                    ? "“Dima bumi dipijak, di sinan langik dijunjuang. Mambangkik batang tarandam, bangkik marwah kito basamo.”"
+                  {culture === "kalimantan"
+                    ? "“Bapakat kita bagawi, bapasang kita basanding; teguh laksana ulin di rimba.”"
                     : "“Udep sare mate syahid, beusajan lam geunaseh. Badai brat ka lheueh ta lewati, singoh langet teuh glah.”"}
                 </blockquote>
 
                 <div className="flex flex-col text-xs text-[#414844]">
                   <span className="font-bold text-[#012d1d]">
-                    {culture === "sumbar"
-                      ? "Pepatah Batang Tarandam Minang"
+                    {culture === "kalimantan"
+                      ? "Pepatah Handep Dayak Kalimantan"
                       : "Pepatah Meuseuraya Aceh"}
                   </span>
                   <span>
-                    {culture === "sumbar"
-                      ? "Artinya: Membangkitkan kembali martabat dan daya lentur jiwa; bersama keluarga dan nagari kita bangkit lebih kuat."
+                    {culture === "kalimantan"
+                      ? "Artinya: Gotong royong di Rumah Betang menyatukan kekuatan; bersama kita kokoh menghadapi masa pascabencana seperti ulin."
                       : "Artinya: Kebersamaan adalah penyembuh terbesar; sesudah badai lebat, fajar harapan akan selalu merekah."}
                   </span>
                 </div>

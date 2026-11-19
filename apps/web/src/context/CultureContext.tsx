@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-type Culture = "aceh" | "sumbar";
+type Culture = "aceh" | "kalimantan";
 
 interface CultureContextType {
   culture: Culture;
@@ -14,20 +14,25 @@ const CultureContext = createContext<CultureContextType>({
   setCulture: () => {},
 });
 
-export function CultureProvider({ children }: { children: React.ReactNode }) {
-  const [culture, setCultureState] = useState<Culture>("aceh");
+export function CultureProvider({
+  children,
+  initialCulture = "aceh",
+}: {
+  children: React.ReactNode;
+  initialCulture?: Culture;
+}) {
+  const [culture, setCultureState] = useState<Culture>(initialCulture);
 
   useEffect(() => {
-    // Baca dari cookie atau localStorage saat mount
+    // Baca dari cookie atau localStorage saat mount jika initialCulture belum terisi dari server
     const stored =
       document.cookie
         .split("; ")
         .find((row) => row.startsWith("culture="))
         ?.split("=")[1] as Culture | undefined;
-    const initial: Culture = stored === "sumbar" ? "sumbar" : "aceh";
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setCultureState(initial);
-    document.documentElement.dataset.culture = initial;
+    const resolved: Culture = stored === "kalimantan" ? "kalimantan" : "aceh";
+    setCultureState(resolved);
+    document.documentElement.dataset.culture = resolved;
   }, []);
 
   const setCulture = (next: Culture) => {
@@ -48,3 +53,4 @@ export function useCulture() {
 }
 
 export { CultureContext };
+

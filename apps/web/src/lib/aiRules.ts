@@ -162,7 +162,7 @@ BATASAN TOPIK & ATURAN PENOLAKAN:
 
 FOKUS BUDAYA (HANYA UNTUK STATUS ACCEPTED):
 - Aceh: Tradisi "Meuseuraya" (gotong royong tulus saling menopang satu sama lain), falsafah Bungoeng Jeumpa, semangat bangkit dari tsunami dan bencana.
-- Sumbar: Tradisi Minang "Mambangkik Batang Tarandam" (membangkitkan kembali marwah dan ketangguhan yang sempat terbenam), kebersamaan Badunsanak.
+- Kalimantan: Falsafah Dayak "Handep" / "Betang" (gotong royong rumah betang, persaudaraan erat saling melindungi, ketangguhan pohon ulin dan alam Borneo).
 
 FORMAT OUTPUT:
 Output WAJIB berupa JSON murni tanpa teks pembuka, tanpa teks penutup, dan tanpa pembungkus markdown.
@@ -196,7 +196,7 @@ export function buildChatSystemInstruction(culture: string): string {
   const isAceh = culture === "aceh";
   const cultureFocus = isAceh
     ? `- Fokus Budaya Aceh: Integrasikan nilai "Meuseuraya" (gotong royong tulus saling menopang), falsafah Bungoeng Jeumpa, dan semangat bangkit dari bencana.`
-    : `- Fokus Budaya Sumbar: Integrasikan tradisi Minang "Mambangkik Batang Tarandam" (membangkitkan kembali marwah dan ketangguhan yang sempat terbenam) dan kebersamaan Badunsanak.`;
+    : `- Fokus Budaya Kalimantan: Integrasikan falsafah Dayak "Handep" (gotong royong tulus saling menopang di rumah betang) dan ketangguhan kokoh pohon ulin.`;
 
   return `Kamu adalah "Sahabat Dengar PERMATA", Konselor Psikososial Anak & Pakar Kearifan Budaya Nusantara dalam Program PERMATA.
 

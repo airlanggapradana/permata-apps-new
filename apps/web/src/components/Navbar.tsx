@@ -25,7 +25,7 @@ const NAV_LINKS = [
 
 const LOCATIONS = [
   { key: "aceh", label: "Aceh", note: "Meuseuraya" },
-  { key: "sumbar", label: "Sumatera Barat", note: "Mambangkik Batang Tarandam" },
+  { key: "kalimantan", label: "Kalimantan", note: "Gotong Royong Dayak" },
 ] as const;
 
 type Tone = "light" | "dark";
@@ -36,6 +36,9 @@ const focusRingOnDark =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 const ease = "ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none";
+// Easing dengan sedikit overshoot supaya centang dan ikon terasa "pop"
+const spring =
+  "ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none";
 
 function PinIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -75,52 +78,72 @@ function ChevronIcon({ className = "" }: { className?: string }) {
 function LocationOption({
   loc,
   active,
+  open,
+  index,
   onPick,
 }: {
   loc: (typeof LOCATIONS)[number];
   active: boolean;
+  open: boolean;
+  index: number;
   onPick: () => void;
 }) {
+  // Opsi muncul bergantian saat daftar dibuka; saat menutup langsung hilang tanpa jeda.
+  // Jeda dipasang di pembungkus agar efek hover pada tombol tidak ikut tertunda.
+  const stagger = (ms: number) => ({
+    transitionDelay: open ? `${ms}ms` : "0ms",
+  });
+
   return (
-    <button
-      type="button"
-      onClick={onPick}
-      aria-pressed={active}
-      className={`group w-full flex items-center gap-3 text-left rounded-xl px-3 min-h-14 transition-colors duration-200 ${focusRing} ${active ? "bg-brand-50" : "hover:bg-slate-50"
+    <div
+      style={stagger(80 + index * 70)}
+      className={`transition-[opacity,transform] duration-400 ${ease} ${open ? "opacity-100 scale-100" : "opacity-0 scale-95"
         }`}
     >
-      <span
-        className={`flex w-9 h-9 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${active
-          ? "bg-brand-800 text-white"
-          : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
+      <button
+        type="button"
+        onClick={onPick}
+        aria-pressed={active}
+        className={`group w-full flex items-center gap-3 text-left rounded-xl px-3 min-h-14 transition-[background-color,transform] duration-200 active:scale-[0.98] motion-reduce:active:scale-100 ${focusRing} ${active ? "bg-brand-50" : "hover:bg-slate-50"
           }`}
       >
-        <PinIcon />
-      </span>
-      <span className="flex flex-col min-w-0 flex-1">
-        <span className="text-sm font-semibold text-slate-900">{loc.label}</span>
-        <span className="text-xs text-slate-600 truncate">{loc.note}</span>
-      </span>
-      <svg
-        className={`w-4 h-4 shrink-0 text-brand-800 transition-all duration-300 ${ease} ${active ? "opacity-100 scale-100" : "opacity-0 scale-50"
-          }`}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="m5 12 5 5L20 7" />
-      </svg>
-    </button>
+        <span
+          className={`flex w-9 h-9 shrink-0 items-center justify-center rounded-full transition-[background-color,transform] duration-300 ${spring} group-hover:scale-110 group-active:scale-95 motion-reduce:group-hover:scale-100 ${active
+            ? "bg-brand-800 text-white"
+            : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
+            }`}
+        >
+          <PinIcon />
+        </span>
+        <span className="flex flex-col min-w-0 flex-1">
+          <span className="text-sm font-semibold text-slate-900">
+            {loc.label}
+          </span>
+          <span className="text-xs text-slate-600 truncate">{loc.note}</span>
+        </span>
+        {/* Centang muncul (pop) setelah barisnya tampil, hanya pada lokasi aktif */}
+        <svg
+          style={stagger(260 + index * 70)}
+          className={`w-4 h-4 shrink-0 text-brand-800 transition-[opacity,transform] duration-300 ${spring} ${active && open ? "opacity-100 scale-100" : "opacity-0 scale-50"
+            }`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m5 12 5 5L20 7" />
+        </svg>
+      </button>
+    </div>
   );
 }
 
 /*
- * Pengganti tombol Aceh/Sumbar. Fungsinya tetap mengganti budaya lewat
- * useCulture, tapi dibungkus satu tombol "Lokasi".
+ * Pengganti tombol pilihan lokasi (Aceh / Kalimantan). Fungsinya tetap mengganti budaya lewat
+ * useCulture, tapi dibungkus satu tombol. Teks tombol menampilkan lokasi yang sedang aktif.
  * inline=true dipakai di menu seluler (daftar mengembang di tempat).
  */
 function LocationMenu({
@@ -160,14 +183,21 @@ function LocationMenu({
     onSelect?.();
   };
 
-  const options = LOCATIONS.map((loc) => (
+  const options = LOCATIONS.map((loc, i) => (
     <LocationOption
       key={loc.key}
       loc={loc}
+      index={i}
+      open={open}
       active={culture === loc.key}
       onPick={() => pick(loc.key)}
     />
   ));
+
+  // Teks tombol = lokasi aktif. Cadangan "Lokasi" bila culture belum terdaftar di LOCATIONS.
+  const current = LOCATIONS.find((loc) => loc.key === culture);
+  const labels = [...LOCATIONS, { key: "", label: "Lokasi" }];
+  const activeKey = current ? current.key : "";
 
   const triggerTone =
     tone === "dark"
@@ -185,11 +215,24 @@ function LocationMenu({
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls={inline ? "location-inline" : "location-panel"}
+        aria-label={`Pilih lokasi, saat ini ${current ? current.label : "belum dipilih"}`}
         className={`inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-full border text-sm font-semibold transition-colors duration-200 ${tone === "dark" ? focusRingOnDark : focusRing} ${inline ? "w-full" : ""
           } ${triggerTone}`}
       >
         <PinIcon />
-        Lokasi
+        {/* Semua nama ditumpuk di satu sel grid: lebar tombol tetap (mengikuti nama terpanjang)
+            sehingga navbar tidak bergeser, dan teksnya berganti dengan fade + blur tanpa geser. */}
+        <span className="grid" aria-hidden="true">
+          {labels.map((l) => (
+            <span
+              key={l.key}
+              className={`col-start-1 row-start-1 text-center transition-[opacity,filter] duration-300 ${ease} ${activeKey === l.key ? "opacity-100 blur-0" : "opacity-0 blur-[3px]"
+                }`}
+            >
+              {l.label}
+            </span>
+          ))}
+        </span>
         <ChevronIcon
           className={`transition-transform duration-300 ${ease} ${open ? "rotate-180" : ""
             }`}
