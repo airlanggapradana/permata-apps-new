@@ -72,7 +72,7 @@ DB (root proxies to API/Prisma):
 - `pnpm db:generate`, `pnpm db:migrate`, `pnpm db:deploy`, `pnpm db:push`, `pnpm db:seed` (or run via `--filter @permata/api` as appropriate).
 
 ## Agent working conventions & gotchas
-- Inspect neighboring code and existing docs before adding patterns; do not duplicate long content from `README.md`/`GUIDE.md`/`PRD Permata.md`.
+- Inspect neighboring code and existing docs before adding patterns; do not duplicate long content from `README.md`/`GUIDE.md`/`docs/PRD Permata.md`.
 - Pick the correct surface: web page/UI vs web route handler (`apps/web/src/app/api/*`) vs Express module (`apps/api/src/modules/*`) vs Prisma schema/migrations (`apps/api/prisma/*`) vs shared package (`packages/*`).
 - Web has its own DB/auth/game-reward/progress logic in `apps/web/src/lib` and game code; API has its own RBAC/Prisma domain model. Keep contracts and env assumptions aligned when flows span both.
 - PWA/offline behavior and daily XP/reward rules are sensitive (see `GUIDE.md`, `apps/web/tests/*`, `apps/web/src/lib/games/*`); prefer existing tests/patterns.
@@ -86,4 +86,4 @@ DB (root proxies to API/Prisma):
 - DB schema/migrations/seed (Prisma/API): `apps/api/prisma/*`
 - Shared UI or Tailwind: `packages/ui/src/*`, `packages/config-tailwind/*`
 - Deploy/proxy wiring: `vercel.json`, `apps/web/next.config.ts`, `apps/api/scripts/prepare-vercel.cjs`
-- Product/feature behavior reference: `GUIDE.md`, `README.md`, `PRD Permata.md`
+- Product/feature behavior reference: `GUIDE.md`, `README.md`, `docs/PRD Permata.md`
