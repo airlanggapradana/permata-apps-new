@@ -22,7 +22,7 @@ services:
     container_name: permata-pgadmin-dev
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@permata.local
+      PGADMIN_DEFAULT_EMAIL: admin@permata.com
       PGADMIN_DEFAULT_PASSWORD: admin
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
