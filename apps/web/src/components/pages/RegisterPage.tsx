@@ -23,15 +23,8 @@ const ROLE_OPTIONS = [
   { value: "VOLUNTEER", label: "Relawan Lapangan" },
 ] as const;
 
-function getSafeNextPath(): string {
-  if (typeof window === "undefined") return "/dashboard";
-  const params = new URLSearchParams(window.location.search);
-  const raw = params.get("next");
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) {
-    return "/dashboard";
-  }
-  return raw;
-}
+// Akun yang baru terdaftar selalu memulai dari skrining pertama.
+const FIRST_SCREENING_PATH = "/tele-screening";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -87,7 +80,7 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push(getSafeNextPath());
+    router.push(FIRST_SCREENING_PATH);
   };
 
   return (

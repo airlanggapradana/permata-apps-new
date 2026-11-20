@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Loader2, LockKeyhole, LogIn, Salad, TreePine } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import { useCulture } from "@/context/CultureContext";
 import { TreeStats } from "@/lib/treeProgress";
 import { AnimatedSection } from "@/components/PageMotion";
@@ -210,8 +213,135 @@ function calculateMicrobiomeInsight(params: {
   };
 }
 
+const gateFocusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]";
+
+/**
+ * Shown while the session is being verified and while an unauthenticated
+ * visitor is redirected to the login page. The buttons stay available in case
+ * the automatic redirect is slow or blocked.
+ */
+function AuthGateScreen({ checking }: { checking: boolean }) {
+  return (
+    <main className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-[var(--canvas-base)]">
+      <section
+        aria-labelledby="mood-food-gate-title"
+        className="w-full max-w-4xl grid md:grid-cols-5 overflow-hidden rounded-xl border border-[var(--brand-200)] bg-surface shadow-md"
+      >
+        <div className="md:col-span-2 bg-[var(--brand-800)] text-white p-8 md:p-10 flex flex-col justify-between gap-10">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--brand-300)] text-[var(--brand-800)]">
+              <Salad size={24} strokeWidth={1.75} aria-hidden="true" />
+            </span>
+            <span className="text-sm font-semibold tracking-wide">
+              Mood + Food
+            </span>
+          </div>
+          <div>
+            <p className="text-xl md:text-2xl font-semibold leading-snug text-[var(--brand-100)]">
+              Makanan yang tepat ikut menenangkan hati.
+            </p>
+            <p className="mt-3 text-sm text-[var(--brand-200)]">
+              Foto santapanmu, pilih suasana hatimu, dan lihat kaitannya
+              dengan kesehatan usus dan otak.
+            </p>
+          </div>
+        </div>
+
+        <div className="md:col-span-3 p-8 md:p-10 flex flex-col justify-center">
+          {checking ? (
+            <div role="status" className="flex items-center gap-3">
+              <Loader2
+                size={22}
+                strokeWidth={2}
+                aria-hidden="true"
+                className="text-[var(--brand-600)] motion-safe:animate-spin"
+              />
+              <div>
+                <p className="text-base font-semibold text-fg">
+                  Memeriksa sesi masukmu
+                </p>
+                <p className="text-sm text-fg-muted">
+                  Sebentar, kami memastikan akunmu sudah masuk.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--accent-50)] text-[var(--accent-text)]">
+                <LockKeyhole size={20} strokeWidth={1.75} aria-hidden="true" />
+              </span>
+              <h1
+                id="mood-food-gate-title"
+                className="mt-4 text-2xl md:text-3xl font-semibold text-fg"
+              >
+                Masuk dulu untuk membuka Mood + Food
+              </h1>
+              <p className="mt-2 text-base text-fg-muted">
+                Analisis makananmu bersifat pribadi. Riwayat dan poin Pohon
+                Harapan hanya bisa disimpan ke akunmu sendiri.
+              </p>
+
+              <ul className="mt-5 space-y-2.5 text-sm text-fg">
+                <li className="flex items-start gap-2.5">
+                  <LockKeyhole
+                    size={16}
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                    className="mt-0.5 shrink-0 text-[var(--brand-600)]"
+                  />
+                  <span>Riwayat analisis tersimpan aman dan hanya terlihat olehmu.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <TreePine
+                    size={16}
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                    className="mt-0.5 shrink-0 text-[var(--brand-600)]"
+                  />
+                  <span>Setiap analisis menambah 40 XP untuk Pohon Harapanmu.</span>
+                </li>
+              </ul>
+
+              <div className="mt-7 flex flex-wrap items-center gap-2.5">
+                <Link
+                  href="/login?next=/mood-food"
+                  className={`inline-flex items-center justify-center gap-2 min-h-11 px-5 rounded-md bg-action hover:bg-action-hover text-white text-sm font-medium transition-colors ${gateFocusRing}`}
+                >
+                  <LogIn size={16} strokeWidth={1.75} aria-hidden="true" />
+                  <span>Masuk Akun</span>
+                </Link>
+                <Link
+                  href="/register?next=/mood-food"
+                  className={`inline-flex items-center justify-center min-h-11 px-4 rounded-md bg-surface border border-line-strong hover:bg-sunken text-fg text-sm font-medium transition-colors ${gateFocusRing}`}
+                >
+                  Daftar
+                </Link>
+              </div>
+              <p
+                role="status"
+                className="mt-4 text-xs text-fg-muted"
+              >
+                Mengalihkan ke halaman masuk otomatis...
+              </p>
+            </>
+          )}
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export default function MoodFoodAnalyzer() {
   const { culture, setCulture } = useCulture();
+  const router = useRouter();
+  const { user: authUser, isLoading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && !authUser) {
+      router.replace("/login?next=/mood-food");
+    }
+  }, [authLoading, authUser, router]);
 
   // Step 1: Mood selection ("sedih" | "marah" | "bahagia")
   const [selectedMood, setSelectedMood] = useState<string>("marah");
@@ -268,7 +398,11 @@ export default function MoodFoodAnalyzer() {
     async function loadInitialDbData() {
       try {
         setIsLoadingDb(true);
-        const res = await fetch("/api/mood-food");
+        const res = await fetch("/api/mood-food", { cache: "no-store" });
+        if (res.status === 401) {
+          if (isMounted) router.replace("/login?next=/mood-food");
+          return;
+        }
         const data = await res.json();
         if (!isMounted) return;
 
@@ -296,7 +430,7 @@ export default function MoodFoodAnalyzer() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [router]);
 
   // Compute 100% dynamic Gut-Brain Axis & Microbiome response based on real-time mood, symptoms & score
   const dynamicMicrobiome = useMemo(() => {
@@ -515,6 +649,12 @@ export default function MoodFoodAnalyzer() {
       );
     }
   };
+
+  // Client-side guard: covers logout while on this page, back/forward cache,
+  // and stale cached HTML that bypassed the server-side redirect.
+  if (authLoading || !authUser) {
+    return <AuthGateScreen checking={authLoading} />;
+  }
 
   return (
     <div className="w-full bg-[#f7f9fb] text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen flex flex-col justify-between">

@@ -1,4 +1,4 @@
-const CACHE_NAME = "permata-survival-v1";
+const CACHE_NAME = "permata-survival-v2";
 
 const CORE_SURVIVAL_URLS = [
   "/offline-survival",
@@ -93,6 +93,12 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/api/") ||
     url.pathname.startsWith("/_vercel/")
   ) {
+    return;
+  }
+
+  // Auth-gated pages must always hit the server so the login check runs;
+  // never store or replay them from the cache.
+  if (url.pathname === "/mood-food" || url.pathname.startsWith("/mood-food/")) {
     return;
   }
 
