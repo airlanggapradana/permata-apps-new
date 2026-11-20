@@ -148,7 +148,7 @@ Halaman pusat kendali pengguna yang terbagi menjadi 4 area utama:
   1. Ketikkan keluh kesah, kecemasan, atau cerita Anda pada kolom input `"Tulis perasaan Anda..."` di bagian bawah.
   2. Tekan tombol **`Enter`** atau klik tombol kirim (ikon pesawat kertas).
   3. **Mekanisme Keamanan & Respons**:
-     - **Percakapan Reguler**: Pesan dikirim ke endpoint `/api/chat` untuk direspons secara empatik dan suportif oleh asisten AI.
+     - **Percakapan Reguler**: Pesan dikirim ke endpoint `/api/chat` untuk direspons secara empatik dan suportif oleh asisten AI. Bila migrasi pgvector sudah diterapkan dan korpus `docs/rag/` telah diindeks (`pnpm rag:index`), respons dapat diperkaya konteks rujukan fitur/panduan PERMATA; jika indeks/kunci DB/AI tidak tersedia, chat tetap berjalan dengan fallback aman tanpa RAG.
      - **Intersepsi Krisis Otomatis**: Jika pesan pengguna mengandung kata kunci indikasi bahaya darurat (*"bunuh diri"*, *"ingin mati"*, *"tidak ingin hidup"*, *"hopeless"*, *"self harm"*), sistem **langsung memotong alur** dan menampilkan pesan darurat berisi nomor **Hotline Kesehatan Mental 119** agar pengguna segera mendapatkan pertolongan manusia.
 
 ---
@@ -227,7 +227,7 @@ Task implementasi Napas Tenang:
 - [x] Pengujian integrasi PostgreSQL untuk validasi, kepemilikan, hadiah bersamaan, dan pergantian hari.
 - [x] Uji browser HP/desktop: timer, jeda/lanjutkan, perpindahan tab, pengurangan animasi, kamera ditolak, izin kamera terlambat, penyimpanan ulang, dan progres dashboard.
 
-Perintah `pnpm --filter @permata/web test:game` menjalankan tes Tas Siaga, Napas Tenang, analisis kamera, Siaga Minang, serta Sigap Bencana. Tes integrasi membutuhkan frontend dan PostgreSQL lokal yang sudah berjalan.
+Perintah `pnpm --filter @permata/web test:game` menjalankan tes Tas Siaga, Napas Tenang, analisis kamera, Siaga Minang, serta Sigap Bencana. Tes integrasi membutuhkan frontend dan PostgreSQL lokal yang sudah berjalan. Untuk RAG AI Companion, pastikan migrasi pgvector diterapkan dan korpus `docs/rag/` diindeks dengan `pnpm rag:index` (membutuhkan `DATABASE_URL` dan `GEMINI_API_KEY`/`AI_API_KEY`).
 
 Materi umum kenyamanan bernapas mengacu pada [panduan NHS](https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/): bernapas dengan nyaman tanpa memaksakan kedalaman atau hitungan. Pilihan ritme dan jumlah putaran dalam aplikasi adalah pengaturan antarmuka latihan.
 
@@ -333,7 +333,7 @@ Task implementasi Sigap Bencana:
 
 ## 3. Panduan Fitur Layanan Backend API (`apps/api`)
 
-Selain antarmuka web di atas, PERMATA memiliki layanan backend komprehensif (`apps/api`) yang mengimplementasikan seluruh spesifikasi teknis di dalam `PRD Permata.md`. Dokumentasi penuh skema request/response dapat diuji langsung melalui **Swagger UI** di `http://localhost:4000/api/docs`.
+Selain antarmuka web di atas, PERMATA memiliki layanan backend komprehensif (`apps/api`) yang mengimplementasikan seluruh spesifikasi teknis di dalam `docs/PRD Permata.md`. Dokumentasi penuh skema request/response dapat diuji langsung melalui **Swagger UI** di `http://localhost:4000/api/docs`.
 
 ### 3.1. Autentikasi, RBAC, & Persetujuan Orang Tua (`/api/v1/auth`, `/api/v1/children`)
 - **7 Peran Pengguna (*Role-Based Access Control*)**:

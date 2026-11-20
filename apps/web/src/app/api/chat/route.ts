@@ -6,6 +6,11 @@ import {
   preflightGuardrail,
   REJECTED_MESSAGES,
 } from "@/lib/aiRules";
+import {
+  buildRagContextBlock,
+  injectRagContext,
+  retrieveRelevantChunks,
+} from "@/lib/rag";
 
 export const maxDuration = 60;
 
@@ -102,6 +107,14 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY || process.env.AI_API_KEY;
 
+    let ragContext = "";
+    try {
+      const chunks = await retrieveRelevantChunks(message.trim());
+      ragContext = buildRagContextBlock(chunks);
+    } catch {
+      ragContext = "";
+    }
+
     if (!apiKey) {
       const fallback = getFallbackReply(message, culture);
       return NextResponse.json({
@@ -133,7 +146,8 @@ export async function POST(req: NextRequest) {
       promptText = `Pesan Anak: "${message.trim()}"\n\nHasilkan respons dalam JSON sesuai instruksi.`;
     }
 
-    const result = await model.generateContent(promptText);
+    const promptWithContext = injectRagContext(promptText, ragContext);
+    const result = await model.generateContent(promptWithContext);
     const rawText = result.response.text();
     const parsed = parseAiJsonResponse(rawText);
 
