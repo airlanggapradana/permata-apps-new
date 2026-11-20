@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,7 +12,7 @@ import jurnalIllustration from "@/assets/localization/aceh/JurnalHikmah.png";
 import screeningIllustration from "@/assets/localization/aceh/ScreeningTriase.png"; // ganti ekstensi dari .jfif, lihat catatan
 import hutanPinus from "@/assets/image/HutanPinus.avif";
 // Ornamen budaya Aceh (bungong jeumpa). Hanya alpha-nya yang dipakai (sebagai mask), warna asli file diabaikan.
-import acehTile from "@/assets/localization/Aceh/aceh-bungong-jeumpa-tile.svg";
+import acehTile from "@/assets/localization/aceh/aceh-bungong-jeumpa-tile.svg";
 // Ornamen budaya Kalimantan (Dayak): pilin = spiral/ukiran, manik = pita manik-manik. Varian *-gold.svg tidak dipakai (mask hanya membaca alpha).
 import kalimantanPilin from "@/assets/localization/Kalimantan/kalimantan-dayak-pilin-tile.svg";
 import kalimantanManik from "@/assets/localization/Kalimantan/kalimantan-dayak-manik-border.svg";
