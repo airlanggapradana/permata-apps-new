@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCulture } from "@/context/CultureContext";
 import { TreeStats, calculateTreeStats } from "@/lib/treeProgress";
 import { AnimatedSection } from "@/components/PageMotion";
+import RichText from "@/components/RichText";
 
 const crisisKeywords = [
   "bunuh diri",
@@ -707,9 +708,7 @@ export default function AiCompanion() {
                             </div>
 
                             <div className="bg-white p-5 rounded-xl rounded-tl-sm shadow-sm text-[#191c1e] font-body-md text-body-md flex flex-col gap-3.5 border border-slate-100">
-                              <p className="whitespace-pre-line leading-relaxed">
-                                {msg.content}
-                              </p>
+                              <RichText text={msg.content} />
 
                               {/* Cultural Wisdom Card Callout */}
                               {msg.culturalWisdom && (
