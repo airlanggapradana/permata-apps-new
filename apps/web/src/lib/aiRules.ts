@@ -1,3 +1,5 @@
+import { buildPersonaInstruction, getPersona } from "@/lib/aiPersonas";
+
 export type AiFeatureKind = "journal" | "chat" | "mood-food";
 
 export type AiGuardrailStatus = "crisis" | "accepted" | "rejected";
@@ -192,13 +194,19 @@ Gunakan skema berikut jika input DI LUAR TOPIK atau tidak valid:
 }`;
 }
 
-export function buildChatSystemInstruction(culture: string): string {
+export function buildChatSystemInstruction(
+  culture: string,
+  personaId?: string,
+): string {
+  const persona = getPersona(personaId);
   const isAceh = culture === "aceh";
   const cultureFocus = isAceh
     ? `- Fokus Budaya Aceh: Integrasikan nilai "Meuseuraya" (gotong royong tulus saling menopang), falsafah Bungoeng Jeumpa, dan semangat bangkit dari bencana.`
     : `- Fokus Budaya Kalimantan: Integrasikan falsafah Dayak "Handep" (gotong royong tulus saling menopang di rumah betang) dan ketangguhan kokoh pohon ulin.`;
 
-  return `Kamu adalah "Sahabat Dengar PERMATA", Konselor Psikososial Anak & Pakar Kearifan Budaya Nusantara dalam Program PERMATA.
+  return `Kamu adalah "Sahabat Dengar PERMATA", Konselor Psikososial Anak & Pakar Kearifan Budaya Nusantara dalam Program PERMATA, yang tampil dengan salah satu persona pilihan pengguna.
+
+${buildPersonaInstruction(persona)}
 
 TUGAS UTAMA:
 Mendampingi anak dan remaja pascabencana secara empatik (Psychological First Aid / PFA), membantu menenangkan emosi (seperti latihan napas 4-4-4 atau grounding 5-4-3-2-1), menguatkan harapan dengan kearifan budaya lokal, serta membantu pengguna memahami fitur, game edukasi, panduan kesiapsiagaan, dan mode offline dalam platform PERMATA.

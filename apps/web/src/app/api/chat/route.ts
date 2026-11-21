@@ -12,9 +12,20 @@ import {
   retrieveRelevantChunks,
 } from "@/lib/rag";
 
+import { getPersona } from "@/lib/aiPersonas";
+
 export const maxDuration = 60;
 
-function getFallbackReply(message: string, culture: string): string {
+function getFallbackReply(
+  message: string,
+  culture: string,
+  personaId?: string,
+): string {
+  const persona = getPersona(personaId);
+  return `${persona.fallbackLead}\n\n${getBaseFallbackReply(message, culture)}`;
+}
+
+function getBaseFallbackReply(message: string, culture: string): string {
   const isAceh = culture === "aceh";
   const lower = message.toLowerCase();
 
@@ -72,6 +83,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { message, culture = "aceh", history = [] } = body;
+    const persona = getPersona(body.persona);
 
     if (!message || typeof message !== "string" || !message.trim()) {
       return NextResponse.json(
@@ -116,7 +128,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!apiKey) {
-      const fallback = getFallbackReply(message, culture);
+      const fallback = getFallbackReply(message, culture, persona.id);
       return NextResponse.json({
         success: true,
         status: "accepted",
@@ -127,7 +139,7 @@ export async function POST(req: NextRequest) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: "gemini-3.8-flash",
-      systemInstruction: buildChatSystemInstruction(culture),
+      systemInstruction: buildChatSystemInstruction(culture, persona.id),
     });
 
     // Construct conversation prompt
@@ -138,7 +150,7 @@ export async function POST(req: NextRequest) {
         .map((h: { role: string; content: string }) =>
           h.role === "user"
             ? `Pengguna: ${h.content}`
-            : `Pendamping: ${h.content}`,
+            : `${persona.name}: ${h.content}`,
         )
         .join("\n\n");
       promptText += `\n\nPengguna: ${message.trim()}\n\nHasilkan respons dalam JSON sesuai instruksi.`;
@@ -220,7 +232,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       status: "accepted",
-      reply: trimmedRaw || getFallbackReply(message, culture),
+      reply: trimmedRaw || getFallbackReply(message, culture, persona.id),
     });
   } catch (error) {
     console.error("CHAT ERROR:", error);
@@ -243,7 +255,11 @@ export async function POST(req: NextRequest) {
           { status: 422 },
         );
       }
-      const fallback = getFallbackReply(msg, body.culture || "aceh");
+      const fallback = getFallbackReply(
+        msg,
+        body.culture || "aceh",
+        typeof body.persona === "string" ? body.persona : undefined,
+      );
       return NextResponse.json({
         success: true,
         status: "accepted",
