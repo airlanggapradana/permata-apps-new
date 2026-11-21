@@ -8,8 +8,12 @@ import Particles from "@/components/ui-kit/Particle/Particles"; // React Bits: B
 import acehBackground from "@/assets/localization/aceh/background.png";
 import kalimantanBackground from "@/assets/localization/Kalimantan/background.jpg";
 // Ilustrasi modul. Modul tanpa gambar otomatis memakai ikon sebagai placeholder.
+import offlineIllustration from "@/assets/localization/aceh/OfflineSurvival.png";
+import passportIllustration from "@/assets/localization/aceh/SafetyPassport.png";
 import jurnalIllustration from "@/assets/localization/aceh/JurnalHikmah.png";
 import screeningIllustration from "@/assets/localization/aceh/ScreeningTriase.png"; // ganti ekstensi dari .jfif, lihat catatan
+import companionIllustration from "@/assets/localization/aceh/SahabatAi.png";
+import moodFoodIllustration from "@/assets/localization/aceh/MoodFood.png";
 import hutanPinus from "@/assets/image/HutanPinus.avif";
 // Ornamen budaya Aceh (bungong jeumpa). Hanya alpha-nya yang dipakai (sebagai mask), warna asli file diabaikan.
 import acehTile from "@/assets/localization/aceh/aceh-bungong-jeumpa-tile.svg";
@@ -467,6 +471,10 @@ const MODULES: {
     {
       icon: "signal",
       iconBoxClass: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70",
+      image: {
+        src: offlineIllustration.src,
+        alt: "Anak membuka panduan pertolongan pertama offline dan kotak P3K darurat tanpa sinyal",
+      },
       title: "Offline Survival Mode",
       tag: "Akses mandiri tanpa sinyal & login",
       desc: "Saat gempa melumpuhkan pemancar seluler, modul ini tetap terbuka di browser HP. Berisi panduan pertolongan pertama fisik, teknik peredam histeria anak, nomor darurat, dan ekspor Paspor Keselamatan offline.",
@@ -477,6 +485,10 @@ const MODULES: {
     {
       icon: "idcard",
       iconBoxClass: "bg-teal-50 text-teal-700 ring-1 ring-teal-200/70",
+      image: {
+        src: passportIllustration.src,
+        alt: "Anak memegang kartu paspor keselamatan darurat berisi identitas, kontak wali, titik evakuasi, dan obat khusus",
+      },
       title: "Safety Passport",
       tag: "Kartu keselamatan darurat anak",
       desc: "Memudahkan orang tua mencatat identitas anak, kontak darurat wali, titik kumpul evakuasi terdekat, serta kebutuhan obat-obatan khusus yang dapat diakses cepat jika terpisah saat bencana.",
@@ -515,6 +527,10 @@ const MODULES: {
     {
       icon: "heart",
       iconBoxClass: "bg-teal-50 text-teal-700 ring-1 ring-teal-200/70",
+      image: {
+        src: companionIllustration.src,
+        alt: "Anak berbincang hangat dengan sahabat AI pendamping yang dilengkapi perlindungan keselamatan",
+      },
       title: "Sahabat AI Pendamping",
       tag: "Didukung Google Gemini & Safety Guard",
       desc: "Teman mengobrol yang sabar dan empatik untuk mendengarkan keluh kesah anak. Dilengkapi sensor otomatis terhadap ancaman bahaya, privasi data (PII), dan larangan memberikan diagnosa medis sembarangan.",
@@ -525,6 +541,10 @@ const MODULES: {
     {
       icon: "bowl",
       iconBoxClass: "bg-amber-50 text-amber-600 ring-1 ring-amber-200/70",
+      image: {
+        src: moodFoodIllustration.src,
+        alt: "Anak memindai foto menu makanan dapur umum untuk analisis mikronutrien penenang saraf",
+      },
       title: "Mood + Food Analyzer",
       tag: "Analisis foto menu dapur umum",
       desc: "Memindai foto makanan darurat dengan kecerdasan buatan untuk menganalisis ketersediaan mikronutrien (Omega-3, zinc, rempah) yang bermanfaat menenangkan ketegangan saraf anak di lokasi bencana.",
