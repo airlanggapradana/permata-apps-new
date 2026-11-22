@@ -375,7 +375,10 @@ export default function ThemedContent({
         kind={transitionKind}
         transitionId={transitionId}
       />
-      <Navbar currentPath={displayedPath} />
+      {/* Halaman login & register punya header merek sendiri (layout split-screen). */}
+      {displayedPath !== "/login" && displayedPath !== "/register" && (
+        <Navbar currentPath={displayedPath} />
+      )}
       <OfflineRuntime currentPath={displayedPath} />
       <PageMotionProvider transitionPhase={transitionPhase}>
         {renderPage()}

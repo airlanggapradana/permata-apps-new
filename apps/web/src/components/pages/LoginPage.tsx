@@ -12,26 +12,20 @@ import {
   Brain,
   CheckCircle2,
   ClipboardCheck,
-  CloudOff,
   Eye,
   EyeOff,
   GraduationCap,
   HandHeart,
-  Headset,
-  Heart,
-  LifeBuoy,
-  Lock,
-  Mail,
+  Leaf,
   PenLine,
   PhoneCall,
   ShieldCheck,
   ShieldUser,
-  Smile,
-  Sprout,
   UserCog,
   Users,
   Wifi,
   WifiOff,
+  BrainCircuit,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -40,6 +34,9 @@ import acehBackground from "@/assets/localization/aceh/background.png";
 
 const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]";
+
+const inputBase =
+  "w-full px-3.5 py-2.5 rounded-[0.5rem] border border-outline-variant/80 bg-surface-container-lowest text-[14px] text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:outline-none transition-all";
 
 function getSafeNextPath(): string {
   if (typeof window === "undefined") return "/dashboard";
@@ -180,10 +177,10 @@ const ROLES: RoleConfig[] = [
   },
 ];
 
-const TRUST_BADGES: { icon: LucideIcon; label: string }[] = [
-  { icon: ShieldCheck, label: "Enkripsi PII Sensor Otomatis" },
-  { icon: BadgeCheck, label: "UU PDP Ramah Anak" },
-  { icon: CloudOff, label: "Offline Ready (IndexedDB)" },
+const FEATURE_PILLS: { icon: LucideIcon; label: string }[] = [
+  { icon: BadgeCheck, label: "Psikolog Profesional & PFA" },
+  { icon: Leaf, label: "Pendekatan Holistik & Budaya" },
+  { icon: ShieldCheck, label: "Enkripsi PII UU PDP Ramah Anak" },
 ];
 
 export default function LoginPage() {
@@ -204,7 +201,6 @@ export default function LoginPage() {
   );
 
   const role = ROLES.find((r) => r.key === roleKey) ?? ROLES[0];
-  const RoleBannerIcon = Smile;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -235,582 +231,383 @@ export default function LoginPage() {
   const loggedIn = !authLoading && !!user;
 
   return (
-    <div className="bg-background text-on-surface flex flex-col justify-between min-h-[calc(100vh-5rem)]">
-      <main className="w-full flex-grow">
-        <div className="max-w-7xl mx-auto w-full px-margin md:px-margin-tablet lg:px-margin-desktop py-space-md lg:py-space-lg">
-          {/* Breadcrumb & status */}
-          <AnimatedSection index={0}>
-            <div className="flex flex-wrap items-center justify-between gap-space-sm mb-space-md">
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/"
-                  className={`text-xs font-semibold tracking-[0.02em] text-secondary hover:underline flex items-center gap-1 ${focusRing}`}
-                >
-                  <ArrowLeft size={16} strokeWidth={2} aria-hidden="true" />
-                  Kembali ke Beranda
-                </Link>
-                <span
-                  className="text-outline-variant text-xs"
+    <main className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-surface-container-lowest text-on-surface">
+      {/* LEFT: brand panel */}
+      <div className="relative min-h-[280px] sm:min-h-[400px] lg:min-h-screen flex flex-col justify-between p-6 sm:p-8 lg:p-14 overflow-hidden bg-primary-container text-on-primary">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={acehBackground.src}
+          alt="Anak-anak Nusantara berdiri bersama di tengah desa yang pulih pascabencana"
+          className="absolute inset-0 w-full h-full object-cover object-center saturate-90"
+        />
+        <div
+          className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-primary via-primary-container/75 to-primary/90"
+          aria-hidden="true"
+        />
+
+        <div className="relative z-10">
+          <Link
+            href="/"
+            className={`inline-flex items-center gap-3 group ${focusRing}`}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/permata-logo.webp"
+              alt="Logo PERMATA"
+              width={40}
+              height={40}
+              className="w-10 h-10 object-contain shrink-0 brightness-0 invert drop-shadow-[0_2px_12px_rgba(255,255,255,0.2)] transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-3"
+            />
+            <span className="flex flex-col">
+              <span className="font-display text-lg sm:text-xl font-extrabold tracking-tight text-white leading-none">
+                PERMATA
+              </span>
+              <span className="text-[11px] text-primary-fixed-dim font-medium mt-1">
+                Resiliensi Jiwa &amp; PFA Anak
+              </span>
+            </span>
+          </Link>
+        </div>
+
+        <div className="relative z-10 my-auto py-8 lg:py-12 max-w-lg">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest/15 backdrop-blur-md text-secondary-fixed text-[12px] font-semibold mb-4 border border-secondary-fixed/20">
+            <BrainCircuit size={15} strokeWidth={2} aria-hidden="true" />
+            Sistem Resiliensi Psikososial Tanggap Bencana
+          </div>
+          <h2 className="text-[30px] lg:text-[42px] font-bold text-white leading-tight tracking-tight mb-4">
+            Pulihkan Senyum &amp; Resiliensi Jiwa Anak Pascabencana
+          </h2>
+          <p className="text-primary-fixed-dim leading-relaxed mb-6 text-[15px] lg:text-[16px]">
+            Platform pendampingan psikososial berbasis kearifan budaya lokal
+            untuk mengembalikan harapan dan keceriaan anak.
+          </p>
+          <div className="hidden sm:flex flex-wrap gap-2.5">
+            {FEATURE_PILLS.map(({ icon: Icon, label }) => (
+              <div
+                key={label}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-lowest/10 backdrop-blur-sm border border-white/10 text-white text-[12px] font-medium"
+              >
+                <Icon
+                  size={16}
+                  strokeWidth={2}
+                  className="text-secondary-fixed"
                   aria-hidden="true"
-                >
-                  •
-                </span>
-                <span className="text-xs tracking-[0.02em] text-on-surface-variant">
-                  Gerbang Autentikasi Psikososial
-                </span>
+                />
+                {label}
               </div>
-            </div>
-          </AnimatedSection>
+            ))}
+          </div>
+        </div>
 
-          {/* Two-column card grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-stretch">
-            {/* LEFT: showcase */}
-            <AnimatedSection index={1} className="lg:col-span-5 flex">
-              <div className="w-full flex flex-col justify-between rounded-md bg-primary-container text-on-primary p-space-md sm:p-space-lg relative overflow-hidden shadow-xl">
-                <div
-                  className="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-secondary/20 blur-3xl pointer-events-none"
+        <div className="relative z-10 hidden sm:flex flex-wrap items-center justify-between gap-2 text-[11px] text-primary-fixed-dim tracking-wider uppercase font-semibold border-t border-white/10 pt-4">
+          <span>PERMATA NUSANTARA</span>
+          <span className="italic font-normal lowercase tracking-normal text-secondary-fixed">
+            &quot;Mambangkik Batang Tarandam&quot;
+          </span>
+        </div>
+      </div>
+
+      {/* RIGHT: auth panel */}
+      <div className="flex flex-col justify-center items-center p-6 sm:p-10 lg:p-14 bg-surface-container-lowest">
+        <AnimatedSection index={1} className="w-full max-w-[440px] py-6">
+          <div className="mb-6">
+            <h1 className="text-[28px] font-bold text-on-surface tracking-tight">
+              Selamat Datang!{" "}
+              <span aria-hidden="true" className="inline-block">
+                👋
+              </span>
+            </h1>
+            <p className="text-[14px] leading-[22px] text-on-surface-variant mt-1">
+              {loggedIn
+                ? "Sesi Anda masih aktif. Lanjutkan ke ruang pendampingan atau keluar dari akun ini."
+                : "Masuk untuk mengakses layanan PERMATA Nusantara."}
+            </p>
+          </div>
+
+          {loggedIn && user ? (
+            <div className="rounded-[0.75rem] bg-surface-container-low p-4 space-y-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2
+                  size={22}
+                  strokeWidth={1.75}
+                  className="text-secondary shrink-0 mt-0.5"
                   aria-hidden="true"
                 />
-                <div
-                  className="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-secondary-fixed/15 blur-3xl pointer-events-none"
-                  aria-hidden="true"
-                />
-
-                <div className="relative z-10 flex-1 flex flex-col gap-space-md">
-                  <div className="flex flex-col gap-2 shrink-0">
-                    <h2 className="text-[26px] sm:text-[32px] leading-tight font-bold tracking-tight text-on-primary">
-                      Tumbuh Bersama, Pulihkan Asa Nusantara.
-                    </h2>
-                    <p className="text-sm leading-relaxed text-primary-fixed-dim">
-                      Ruang aman anak dan pendamping psikososial tanggap
-                      bencana. Menyulam kembali senyum, kekuatan batin, dan
-                      kebersamaan di tanah pascabencana.
-                    </p>
-                  </div>
-
-                  <div className="relative flex-1 min-h-72 rounded-md overflow-hidden bg-primary/70 shadow-md">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={acehBackground.src}
-                      alt="Anak-anak Aceh merangkul di zona rekonstruksi pascabencana"
-                      className="w-full h-72 lg:absolute lg:inset-0 lg:h-full object-cover object-center mix-blend-luminosity hover:mix-blend-normal transition-all duration-700"
-                    />
-                    <div
-                      className="absolute inset-0 bg-gradient-to-t from-primary via-primary/40 to-transparent"
-                      aria-hidden="true"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 p-space-sm flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center text-primary">
-                          <Heart size={18} strokeWidth={2} aria-hidden="true" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold tracking-[0.02em] leading-tight text-on-primary">
-                            Anak Tangguh Indonesia
-                          </p>
-                          <p className="text-[11px] leading-tight text-primary-fixed-dim">
-                            14 Wilayah Tanggap &amp; Pulih Bencana
-                          </p>
-                        </div>
-                      </div>
-                      <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest/20 backdrop-blur-md text-secondary-fixed text-[11px] font-medium">
-                        Aktif
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="shrink-0 rounded-md bg-surface-container-lowest/10 backdrop-blur-sm p-space-md">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-[0.5rem] bg-tertiary-fixed text-tertiary flex items-center justify-center shrink-0 shadow-sm">
-                        <BookOpen
-                          size={18}
-                          strokeWidth={2}
-                          aria-hidden="true"
-                        />
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-xs font-semibold text-tertiary-fixed tracking-wider uppercase">
-                          Hikmah Tradisi Kebersamaan
-                        </span>
-                        <p className="text-sm italic font-medium text-on-primary">
-                          “Peugah hal nyang na, peubuet nyang baik. Mambangkik
-                          batang tarandam.”
-                        </p>
-                        <p className="text-[12px] leading-normal text-primary-fixed-dim">
-                          Menjaga kejujuran hati, berbuat kebajikan bersama,
-                          serta membangkitkan kembali martabat dan harapan yang
-                          sempat terendam duka.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                <div className="space-y-1 min-w-0">
+                  <p className="text-sm font-semibold text-primary">
+                    Anda sudah masuk sebagai {user.fullName}
+                  </p>
+                  <p className="text-xs text-on-surface-variant break-all">
+                    {user.email}
+                  </p>
                 </div>
-
-                <div className="relative z-10 pt-space-md flex flex-col gap-space-sm shrink-0">
-                  <div className="grid grid-cols-2 gap-space-xs rounded-md bg-primary/80 p-space-xs">
-                    <div className="flex flex-col px-space-xs py-1">
-                      <span className="text-xl font-bold leading-tight text-secondary-fixed">
-                        1.200+
-                      </span>
-                      <span className="text-[11px] leading-tight text-primary-fixed-dim">
-                        Fasilitator PFA Terlatih
-                      </span>
-                    </div>
-                    <div className="flex flex-col px-space-xs py-1">
-                      <span className="text-xl font-bold leading-tight text-secondary-fixed">
-                        28.450+
-                      </span>
-                      <span className="text-[11px] leading-tight text-primary-fixed-dim">
-                        Anak Didampingi Aman
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    {TRUST_BADGES.map(({ icon: Icon, label }) => (
-                      <div
-                        key={label}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-lowest/10 text-primary-fixed-dim text-[11px] font-medium"
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <Link
+                  href="/dashboard"
+                  className={`flex-1 inline-flex items-center justify-center gap-2 py-3 px-4 rounded-[0.75rem] bg-primary-container hover:bg-primary text-white text-[15px] font-semibold shadow-sm transition-all active:scale-[0.99] ${focusRing}`}
+                >
+                  Ke Dashboard
+                  <ArrowRight size={18} strokeWidth={2} aria-hidden="true" />
+                </Link>
+                <Link
+                  href="/safety-passport"
+                  className={`flex-1 inline-flex items-center justify-center py-3 px-4 rounded-[0.75rem] border border-outline-variant hover:bg-surface-container text-on-surface text-[14px] font-semibold transition-all ${focusRing}`}
+                >
+                  My Safety Passport
+                </Link>
+              </div>
+              <button
+                type="button"
+                onClick={logout}
+                className={`w-full min-h-11 px-4 rounded-[0.75rem] text-sm font-medium text-on-surface-variant hover:text-error hover:bg-surface-container transition-colors ${focusRing}`}
+              >
+                Keluar dari akun ini
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Role selector */}
+              <div className="mb-4">
+                <span
+                  id="role-group-label"
+                  className="block font-semibold text-[12px] text-on-surface mb-2 uppercase tracking-wide"
+                >
+                  Pilih Peran Akun:
+                </span>
+                <div
+                  role="radiogroup"
+                  aria-labelledby="role-group-label"
+                  className="grid grid-cols-3 gap-1.5 p-1 rounded-[0.75rem] bg-surface-container-low"
+                >
+                  {ROLES.map((r) => {
+                    const active = r.key === roleKey;
+                    const Icon = r.icon;
+                    return (
+                      <button
+                        key={r.key}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        onClick={() => setRoleKey(r.key)}
+                        className={`flex flex-col items-center justify-center p-2 rounded-[0.5rem] transition-all text-center min-w-0 ${focusRing} ${
+                          active
+                            ? "bg-primary-container text-on-primary shadow-sm"
+                            : "bg-surface-container-lowest text-on-surface hover:bg-surface-container"
+                        }`}
                       >
                         <Icon
-                          size={14}
+                          size={18}
                           strokeWidth={2}
-                          className="text-secondary-fixed"
+                          className={`mb-1 ${active ? "" : "text-secondary"}`}
                           aria-hidden="true"
                         />
-                        {label}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </AnimatedSection>
-
-            {/* RIGHT: login */}
-            <AnimatedSection index={2} className="lg:col-span-7 flex">
-              <div className="w-full flex flex-col justify-between bg-surface-container-lowest rounded-md p-space-md sm:p-space-lg lg:p-space-xl shadow-md">
-                <div>
-                  <div className="flex flex-col gap-1 mb-space-md">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-secondary uppercase tracking-wider">
-                        Portal Masuk Terpadu
-                      </span>
-                      <span className="text-[12px] font-medium text-on-surface-variant flex items-center gap-1">
-                        {isOnline ? (
-                          <Wifi
-                            size={15}
-                            strokeWidth={2}
-                            className="text-secondary"
-                            aria-hidden="true"
-                          />
-                        ) : (
-                          <WifiOff
-                            size={15}
-                            strokeWidth={2}
-                            className="text-error"
-                            aria-hidden="true"
-                          />
-                        )}
-                        {isOnline ? "Koneksi Stabil" : "Tidak Ada Koneksi"}
-                      </span>
-                    </div>
-                    <h1 className="text-[24px] sm:text-[32px] leading-8 sm:leading-10 font-bold tracking-tight text-primary">
-                      Masuk ke Ruang Resiliensi
-                    </h1>
-                    <p className="text-sm leading-[22px] text-on-surface-variant">
-                      {loggedIn
-                        ? "Sesi Anda masih aktif. Lanjutkan ke ruang pendampingan atau keluar dari akun ini."
-                        : "Pilih peran Anda dan masukkan kredensial untuk melanjutkan sesi pendampingan psikososial."}
-                    </p>
-                  </div>
-
-                  {loggedIn && user ? (
-                    <div className="rounded-md bg-surface-container-low p-space-md space-y-4">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle2
-                          size={22}
-                          strokeWidth={1.75}
-                          className="text-secondary shrink-0 mt-0.5"
-                          aria-hidden="true"
-                        />
-                        <div className="space-y-1 min-w-0">
-                          <p className="text-sm font-semibold text-primary">
-                            Anda sudah masuk sebagai {user.fullName}
-                          </p>
-                          <p className="text-xs text-on-surface-variant break-all">
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col sm:flex-row gap-2.5">
-                        <Link
-                          href="/dashboard"
-                          className={`flex-1 inline-flex items-center justify-center gap-2 min-h-12 px-4 rounded-md bg-primary hover:bg-primary-container text-on-primary text-sm font-semibold shadow-md transition-all duration-200 ${focusRing}`}
-                        >
-                          Ke Dashboard
-                          <ArrowRight
-                            size={18}
-                            strokeWidth={2}
-                            aria-hidden="true"
-                          />
-                        </Link>
-                        <Link
-                          href="/safety-passport"
-                          className={`flex-1 inline-flex items-center justify-center min-h-12 px-4 rounded-md bg-surface-container-high hover:bg-surface-variant text-on-surface text-sm font-semibold transition-all ${focusRing}`}
-                        >
-                          My Safety Passport
-                        </Link>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={logout}
-                        className={`w-full min-h-11 px-4 rounded-md text-sm font-medium text-on-surface-variant hover:text-error hover:bg-surface-container-lowest transition-colors ${focusRing}`}
-                      >
-                        Keluar dari akun ini
+                        <span className="text-[11px] font-semibold leading-tight">
+                          {r.label}
+                        </span>
                       </button>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Role selector */}
-                      <div className="mb-space-lg">
-                        <span
-                          id="role-group-label"
-                          className="block text-xs font-semibold tracking-[0.02em] text-on-surface mb-2"
-                        >
-                          Pilih Peran Akun:
-                        </span>
-                        <div
-                          role="radiogroup"
-                          aria-labelledby="role-group-label"
-                          className="grid grid-cols-2 sm:grid-cols-3 gap-2"
-                        >
-                          {ROLES.map((r) => {
-                            const active = r.key === roleKey;
-                            const Icon = r.icon;
-                            return (
-                              <button
-                                key={r.key}
-                                type="button"
-                                role="radio"
-                                aria-checked={active}
-                                onClick={() => setRoleKey(r.key)}
-                                className={`flex flex-col items-center justify-center p-2.5 rounded-md transition-all duration-200 text-center ${focusRing} ${
-                                  active
-                                    ? "bg-primary-container text-on-primary shadow-sm"
-                                    : "bg-surface-container-low text-on-surface hover:bg-surface-container"
-                                }`}
-                              >
-                                <span
-                                  className={`w-7 h-7 rounded-[0.5rem] flex items-center justify-center mb-1 ${
-                                    active
-                                      ? "bg-surface-container-lowest/20 text-on-primary"
-                                      : "bg-surface-container-high text-secondary"
-                                  }`}
-                                >
-                                  <Icon
-                                    size={18}
-                                    strokeWidth={2}
-                                    aria-hidden="true"
-                                  />
-                                </span>
-                                <span className="text-[12px] font-semibold leading-tight">
-                                  {r.label}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Authentication form */}
-                      <form
-                        onSubmit={handleSubmit}
-                        noValidate
-                        className="space-y-space-md"
-                      >
-                        {errorMessage && (
-                          <div
-                            role="alert"
-                            className="bg-error-container text-on-error-container rounded-md p-3.5 flex items-start gap-2.5 text-sm"
-                          >
-                            <AlertCircle
-                              size={18}
-                              strokeWidth={1.75}
-                              className="shrink-0 mt-0.5"
-                              aria-hidden="true"
-                            />
-                            <span>{errorMessage}</span>
-                          </div>
-                        )}
-
-                        <div className="flex flex-col gap-1.5">
-                          <label
-                            htmlFor="login-email"
-                            className="flex items-center justify-between text-sm font-semibold text-on-surface"
-                          >
-                            <span>Alamat Email</span>
-                            <span className="text-[11px] text-secondary font-medium">
-                              Contoh: {role.placeholder}
-                            </span>
-                          </label>
-                          <div className="relative flex items-center">
-                            <div className="absolute left-3.5 flex items-center pointer-events-none text-on-surface-variant">
-                              <Mail
-                                size={20}
-                                strokeWidth={1.75}
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <input
-                              id="login-email"
-                              type="email"
-                              autoComplete="email"
-                              required
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              placeholder={role.placeholder}
-                              className="w-full bg-surface-container-low text-on-surface placeholder:text-outline text-base pl-11 pr-4 py-3 rounded-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary transition-all"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                          <label
-                            htmlFor="login-password"
-                            className="text-sm font-semibold text-on-surface"
-                          >
-                            Kata Sandi
-                          </label>
-                          <div className="relative flex items-center">
-                            <div className="absolute left-3.5 flex items-center pointer-events-none text-on-surface-variant">
-                              <Lock
-                                size={20}
-                                strokeWidth={1.75}
-                                aria-hidden="true"
-                              />
-                            </div>
-                            <input
-                              id="login-password"
-                              type={showPassword ? "text" : "password"}
-                              autoComplete="current-password"
-                              required
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder="Masukkan kata sandi Anda"
-                              className="w-full bg-surface-container-low text-on-surface placeholder:text-outline text-base pl-11 pr-12 py-3 rounded-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-secondary transition-all"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword((v) => !v)}
-                              aria-label={
-                                showPassword
-                                  ? "Sembunyikan kata sandi"
-                                  : "Tampilkan kata sandi"
-                              }
-                              className="absolute right-3 p-1 rounded-[0.5rem] text-on-surface-variant hover:text-on-surface focus-visible:outline-2 focus-visible:outline-secondary"
-                            >
-                              {showPassword ? (
-                                <EyeOff
-                                  size={20}
-                                  strokeWidth={1.75}
-                                  aria-hidden="true"
-                                />
-                              ) : (
-                                <Eye
-                                  size={20}
-                                  strokeWidth={1.75}
-                                  aria-hidden="true"
-                                />
-                              )}
-                            </button>
-                          </div>
-                          <p className="text-[12px] text-on-surface-variant pl-1">
-                            {role.pwdHelper}
-                          </p>
-                        </div>
-
-                        <div className="pt-2 flex flex-col gap-3">
-                          <button
-                            type="submit"
-                            disabled={submitting}
-                            aria-busy={submitting}
-                            className={`w-full py-3.5 px-6 rounded-md bg-primary hover:bg-primary-container disabled:bg-surface-container-high disabled:text-outline disabled:shadow-none text-on-primary text-[16px] font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.99] ${focusRing}`}
-                          >
-                            <span>
-                              {submitting
-                                ? "Memproses masuk..."
-                                : "Masuk Sekarang"}
-                            </span>
-                            {!submitting && (
-                              <ArrowRight
-                                size={20}
-                                strokeWidth={2}
-                                aria-hidden="true"
-                              />
-                            )}
-                          </button>
-                        </div>
-                      </form>
-                    </>
-                  )}
+                    );
+                  })}
                 </div>
-
-                <div className="mt-space-md pt-space-md flex flex-col gap-3">
-                  {/* Offline fallback */}
-                  <div className="rounded-md bg-tertiary-fixed/40 p-space-sm flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-[0.5rem] bg-tertiary-fixed-dim text-tertiary flex items-center justify-center shrink-0">
-                      <WifiOff size={18} strokeWidth={2} aria-hidden="true" />
-                    </div>
-                    <div className="flex flex-col flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-bold tracking-[0.02em] text-tertiary">
-                          Sinyal Posko Bencana Terputus?
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest text-tertiary font-semibold text-[10px]">
-                          Mode Siaga
-                        </span>
-                      </div>
-                      <p className="text-[12px] text-tertiary-container mt-0.5 leading-snug">
-                        Panduan keselamatan dan audio relaksasi pernapasan tetap
-                        dapat dibuka secara luring tanpa koneksi internet maupun
-                        masuk akun.
-                      </p>
-                      <div className="pt-1.5">
-                        <Link
-                          href="/offline-survival"
-                          className={`inline-flex items-center gap-1 text-xs font-bold tracking-[0.02em] text-tertiary hover:underline ${focusRing}`}
-                        >
-                          Buka Mode Siaga Offline
-                          <ArrowRight
-                            size={14}
-                            strokeWidth={2}
-                            aria-hidden="true"
-                          />
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Registration */}
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left pt-1">
-                    <p className="text-[13px] text-on-surface-variant">
-                      Belum terdaftar di posko?{" "}
-                      <Link
-                        href="/register"
-                        className={`font-semibold text-secondary hover:underline ${focusRing}`}
-                      >
-                        Daftar Akun Baru
-                      </Link>
-                    </p>
-                    <p className="text-[12px] text-on-surface-variant flex items-center gap-1">
-                      <ShieldCheck
-                        size={16}
-                        strokeWidth={1.75}
-                        className="text-primary shrink-0"
-                        aria-hidden="true"
-                      />
-                      Data tiap akun terpisah demi privasi keluarga
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </AnimatedSection>
-          </div>
-
-          {/* Emergency strip */}
-          <AnimatedSection index={3}>
-            <div className="mt-space-md rounded-md bg-surface-container-low p-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
-                  <LifeBuoy size={22} strokeWidth={1.75} aria-hidden="true" />
-                </div>
-                <div className="flex flex-col">
-                  <p className="text-sm font-semibold text-on-surface">
-                    Butuh Bantuan Psikologis Cepat untuk Anak yang Panik atau
-                    Syok?
-                  </p>
-                  <p className="text-[13px] text-on-surface-variant">
-                    Akses tim konselor SafeConnect 119 bebas pulsa atau panggil
-                    petugas relawan posko terdekat.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <a
-                  href="tel:119"
-                  className={`px-4 py-2 rounded-md bg-error text-on-error text-sm font-semibold flex items-center gap-1.5 shadow-sm hover:opacity-95 transition-all ${focusRing}`}
+                <p
+                  className="mt-2 text-[12px] leading-snug text-on-surface-variant"
+                  aria-live="polite"
                 >
-                  <PhoneCall size={18} strokeWidth={2} aria-hidden="true" />
-                  Hubungi 119 Bebas Pulsa
-                </a>
+                  <span className="font-semibold text-on-surface">
+                    {role.title}.
+                  </span>{" "}
+                  {role.desc}
+                </p>
               </div>
-            </div>
-          </AnimatedSection>
-        </div>
-      </main>
 
-      <AnimatedSection index={4}>
-        <footer className="w-full bg-surface-container-low mt-space-xl">
-          <div className="bg-primary-container text-on-primary py-space-sm px-margin md:px-margin-tablet lg:px-margin-desktop">
-            <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-space-sm">
-              <div className="flex items-center gap-space-sm">
-                <Headset
-                  size={20}
-                  strokeWidth={1.75}
-                  className="text-secondary-fixed shrink-0"
-                  aria-hidden="true"
-                />
-                <span className="text-sm font-semibold text-on-primary">
-                  SafeConnect 119 - Bantuan PFA Darurat &amp; Konseling
-                  Psikologis Tanggap Bencana Anak
-                </span>
-              </div>
-              <div className="flex items-center gap-space-xs">
-                <span
-                  className="w-2 h-2 rounded-full bg-secondary-fixed motion-safe:animate-pulse"
-                  aria-hidden="true"
-                />
-                <span className="text-xs font-semibold tracking-[0.02em] text-primary-fixed-dim">
-                  Layanan 24/7 Bebas Pulsa
-                </span>
-              </div>
-            </div>
-          </div>
+              <form
+                onSubmit={handleSubmit}
+                noValidate
+                className="flex flex-col gap-3.5"
+              >
+                {errorMessage && (
+                  <div
+                    role="alert"
+                    className="bg-error-container text-on-error-container rounded-[0.5rem] p-3.5 flex items-start gap-2.5 text-sm"
+                  >
+                    <AlertCircle
+                      size={18}
+                      strokeWidth={1.75}
+                      className="shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
 
-          <div className="max-w-7xl mx-auto px-margin md:px-margin-tablet lg:px-margin-desktop py-space-xl flex flex-col gap-space-lg">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md bg-surface-container-lowest p-space-md rounded-md shadow-[0_1px_8px_rgba(27,67,50,0.03)]">
-              <div className="flex items-center gap-space-sm">
-                <div className="w-9 h-9 rounded-[0.5rem] bg-surface-container-high flex items-center justify-center text-primary shrink-0">
-                  <ShieldCheck
-                    size={20}
-                    strokeWidth={1.75}
-                    aria-hidden="true"
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="login-email"
+                    className="text-[13px] font-medium text-on-surface"
+                  >
+                    Alamat Email
+                  </label>
+                  <input
+                    id="login-email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={role.placeholder}
+                    className={inputBase}
                   />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-on-surface">
-                    Jaminan Privasi &amp; Perlindungan Data Anak
-                  </p>
-                  <p className="text-sm text-on-surface-variant">
-                    Sesuai UU PDP No. 27/2022. Sensor PII ramah anak melindungi
-                    identitas emosional dan catatan pemulihan jiwa.
+
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="login-password"
+                    className="text-[13px] font-medium text-on-surface"
+                  >
+                    Kata Sandi
+                  </label>
+                  <div className="relative flex items-center">
+                    <input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Masukkan kata sandi Anda"
+                      aria-describedby="login-password-help"
+                      className={`${inputBase} pr-10`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={
+                        showPassword
+                          ? "Sembunyikan kata sandi"
+                          : "Tampilkan kata sandi"
+                      }
+                      className={`absolute right-2 p-1 rounded-[0.5rem] text-on-surface-variant hover:text-on-surface ${focusRing}`}
+                    >
+                      {showPassword ? (
+                        <EyeOff
+                          size={18}
+                          strokeWidth={1.75}
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Eye size={18} strokeWidth={1.75} aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                  <p
+                    id="login-password-help"
+                    className="text-[12px] text-on-surface-variant"
+                  >
+                    {role.pwdHelper}
                   </p>
                 </div>
-              </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-space-sm text-center sm:text-left pt-space-xs">
-              <p className="text-sm text-on-surface-variant">
-                © {new Date().getFullYear()} PERMATA Nusantara. Memulihkan Jiwa,
-                Meneguhkan Tunas Bangsa.
-              </p>
-              <p className="text-sm text-tertiary-container italic font-medium">
-                &quot;Mambangkik Batang Tarandam • Semangat Meuseuraya&quot;
-              </p>
+                <div className="flex items-center justify-between gap-2 pt-0.5">
+                  <span
+                    className={`text-[12px] font-medium flex items-center gap-1 ${
+                      isOnline ? "text-secondary" : "text-error"
+                    }`}
+                  >
+                    {isOnline ? (
+                      <Wifi size={14} strokeWidth={2} aria-hidden="true" />
+                    ) : (
+                      <WifiOff size={14} strokeWidth={2} aria-hidden="true" />
+                    )}
+                    {isOnline ? "Koneksi Stabil" : "Tidak Ada Koneksi"}
+                  </span>
+                  <Link
+                    href="/offline-survival"
+                    className={`text-[12px] text-secondary font-semibold hover:underline flex items-center gap-1 ${focusRing}`}
+                  >
+                    <WifiOff size={14} strokeWidth={2} aria-hidden="true" />
+                    Siaga Posko Offline
+                  </Link>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  aria-busy={submitting}
+                  className={`w-full mt-1 py-3 px-4 rounded-[0.75rem] bg-primary-container hover:bg-primary disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-[15px] flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.99] ${focusRing}`}
+                >
+                  <span>
+                    {submitting ? "Memproses masuk..." : "Masuk Sekarang"}
+                  </span>
+                  {!submitting && (
+                    <ArrowRight size={18} strokeWidth={2} aria-hidden="true" />
+                  )}
+                </button>
+
+                <p className="text-center py-1 text-[13px] text-on-surface-variant">
+                  Belum punya akun?{" "}
+                  <Link
+                    href="/register"
+                    className={`font-semibold text-secondary hover:underline ${focusRing}`}
+                  >
+                    Daftar di sini
+                  </Link>
+                </p>
+
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t border-outline-variant/50" />
+                  <span className="flex-shrink mx-3 text-[12px] text-outline">
+                    atau
+                  </span>
+                  <div className="flex-grow border-t border-outline-variant/50" />
+                </div>
+
+                <Link
+                  href="/"
+                  className={`w-full py-2.5 px-4 rounded-[0.75rem] border border-outline-variant hover:bg-surface-container text-on-surface font-semibold text-[14px] flex items-center justify-center gap-2 transition-all ${focusRing}`}
+                >
+                  <ArrowLeft size={18} strokeWidth={2} aria-hidden="true" />
+                  <span>Kembali ke Beranda</span>
+                </Link>
+              </form>
+            </>
+          )}
+
+          {/* Emergency support card */}
+          <div className="mt-6 p-3.5 rounded-[0.75rem] bg-[#fff7ed] border border-[#ffedd5] flex items-start gap-3 text-left">
+            <PhoneCall
+              size={20}
+              strokeWidth={2}
+              className="text-[#c2410c] shrink-0 mt-0.5"
+              aria-hidden="true"
+            />
+            <div className="flex flex-col text-[12px]">
+              <span className="font-bold text-[#9a3412]">
+                Butuh bantuan segera?
+              </span>
+              <span className="text-[#7c2d12] mt-0.5">
+                Hotline 24 Jam:{" "}
+                <a
+                  href="tel:119"
+                  className={`font-semibold underline-offset-2 hover:underline ${focusRing}`}
+                >
+                  119 (SafeConnect)
+                </a>{" "}
+                | Darurat:{" "}
+                <a
+                  href="tel:112"
+                  className={`font-semibold underline-offset-2 hover:underline ${focusRing}`}
+                >
+                  112
+                </a>
+              </span>
             </div>
           </div>
-        </footer>
-      </AnimatedSection>
-    </div>
+        </AnimatedSection>
+      </div>
+    </main>
   );
 }
