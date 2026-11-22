@@ -9,7 +9,10 @@
     "start": "next start",
     "lint": "eslint .",
     "test:game": "node --test tests/emergency-bag.test.mjs tests/breathing.test.mjs tests/breathing-motion.test.mjs tests/siaga-minang-engine.test.mjs tests/siaga-minang.test.mjs tests/sigap-bencana-engine.test.mjs tests/sigap-bencana.test.mjs",
-    "test:offline": "node --test tests/offline-cache.test.mjs"
+    "test:offline": "node --test tests/offline-cache.test.mjs",
+    "test:origin": "node --test tests/request-origin.test.mjs",
+    "test:roleplay": "node --test tests/roleplay-engine.test.mjs tests/roleplay-api.test.mjs tests/roleplay-presentation.test.mjs",
+    "test:roleplay:integration": "node --test tests/roleplay-live.test.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1167.0",

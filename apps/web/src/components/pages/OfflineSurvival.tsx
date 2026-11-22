@@ -757,6 +757,11 @@ export default function OfflineSurvival() {
           >
             {/* Left Column: PFA Principles & Acute Stress Scenarios */}
             <div className="lg:col-span-7 space-y-6">
+              <div className="rounded-lg border border-line bg-surface p-5">
+                <h2 className="text-xl font-semibold text-fg">Berlatih menemani lewat cerita</h2>
+                <p className="mt-2 text-base leading-relaxed text-fg-muted">Jelajahi cerita Roleplay Psikoedukasi untuk belajar mendengarkan, memberi pilihan, dan mencari bantuan pendamping. Bisa dimainkan tanpa sinyal setelah paket disimpan.</p>
+                <a href="/roleplay" className={`mt-4 inline-flex min-h-11 items-center justify-center rounded-md bg-action px-4 py-3 text-base font-semibold text-white hover:bg-action-hover ${focusRing}`}>Buka Roleplay Psikoedukasi</a>
+              </div>
               {/* Cultural Wisdom Anchor */}
               <div className="bg-accent-50 border border-accent-200 rounded-lg p-5 space-y-1.5">
                 <p className="text-xs font-semibold uppercase tracking-[0.06em] text-fg-accent">

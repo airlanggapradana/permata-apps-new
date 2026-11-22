@@ -31,13 +31,14 @@ interface AuthContextValue {
   user: AuthUser | null;
   treeStats: TreeStats | null;
   isLoading: boolean;
+  isAuthUnavailable: boolean;
   refreshAuth: () => Promise<void>;
   login: (
     email: string,
-    password: string
+    password: string,
   ) => Promise<{ ok: boolean; error?: string }>;
   register: (
-    payload: RegisterPayload
+    payload: RegisterPayload,
   ) => Promise<{ ok: boolean; error?: string }>;
   logout: () => Promise<void>;
   setTreeStats: React.Dispatch<React.SetStateAction<TreeStats | null>>;
@@ -47,6 +48,7 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   treeStats: null,
   isLoading: true,
+  isAuthUnavailable: false,
   refreshAuth: async () => {},
   login: async () => ({ ok: false }),
   register: async () => ({ ok: false }),
@@ -58,11 +60,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [treeStats, setTreeStats] = useState<TreeStats | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthUnavailable, setIsAuthUnavailable] = useState(false);
 
   const refreshAuth = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/me", { cache: "no-store" });
+      const res = await fetch("/api/auth/me", {
+        cache: "no-store",
+        signal: AbortSignal.timeout(10000),
+      });
       if (!res.ok) {
+        setIsAuthUnavailable(res.status >= 500);
         setUser(null);
         setTreeStats(null);
         return;
@@ -72,6 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user?: AuthUser | null;
         treeStats?: TreeStats | null;
       };
+      setIsAuthUnavailable(false);
       if (data.authenticated && data.user) {
         setUser(data.user);
         setTreeStats(data.treeStats ?? null);
@@ -81,6 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch {
       // Safe fallback when offline or server unreachable
+      setIsAuthUnavailable(true);
       setUser(null);
       setTreeStats(null);
     } finally {
@@ -121,11 +130,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setUser(data.user);
       setTreeStats(data.treeStats ?? null);
+      setIsAuthUnavailable(false);
       return { ok: true };
     } catch {
       return {
         ok: false,
-        error: "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+        error:
+          "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
       };
     }
   }, []);
@@ -151,11 +162,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setUser(data.user);
       setTreeStats(data.treeStats ?? null);
+      setIsAuthUnavailable(false);
       return { ok: true };
     } catch {
       return {
         ok: false,
-        error: "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+        error:
+          "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
       };
     }
   }, []);
@@ -168,6 +181,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     setUser(null);
     setTreeStats(null);
+    setIsAuthUnavailable(false);
   }, []);
 
   return (
@@ -176,6 +190,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         treeStats,
         isLoading,
+        isAuthUnavailable,
         refreshAuth,
         login,
         register,

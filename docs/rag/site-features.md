@@ -21,7 +21,7 @@ PERMATA (Platform Integrasi Pendidikan Resiliensi Mental & Pendampingan Anak dal
 - `/safety-passport` — Safety Passport (Kartu Keselamatan Keluarga). Kelola kontak darurat, anggota keluarga, titik kumpul, kebutuhan darurat, dan catatan penting untuk kesiapan keluarga.
 - `/offline-survival` — Offline Survival Mode & PWA. Panduan darurat yang dapat diakses tanpa koneksi internet dan tanpa login: keselamatan fisik, prinsip PFA, grounding, napas tenang, go-bag, nomor darurat, dan ekspor kartu keselamatan.
 - `/login` dan `/register` — Autentikasi akun pengguna (registrasi, masuk, sesi).
-- `/roleplay` — Roleplay Psikoedukasi. Modul skenario pengambilan keputusan/pertumbuhan psikologis (pada antarmuka web dapat berstatus pengantar/coming soon sesuai pengembangan).
+- `/roleplay` — Roleplay Psikoedukasi. Empat cerita bercabang terkurasi untuk melatih empati: menemani teman di posko, rindu rumah/sekolah, mengikuti pendamping setelah guncangan, serta memeriksa kabar. Konteks Aceh/Kalimantan, avatar Rafi/Lala dengan ekspresi sesuai adegan, layar percakapan ringkas, serta refleksi “Jejak pilihanmu” dari pilihan aktual pemain. Umpan balik lembut tanpa skor gagal, jeda, napas pelan, grounding, dan panduan mencari orang dewasa tepercaya. Tidak memakai AI atau input teks bebas.
 
 ## Game Center (Resiliensi & Edukasi)
 - `/game-quake` — Sigap Bencana. Petualangan rumah simulasi (Phaser 3) untuk belajar respons aman saat dan setelah gempa melalui tiga pertanyaan/situasi berurutan, lalu mencapai pintu keluar. Kontrol keyboard/tombol layar, jeda, musik opsional. Pengguna login dapat menyimpan hasil; penyelesaian pertama memberi hingga 20 XP/hari (sesuai aturan aplikasi).
@@ -29,7 +29,7 @@ PERMATA (Platform Integrasi Pendidikan Resiliensi Mental & Pendampingan Anak dal
 - `/game-breath` — Napas Tenang (Breathing Calm). Latihan napas dengan pilihan ritme (Ringan/Santai) dan 5 atau 8 putaran, panduan tarik/hembus tanpa menahan napas, jeda/lanjut, jeda otomatis saat pindah tab. Kamera opsional sebagai cermin/percobaan deteksi lokal (tidak menentukan XP). Hadiah maksimal 15 XP/hari dibagi dengan target napas dashboard.
 - `/game-siagaminang` — Siaga Minang. Petualangan platform klasik bertema Minangkabau: kumpulkan 10 perlengkapan, lewati tiga checkpoint, capai tujuan. Kontrol keyboard/tombol layar, jeda, musik opsional. Jika jatuh kembali ke pos terakhir. Pengguna login menyimpan hasil; penyelesaian pertama memberi 20 XP/hari.
 - `/game-adventure` — Adventure Budaya. Simulasi naratif mitigasi bencana berbasis kearifan lokal.
-- `/roleplay` — Roleplay Psikoedukasi (juga dapat diakses dari menu game/fitur terkait).
+- `/roleplay` — Roleplay Psikoedukasi. Tamu dapat memainkan seluruh cerita. Pengguna login mendapat maksimal 20 XP roleplay per hari untuk seluruh skenario, berdasarkan hari Asia/Makassar. Progres lokal disimpan maksimal tujuh hari bila penyimpanan browser diizinkan. Gunakan “Simpan untuk offline” saat terhubung; cerita bisa dimainkan offline setelah paket tersimpan. Penyimpanan hasil offline ke akun dilakukan saat ringkasan dibuka kembali dengan akun yang sama dan koneksi tersedia; XP dihitung pada hari penyimpanan ke server. Mode AI, CMS skenario, dan fasilitator belum tersedia.
 
 Alamat lama `/PickAndDrop.html`, `/Breathing.html`, dan `/SiagaMinang.html` mengarah ke permainan dalam aplikasi.
 

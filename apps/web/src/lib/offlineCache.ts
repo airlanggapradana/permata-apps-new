@@ -6,7 +6,7 @@ import {
   PSYCHOLOGICAL_SCENARIOS,
 } from "@/data/offlineSurvivalData";
 
-export const SURVIVAL_CACHE_NAME = "permata-survival-v1";
+export const SURVIVAL_CACHE_NAME = "permata-survival-v3";
 export const SURVIVAL_META_STORAGE_KEY = "permata_offline_meta_v1";
 export const SURVIVAL_GOBAG_STORAGE_KEY = "permata_offline_gobag_v1";
 export const SURVIVAL_CARD_STORAGE_KEY = "permata_offline_safety_card_v1";
@@ -48,6 +48,7 @@ export function collectRuntimeAssetUrls(): string[] {
     "/PickAndDrop.html",
     "/SiagaMinang.html",
     "/game-siagaminang",
+    "/roleplay",
   ]);
 
   document.querySelectorAll("link[href], script[src]").forEach((el) => {
@@ -97,7 +98,7 @@ export async function registerSurvivalServiceWorker(): Promise<ServiceWorkerRegi
   }
 }
 
-export async function syncOfflineSurvivalBundle(): Promise<OfflineSyncMeta> {
+export async function syncOfflineSurvivalBundle(requiredUrls: string[] = []): Promise<OfflineSyncMeta> {
   if (typeof window === "undefined") {
     throw new Error("Penyimpanan offline hanya tersedia di peramban.");
   }
@@ -143,7 +144,7 @@ export async function syncOfflineSurvivalBundle(): Promise<OfflineSyncMeta> {
         const res = await fetch(url, { cache: "no-cache" });
         if (res.ok) {
           await cache.put(url, res.clone());
-        }
+        } else throw new Error("Paket tidak tersedia");
       })
     );
     cachedUrlsCount = results.filter((r) => r.status === "fulfilled").length;
@@ -153,6 +154,28 @@ export async function syncOfflineSurvivalBundle(): Promise<OfflineSyncMeta> {
     throw new Error(
       "Peramban tidak mendukung Cache API atau sedang offline saat mengunduh paket baru."
     );
+  }
+
+  // A partial emergency bundle must not be presented as a complete story download.
+  // Verify the current HTML and every currently loaded story script/style/font.
+  if (requiredUrls.length) {
+    if (!("caches" in window)) throw new Error("Cache API tidak tersedia.");
+    if (!("serviceWorker" in navigator)) throw new Error("Mode offline tidak didukung peramban ini.");
+    const cache = await caches.open(SURVIVAL_CACHE_NAME);
+    const required = new Set([...requiredUrls, ...urls.filter((url) => url.startsWith("/_next/static/"))]);
+    const results = await Promise.allSettled(Array.from(required, async (url) => {
+      const response = await fetch(url, { cache: "no-cache" });
+      if (!response.ok || response.redirected) throw new Error("Paket cerita belum lengkap.");
+      await cache.put(url, response.clone());
+    }));
+    if (results.some((result) => result.status === "rejected")) throw new Error("Paket cerita belum lengkap.");
+    let readyTimer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise<never>((_, reject) => { readyTimer = setTimeout(() => reject(new Error("Paket belum siap. Coba unduh lagi.")), 15000); }),
+      ]);
+    } finally { clearTimeout(readyTimer); }
   }
 
   const meta: OfflineSyncMeta = {

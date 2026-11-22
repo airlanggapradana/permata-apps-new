@@ -79,7 +79,7 @@ flowchart LR
 | **Napas Tenang**          | `/game-breath`      | Latihan pernapasan terpandu dengan pilihan ritme, jeda/lanjutkan, serta mode cermin/deteksi kamera lokal opsional.          | Maks. **15 XP/hari** (dibagi dengan target napas dashboard) &bull; [Walkthrough](GUIDE.md#walkthrough-napas-tenang) |
 | **Siaga Minang**          | `/game-siagaminang` | Petualangan layar penuh berlatar Minangkabau berlapis, 10 perlengkapan, dan 3 checkpoint.                                   | **20 XP/hari** &bull; [Walkthrough](GUIDE.md#walkthrough-siaga-minang)                                              |
 | **Adventure Budaya**      | `/game-adventure`   | Simulasi naratif mitigasi bencana berbasis kearifan lokal.                                                                  | Modul edukasi interaktif                                                                                            |
-| **Roleplay Psikoedukasi** | `/roleplay`         | Modul skenario pengambilan keputusan dan pertumbuhan psikologis.                                                            | Modul pengantar psikoedukasi                                                                                        |
+| **Roleplay Psikoedukasi** | `/roleplay`         | Empat cerita bercabang terkurasi untuk melatih empati, mendengarkan, dan mencari pendamping.                                 | Tema Aceh/Kalimantan, mode tamu, jeda, napas/grounding, paket offline, dan maksimal 20 XP/hari untuk akun login.         |
 
 > [!NOTE]
 > Rute lama (`/PickAndDrop.html`, `/Breathing.html`, dan `/SiagaMinang.html`) otomatis mengarahkan pengguna ke halaman game di dalam aplikasi.

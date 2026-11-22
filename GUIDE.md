@@ -180,7 +180,7 @@ Seluruh permainan dapat diakses melalui bagian **Game Center Resiliensi** di hal
 | 3 | **Napas Tenang (Breathing Calm)** | `/game-breath` | Pilih ritme **Ringan** (3 detik tarik / 3 detik hembuskan) atau **Santai** (4 / 4), serta 5 atau 8 putaran. Klik **Mulai Latihan** untuk mengikuti lingkaran tanpa menahan napas. Bisa dijeda kapan saja; kamera opsional sebagai cermin. Hasil tersimpan untuk pengguna yang login, dengan maksimal **15 XP/hari** bersama target latihan napas di dashboard. |
 | 4 | **Siaga Minang** | `/game-siagaminang` | Klik **Mulai Petualangan**, jelajahi arena klasik layar penuh, kumpulkan 10 perlengkapan dari empat jenis, lewati tiga checkpoint, lalu capai titik akhir. Kontrol keyboard atau tombol layar HP. Jika jatuh, kembali ke pos terakhir tanpa kehilangan barang. Pengguna yang login menyimpan hasil ke PostgreSQL; penyelesaian pertama mendapat **20 XP/hari**. |
 | 5 | **Adventure Budaya** | `/game-adventure` | Klik tombol **`Mainkan Sekarang`** untuk membuka roleplay naratif mitigasi bencana berbasis kearifan lokal Nusantara (*Knock The Drought Out*). |
-| 6 | **Roleplay Psikoedukasi** | `/roleplay` | Modul simulasi pengambilan keputusan dan *Growth Path* psikologis (saat ini berstatus *Coming Soon* pada antarmuka web dan didukung oleh modul skenario bercabang di backend API). |
+| 6 | **Roleplay Psikoedukasi** | `/roleplay` | Empat cerita bercabang terkurasi: menemani teman di posko, rindu rumah, dukungan setelah guncangan, dan memeriksa kabar. Pilihan dialog, umpan balik empatik, jeda, latihan napas/grounding, dan ringkasan pembelajaran. Tamu dapat bermain; akun menyimpan progres dan maksimal 20 XP roleplay/hari. |
 
 > **Catatan Navigasi**: Gunakan tautan **`Kembali ke Dashboard`** untuk kembali ke `/dashboard`. Pada Tas Siaga Bencana, tautan tersedia di bagian atas halaman dan tombol **`Lihat Pohon Harapan`** tersedia setelah bermain. Alamat lama `/PickAndDrop.html` otomatis membuka permainan yang baru.
 
@@ -415,7 +415,10 @@ Selain antarmuka web di atas, PERMATA memiliki layanan backend komprehensif (`ap
 | `POST /api/games/breathing` | Memulai sesi Napas Tenang (`action: start`, `mode: gentle:5`, `gentle:8`, `steady:5`, atau `steady:8`) dan menyimpan durasi aktif (`action: finish`, `attemptId`, `activeMs`); membutuhkan login | `apps/web/src/app/api/games/breathing/route.ts` |
 | `POST /api/games/siaga-minang` | Memulai sesi (`action: start`, `mode: practice`) dan menyimpan hasil perjalanan (`action: finish`, `attemptId`, `items`, `checkpoints`, `reachedGoal`, `falls`, `activeMs`); hadiah dihitung server | `apps/web/src/app/api/games/siaga-minang/route.ts` |
 | `POST /api/games/sigap-bencana` | Memulai sesi (`action: start`, `mode: practice`) dan menyimpan hasil (`action: finish`, `attemptId`, `answers`, `rooms`, `reachedExit`, `mistakes`, `activeMs`); jawaban, durasi, serta hadiah 20 XP/hari diperiksa server | `apps/web/src/app/api/games/sigap-bencana/route.ts` |
+| `POST /api/games/roleplay` | Memulai/memulihkan sesi (`action: start`, `run`) dan menyimpan penutup cerita (`action: finish`, `run`); memvalidasi jalur, versi, budaya, dan pemilik sesi. Maksimal 20 XP roleplay/hari untuk seluruh skenario; pengiriman ulang tidak menggandakan hadiah | `apps/web/src/app/api/games/roleplay/route.ts` |
 | `POST /api/journal/breathe` | Menandai latihan napas yang dilaporkan dari dashboard, berbagi batas hadiah harian dengan Napas Tenang | `apps/web/src/app/api/journal/breathe/route.ts` |
+
+Endpoint game dan latihan napas dashboard memakai pemeriksaan asal permintaan yang sama (`src/lib/requestOrigin.ts`). Alamat browser dibandingkan dengan host permintaan yang diterima agar akses lokal melalui `localhost` maupun `127.0.0.1` tetap bekerja; permintaan dari situs lain tetap ditolak. Jalankan `pnpm --filter @permata/web test:origin` untuk regresi pemeriksaan ini.
 
 ### Grup Endpoint Backend Utama (`apps/api` - Port `4000`)
 

@@ -13,6 +13,7 @@ function worker({ offline = false, cacheWriteFails = false } = {}) {
   const entries = new Map();
   const names = new Set([
     "permata-survival-v1",
+    "permata-survival-v3",
     "permata-survival-old",
     "another-app-cache",
   ]);
@@ -130,13 +131,20 @@ test("failed cache writes do not replace successful network responses", async ()
 test("API writes and other origins bypass the survival cache", async () => {
   const sw = worker();
   assert.equal(await sw.fetch("/api/games/breathing"), null);
+  assert.equal(await sw.fetch("/api/games/roleplay", { method: "POST" }), null);
   assert.equal(await sw.fetch("/app.js", { method: "POST" }), null);
   assert.equal(await sw.fetch("https://external.example/app.js"), null);
+});
+
+test("a downloaded roleplay page can be reopened offline", async () => {
+  const sw = worker({ offline: true });
+  sw.seed("/roleplay", "downloaded-story-page");
+  assert.equal(await (await sw.fetch("/roleplay", { mode: "navigate" })).text(), "downloaded-story-page");
 });
 test("worker upgrades preserve unrelated caches", async () => {
   const sw = worker();
   assert.deepEqual((await sw.activate()).sort(), [
     "another-app-cache",
-    "permata-survival-v1",
+    "permata-survival-v3",
   ]);
 });

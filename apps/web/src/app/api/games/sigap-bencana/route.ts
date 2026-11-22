@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { isSameOriginRequest } from "@/lib/requestOrigin";
 import { getPgPool } from "@/lib/db";
 import { getSessionUser, getUserTreeStats } from "@/lib/auth";
 import {
@@ -14,10 +15,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  if (
-    req.headers.get("origin") &&
-    req.headers.get("origin") !== req.nextUrl.origin
-  )
+  if (!isSameOriginRequest(req))
     return NextResponse.json(
       { error: "Asal permintaan tidak sesuai." },
       { status: 403 },

@@ -2,6 +2,10 @@
 
 Dokumen ini memetakan fitur-fitur **Roleplay Psikoedukasi** yang realistis dan selaras untuk diterapkan pada aplikasi **PERMATA** berdasarkan arsitektur, modul, dan aset yang sudah ada saat ini (`apps/web`, `apps/api`, serta pedoman produk dan desain).
 
+> **Status implementasi tahap 1 (23 November 2026):** Empat cerita terkurasi, varian Aceh/Kalimantan, umpan balik empatik, jeda, napas pelan/grounding, mode tamu, ringkasan, dan XP harian di `apps/web` telah diimplementasikan. Paket offline menyertakan halaman dan aset aplikasi; hasil lokal dapat disimpan ke akun yang sama saat kembali terhubung. Batas XP adalah 20 per fitur per hari (`Asia/Makassar`), berdasarkan hari penyimpanan ke server. Tidak ada input teks bebas. Integrasi simulasi Express, CMS/fasilitator, dan dialog AI tetap merupakan tahap lanjutan. Baseline di bawah merekam keadaan sebelum implementasi. Peninjauan pakar dan budaya pada checklist rilis tetap perlu dilakukan.
+
+> **Penyempurnaan pengalaman:** Layar percakapan pada ponsel diringkas menjadi satu kartu, dengan konteks lengkap yang dapat dibuka. Avatar Rafi/Lala menampilkan ekspresi dan gestur sesuai adegan serta respons. Ringkasan “Jejak pilihanmu” memuat hingga tiga contoh pilihan aktual, termasuk respons yang disesuaikan setelah umpan balik. Metadata presentasi diturunkan dari ID adegan/pilihan yang sama, sehingga versi skenario, progres tersimpan, dan aturan XP tetap kompatibel.
+
 ---
 
 ## 1. Kondisi Aplikasi Saat Ini (Baseline)

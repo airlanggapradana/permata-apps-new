@@ -1,4 +1,4 @@
-const CACHE_NAME = "permata-survival-v2";
+const CACHE_NAME = "permata-survival-v3";
 
 const CORE_SURVIVAL_URLS = [
   "/offline-survival",
@@ -13,6 +13,7 @@ const CORE_SURVIVAL_URLS = [
   "/PickAndDrop.html",
   "/SiagaMinang.html",
   "/game-siagaminang",
+  "/roleplay",
 ];
 
 async function safeCacheUrls(cache, urls) {
@@ -24,7 +25,7 @@ async function safeCacheUrls(cache, urls) {
       const response = await fetch(url, { cache: "no-cache" });
       if (response && response.ok) {
         await cache.put(url, response.clone());
-      }
+      } else throw new Error("Paket tidak tersedia");
     })
   );
   const cachedCount = results.filter((r) => r.status === "fulfilled").length;
