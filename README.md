@@ -74,15 +74,21 @@ flowchart LR
 
 | Game                      | Rute                | Deskripsi Singkat                                                                                                           | Hadiah Harian &amp; Catatan                                                                                         |
 | :------------------------ | :------------------ | :-------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------ |
-| **Sigap Bencana**         | `/game-quake`       | Petualangan rumah berbasis **Phaser 3**, 3 pertanyaan dengan petunjuk &amp; percobaan ulang, kontrol keyboard/sentuh.       | Maks. **20 XP/hari** &bull; [Walkthrough](GUIDE.md#walkthrough-sigap-bencana)                                       |
-| **Tas Siaga Bencana**     | `/game-healing`     | Mengenal 6 perlengkapan darurat dalam latihan santai atau tantangan 60 detik (dukungan sentuh, mouse, &amp; kamera tangan). | **20 XP/hari** &bull; [Walkthrough](GUIDE.md#walkthrough-tas-siaga-bencana)                                         |
+| **Sigap Bencana**         | `/game-quake`       | Jelajahi rumah berilustrasi dengan **Phaser 3**, pelajari 3 situasi keselamatan, dan rasakan simulasi guncangan yang bisa dimatikan. | Maks. **20 XP/hari** &bull; Keyboard/sentuh, pengurangan animasi &bull; [Walkthrough](GUIDE.md#walkthrough-sigap-bencana) |
+| **Tas Siaga Bencana**     | `/game-healing`     | Tutorial dialog Aira, pilih atau seret 6 perlengkapan ke tas, lalu selesaikan latihan santai atau tantangan 60 detik. | **20 XP/hari** &bull; Sentuh, mouse, atau kamera tangan opsional &bull; [Walkthrough](GUIDE.md#walkthrough-tas-siaga-bencana) |
 | **Napas Tenang**          | `/game-breath`      | Latihan pernapasan terpandu dengan pilihan ritme, jeda/lanjutkan, serta mode cermin/deteksi kamera lokal opsional.          | Maks. **15 XP/hari** (dibagi dengan target napas dashboard) &bull; [Walkthrough](GUIDE.md#walkthrough-napas-tenang) |
-| **Siaga Minang**          | `/game-siagaminang` | Petualangan layar penuh berlatar Minangkabau berlapis, 10 perlengkapan, dan 3 checkpoint.                                   | **20 XP/hari** &bull; [Walkthrough](GUIDE.md#walkthrough-siaga-minang)                                              |
+| **Siaga Minang**          | `/game-siagaminang` | Petualangan Aira berlatar Minangkabau: 3 pos, 10 jenis perlengkapan, jembatan interaktif, dan kuis bersama Kak Naya menuju titik kumpul. | **20 XP/hari** &bull; Bintang pembelajaran, inventori edukatif, kontrol dua jari &bull; [Walkthrough](GUIDE.md#walkthrough-siaga-minang) |
 | **Adventure Budaya**      | `/game-adventure`   | Simulasi naratif mitigasi bencana berbasis kearifan lokal.                                                                  | Modul edukasi interaktif                                                                                            |
-| **Roleplay Psikoedukasi** | `/roleplay`         | Empat cerita bercabang terkurasi untuk melatih empati, mendengarkan, dan mencari pendamping.                                 | Tema Aceh/Kalimantan, mode tamu, jeda, napas/grounding, paket offline, dan maksimal 20 XP/hari untuk akun login.         |
+| **Roleplay Psikoedukasi** | `/roleplay`         | Empat cerita bercabang dengan 7 karakter dan ekspresi untuk melatih empati, mendengarkan, serta mencari pendamping. | Tema Aceh/Kalimantan, mode tamu, jeda, napas/grounding, paket offline, dan maksimal **20 XP/hari** untuk akun login. |
 
 > [!NOTE]
 > Rute lama (`/PickAndDrop.html`, `/Breathing.html`, dan `/SiagaMinang.html`) otomatis mengarahkan pengguna ke halaman game di dalam aplikasi.
+
+**Siaga Minang** terdiri dari **Kumpulkan Perlengkapan**, **Tantangan Jalur Aman**, dan **Misi Evakuasi**. Kak Naya tampil sebagai pendamping di checkpoint dan kartu kuis, mengenakan rompi hijau serta membawa papan catatan. Sepuluh perlengkapan mencakup air minum, makanan siap santap, P3K, senter, pengisi daya portabel, jas hujan, masker, selimut, peluit, dan radio. Kuis menjeda permainan dan dapat dicoba lagi; bintang diberikan berdasarkan pembelajaran. Jika jatuh, progres perlengkapan dan kuis tetap terjaga selama sesi.
+
+Dalam **Roleplay Psikoedukasi**, pemain berperan sebagai **Aira** dan menemani **Rusdi**, **Cut**, **Evan**, serta **Lani**, dengan dukungan **Kak Naya** dan **Bu Sari**. Setiap cerita memakai karakter dan ekspresi sesuai situasinya. Potret roleplay dan ilustrasi Siaga Minang disertakan dalam paket offline.
+
+Di **Sigap Bencana**, efek guncangan berhenti saat jeda atau pertanyaan terbuka dan mengikuti pengaturan pengurangan animasi perangkat. **Tas Siaga Bencana** menyediakan dialog bertahap serta narasi opsional. Kamera tangan tetap opsional dan memerlukan internet saat memuat model MediaPipe dari CDN.
 
 ### Layanan Backend API (`apps/api`)
 
@@ -282,10 +288,22 @@ pnpm test
 # atau langsung pada workspace API:
 pnpm --filter @permata/api test
 
-# Frontend game & offline cache tests (Node.js test runner di apps/web/tests/)
-pnpm --filter @permata/web test:game
+# Frontend: tes logika, API dengan dependensi tiruan, dan cache offline
+# Tidak membutuhkan server aplikasi atau koneksi database
+pnpm --filter @permata/web test:minang
+pnpm --filter @permata/web test:bag-camera
+pnpm --filter @permata/web test:roleplay
 pnpm --filter @permata/web test:offline
+
+# Frontend: suite game termasuk integrasi dan integrasi roleplay
+# Membutuhkan frontend serta PostgreSQL lokal yang sudah berjalan
+pnpm --filter @permata/web test:game
+pnpm --filter @permata/web test:roleplay:integration
 ```
+
+Tes Siaga Minang mencakup jalur yang bisa ditamatkan, checkpoint, interaksi jembatan, percobaan ulang kuis, validasi versi sesi, dan batas hadiah harian. Tes kamera Tas Siaga memeriksa penghentian tracker saat pemrosesan masih aktif, pemanggilan penutupan berulang, dan kegagalan inisialisasi. Tes offline memastikan ilustrasi permainan tersedia setelah paket diunduh.
+
+Tes integrasi web membaca konfigurasi dari `apps/web/.env.local`. Gunakan `PERMATA_TEST_BASE_URL` dan `PERMATA_TEST_DATABASE_URL` untuk mengganti alamat aplikasi dan database pengujian; keduanya harus menunjuk ke layanan lokal.
 
 ---
 
@@ -315,4 +333,5 @@ Pastikan Environment Variables berikut telah diatur di pengaturan proyek Vercel 
 - [`GUIDE.md`](GUIDE.md) — Panduan penggunaan fitur antarmuka web, walkthrough game, serta modul backend.
 - [`docs/PRD Permata.md`](docs/PRD%20Permata.md) — Dokumen _Product Requirements_ sistem PERMATA.
 - [`docs/AI_Rules.txt`](docs/AI_Rules.txt) — Panduan dan _guardrails_ perilaku AI.
+- Referensi aset permainan: [Tas Siaga](docs/emergency-bag-assets.txt), [Sigap Bencana](docs/sigap-bencana-assets.txt), [Siaga Minang](docs/siaga-minang-assets.txt), [Kak Naya](docs/siaga-minang-naya-assets.txt), dan [karakter roleplay](docs/roleplay-character-assets.txt).
 - [`packages/ui`](packages/ui) &amp; [`packages/config-tailwind`](packages/config-tailwind) — Paket UI dan konfigurasi Tailwind bersama.
