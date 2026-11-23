@@ -5,8 +5,38 @@ import {
   QUAKE_WIDTH,
 } from "@/lib/games/sigapBencana";
 
-export function drawQuakeHero(ctx: CanvasRenderingContext2D, pose: MinangPose) {
+export type QuakeHouseArt = {
+  rooms: HTMLImageElement[];
+};
+
+export function drawQuakeHero(
+  ctx: CanvasRenderingContext2D,
+  pose: MinangPose,
+  art?: { image: HTMLImageElement; frame: number },
+) {
   ctx.clearRect(0, 0, 96, 140);
+  if (art) {
+    const width = art.image.naturalWidth / 4;
+    const height = art.image.naturalHeight / 2;
+    const bounce =
+      pose.air > 0.5 ? 0 : Math.sin(pose.gait * 2) * pose.run * 1.2;
+    ctx.save();
+    ctx.translate(48, 132 + bounce + pose.landing * 2);
+    ctx.scale(pose.facing, 1);
+    ctx.drawImage(
+      art.image,
+      (art.frame % 4) * width + 5,
+      Math.floor(art.frame / 4) * height + 5,
+      width - 10,
+      height - 12,
+      -48,
+      -127,
+      96,
+      140,
+    );
+    ctx.restore();
+    return;
+  }
   ctx.save();
   ctx.translate(48, 132);
   ctx.scale(pose.facing, 1);
@@ -96,7 +126,95 @@ export function drawQuakeHero(ctx: CanvasRenderingContext2D, pose: MinangPose) {
   ctx.restore();
 }
 
-export function drawQuakeHouse(ctx: CanvasRenderingContext2D) {
+export function drawQuakeHouse(
+  ctx: CanvasRenderingContext2D,
+  art?: QuakeHouseArt,
+) {
+  if (art) {
+    ctx.fillStyle = "#f4cdb1";
+    ctx.fillRect(0, 0, QUAKE_WIDTH, 1800);
+    ctx.save();
+    ctx.translate(0, 800);
+    for (let i = 0; i < 3; i++) {
+      const image = art.rooms[i];
+      const roomHeight = (950 * image.naturalHeight) / image.naturalWidth;
+      ctx.drawImage(image, i * 950, 0, 950, roomHeight);
+      // Extend the wooden floor for tall phone viewports.
+      ctx.drawImage(
+        image,
+        0,
+        image.naturalHeight - 128,
+        image.naturalWidth,
+        128,
+        i * 950,
+        roomHeight,
+        950,
+        1000 - roomHeight,
+      );
+    }
+    for (const x of [950, 1900]) {
+      rounded(ctx, x - 8, 0, 16, 480, 2, "#e5c49f");
+      rounded(ctx, x - 7, 0, 4, 480, 1, "#fff0cb");
+    }
+    for (const obstacle of QUAKE_OBSTACLES) {
+      const { x, width, height } = obstacle;
+      const y = QUAKE_FLOOR - height;
+      ctx.fillStyle = "#9e4e2533";
+      ctx.beginPath();
+      ctx.ellipse(
+        x + width / 2,
+        QUAKE_FLOOR + 3,
+        width * 0.65,
+        5,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+      const wood = ctx.createLinearGradient(x, y, x + width, y + height);
+      wood.addColorStop(0, "#efa548");
+      wood.addColorStop(1, "#bf652b");
+      ctx.fillStyle = wood;
+      ctx.beginPath();
+      ctx.roundRect(x, y, width, height, 5);
+      ctx.fill();
+      rounded(ctx, x + 5, y + 5, width - 10, height - 10, 2, "#cf7b31");
+      ctx.strokeStyle = "#ac5624";
+      ctx.lineWidth = 1;
+      for (let offset = 12; offset < width - 5; offset += 12) {
+        ctx.beginPath();
+        ctx.moveTo(x + offset, y + 5);
+        ctx.lineTo(x + offset, y + height - 5);
+        ctx.stroke();
+      }
+      ctx.lineWidth = 7;
+      ctx.strokeStyle = "#efa54d";
+      ctx.beginPath();
+      ctx.moveTo(x + 9, y + height - 8);
+      ctx.lineTo(x + width - 9, y + 8);
+      ctx.stroke();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#ffce7e";
+      ctx.beginPath();
+      ctx.moveTo(x + 5, y + 3);
+      ctx.lineTo(x + width - 5, y + 3);
+      ctx.stroke();
+      for (const screwX of [x + 4, x + width - 4])
+        for (const screwY of [y + 4, y + height - 4]) {
+          ctx.fillStyle = "#ffcf7c";
+          ctx.beginPath();
+          ctx.arc(screwX, screwY, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+    }
+    ctx.font = "900 15px Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#fffbe5";
+    ctx.fillText("KELUAR", 2724, 175);
+    ctx.restore();
+    return;
+  }
   // Extra wall above the scene fills tall portrait viewports.
   ctx.fillStyle = "#dce3cf";
   ctx.fillRect(0, 0, QUAKE_WIDTH, 1800);

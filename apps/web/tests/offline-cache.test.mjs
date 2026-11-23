@@ -80,6 +80,18 @@ function worker({ offline = false, cacheWriteFails = false } = {}) {
       await pending;
       return [...names];
     },
+    async install() {
+      let pending;
+      listeners.install({
+        waitUntil(value) {
+          pending = value;
+        },
+      });
+      await pending;
+    },
+    setOffline(value) {
+      offline = value;
+    },
   };
 }
 
@@ -141,6 +153,29 @@ test("a downloaded roleplay page can be reopened offline", async () => {
   sw.seed("/roleplay", "downloaded-story-page");
   assert.equal(await (await sw.fetch("/roleplay", { mode: "navigate" })).text(), "downloaded-story-page");
 });
+test("installing the survival bundle also downloads the roleplay character artwork", async () => {
+  const sw = worker();
+  await sw.install();
+  sw.setOffline(true);
+  for (const path of ["/roleplay", "/images/roleplay/characters-v2.webp"]) {
+    const response = await sw.fetch(path, {
+      mode: path === "/roleplay" ? "navigate" : "cors",
+    });
+    assert.equal(response.status, 200);
+    assert.equal(await response.text(), "new-version");
+  }
+});
+test("the survival bundle keeps every Minang scene and sprite available offline", async () => {
+  const sw = worker();
+  await sw.install();
+  sw.setOffline(true);
+  for (const asset of ["village", "route", "evacuation", "aira", "items", "terrain", "naya"]) {
+    const response = await sw.fetch(`/images/siaga-minang/${asset}-v2.webp`);
+    assert.equal(response.status, 200, asset);
+    assert.equal(await response.text(), "new-version", asset);
+  }
+});
+
 test("worker upgrades preserve unrelated caches", async () => {
   const sw = worker();
   assert.deepEqual((await sw.activate()).sort(), [

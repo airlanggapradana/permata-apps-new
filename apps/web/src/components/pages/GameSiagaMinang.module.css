@@ -1,285 +1,563 @@
 .classic {
-  --canvas-base: #102e32;
-  --surface: #163b3e;
-  --surface-sunken: #102e32;
-  --surface-brand: #374838;
-  --text: #fff7e5;
-  --text-secondary: #ccddd5;
-  --text-tertiary: #adbfba;
-  --text-brand: #f2d28f;
-  --border: #49645c;
-  --action: #c64f48;
-  --action-hover: #d86052;
-  --focus-ring: #f2d28f;
+  --canvas-base: #fff2d6;
+  --surface: #fffaf0;
+  --surface-sunken: #f7e5c1;
+  --surface-brand: #e8f0d1;
+  --text: #432917;
+  --text-secondary: #685340;
+  --text-tertiary: #7a6652;
+  --text-brand: #226347;
+  --border: #dab779;
+  --action: #27834e;
+  --action-hover: #1e673e;
   position: fixed;
   inset: 0;
   z-index: 80;
   display: grid;
   align-items: center;
   overflow: auto;
-  color: var(--text);
-  color-scheme: dark;
-  background: #102e32;
-}
-.classic::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
+  color: #432917;
+  color-scheme: light;
   background:
-    radial-gradient(ellipse at 12% 20%, #56877740, transparent 60%),
-    radial-gradient(ellipse at 90% 80%, #c7ac6820, transparent 50%);
+    linear-gradient(#fff2dadb, #ffedc8de),
+    url("/images/siaga-minang/village-v2.webp") center / cover;
 }
 .content {
   position: relative;
   width: min(1120px, calc(100% - 32px));
   margin: auto;
-  padding: max(20px, env(safe-area-inset-top)) max(0px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(0px, env(safe-area-inset-left));
-}
-.heading {
-  margin: 22px 0 28px;
-}
-.heading h1 {
-  color: #f2d28f;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  font-weight: 900;
-  text-shadow: 0 2px 20px #0003;
-}
-.menus > div,
-.result {
-  border: 1px solid #d4b77a70;
-  box-shadow:
-    0 20px 70px #061b2440,
-    inset 0 1px 0 #fff1cc0a;
-}
-.cover {
-  position: relative;
-  height: 205px;
-  margin: -24px -24px 24px;
-  overflow: hidden;
-  border-radius: 15px 15px 0 0;
-  border-bottom: 1px solid #e9d19b60;
-}
-.coverTag {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  padding: 7px 10px;
-  border-radius: 20px;
-  background: #183b3bcc;
-  color: #fff0c3;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  padding: max(24px, env(safe-area-inset-top)) 0
+    max(28px, env(safe-area-inset-bottom));
 }
 .back {
-  color: #ffe188;
+  color: #7e3a20;
+}
+.heading {
+  margin: 20px 0 24px;
+}
+.heading h1 {
+  color: #b23c2d;
+  font-weight: 900;
+  font-size: 36px;
+}
+.introLayout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 22px;
+}
+.introTutorial {
+  position: relative;
+  grid-column: 1 / -1;
+  min-height: 205px;
+  padding-left: 180px;
+}
+.introTutorial section {
+  border-color: #fff8dd;
+  background: linear-gradient(#fffcdf, #ffe8b8);
+  box-shadow:
+    0 5px 0 #d09a52,
+    0 10px 20px #714d2526;
+}
+.introTutorial button:last-child {
+  background: #27834e;
+  color: #fff8e7;
+}
+.tutorialHero {
+  position: absolute;
+  width: 172px;
+  height: 258px;
+  left: -180px;
+  bottom: -20px;
+  background: url("/images/siaga-minang/aira-v2.webp") 0 0 / 400% 200%;
+  clip-path: inset(2% 3% 3%);
+}
+.introCard,
+.result {
+  padding: 25px;
+  border: 3px solid #d59a47;
+  border-radius: 26px;
+  background: #fff9eaf2;
+  box-shadow:
+    0 6px 0 #c59b5d55,
+    0 14px 32px #69452322;
+}
+.introCard h2 {
+  margin: 12px 0;
+  font-size: 23px;
+  font-weight: 850;
+  color: #6a3c1c;
+}
+.introCard > p {
+  margin: 14px 0;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.cover {
+  height: 200px;
+  overflow: hidden;
+  margin: -25px -25px 18px;
+  border-radius: 23px 23px 0 0;
+}
+.coverArtwork {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: url("/images/siaga-minang/village-v2.webp") center 42% / cover;
+}
+.coverHero {
+  position: absolute;
+  bottom: -15px;
+  left: 25%;
+  width: 140px;
+  height: 210px;
+  background: url("/images/siaga-minang/aira-v2.webp") 0 0 / 400% 200%;
+  clip-path: inset(3%);
+}
+.posList {
+  display: grid;
+  gap: 9px;
+  margin-top: 18px;
+}
+.posList li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f6e4b8;
+  font-size: 14px;
+}
+.posList strong {
+  color: #1e7447;
+}
+.learningNote {
+  padding: 14px;
+  border-radius: 16px;
+  color: #286a3c;
+  background: #e8efd2;
+  font-weight: 700;
+}
+.introCard .small {
+  font-size: 13px;
+}
+.small a {
+  text-decoration: underline;
 }
 .classic[data-stage="true"] {
   overflow: hidden;
-}
-.classic[data-stage="true"]::before,
-.classic[data-stage="true"] .heading {
-  display: none;
+  background: #39b9f3;
 }
 .classic[data-stage="true"] .content {
   width: 100%;
   height: 100%;
-  margin: 0;
   padding: 0;
+  margin: 0;
+}
+.classic[data-stage="true"] .heading {
+  display: none;
+}
+.classic[data-phase="paused"] .exit,
+.classic[data-phase="question"] .exit {
+  visibility: hidden;
+}
+.stage,
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.stage {
+  isolation: isolate;
 }
 .exit {
   position: absolute;
-  top: max(14px, env(safe-area-inset-top));
   left: max(14px, env(safe-area-inset-left));
+  top: max(18px, env(safe-area-inset-top));
   z-index: 24;
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid #e5c9958c;
-  border-radius: 16px;
-  background: linear-gradient(145deg, #23474aec, #15373aef);
-  color: #fff6df;
-  font-size: 12px;
-  font-weight: 600;
-  box-shadow:
-    0 5px 18px #163e3426,
-    inset 0 1px 0 #fff2cd1a;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: 3px solid #fff5cf;
+  border-radius: 50%;
+  color: #733d1d;
+  background: linear-gradient(#fff9dc, #f6d392);
+  box-shadow: 0 4px 0 #a85d2e;
 }
 .exitLabel {
   display: none;
 }
-.classic[data-phase="paused"] .exit {
-  visibility: hidden;
-}
-.stage {
+.gameLogo {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
-  isolation: isolate;
+  left: 74px;
+  top: 14px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #b22d1e;
+  pointer-events: none;
 }
-.scene {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+.gameLogo strong {
+  display: block;
+  font-family: var(--font-jakarta), sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  -webkit-text-stroke: 3px #fff5dc;
+  paint-order: stroke fill;
+  filter: drop-shadow(0 3px 0 #82351d);
+}
+.gameLogo strong span {
+  display: block;
+  color: #6f381f;
+}
+.gameLogo small {
+  display: block;
+  margin-top: 8px;
+  padding: 3px 5px;
+  border-radius: 8px;
+  background: #ffe1a6;
+  font-size: 11px;
+  color: #4f2b15;
+  font-weight: 800;
+}
+.itemIcon {
+  display: inline-block;
+  width: 48px;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  border-radius: 16%;
+  background: #fff7de url("/images/siaga-minang/items-v2.webp") no-repeat;
+  background-size: 400% 300%;
+  clip-path: inset(2% round 12%);
+}
+.logoHouse {
+  width: 68px;
 }
 .hud {
   position: absolute;
-  top: max(14px, env(safe-area-inset-top));
-  left: calc(68px + env(safe-area-inset-left, 0px));
-  right: max(14px, env(safe-area-inset-right));
+  left: 320px;
+  right: max(18px, env(safe-area-inset-right));
+  top: max(20px, env(safe-area-inset-top));
   z-index: 12;
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 18px;
   pointer-events: none;
 }
 .stats {
-  min-width: 0;
-  flex: 1;
-  max-width: 340px;
-  border: 1px solid #efd39b9c;
-  border-radius: 18px;
-  padding: 10px 14px;
-  background: linear-gradient(145deg, #254b4ded, #15373bef);
-  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 22px;
+  border: 3px solid #fff4d3;
+  border-radius: 999px;
+  background: linear-gradient(#ffebbd, #ffd48b);
   box-shadow:
-    0 6px 24px #183f3426,
-    inset 0 1px 0 #fff2cd1a;
-  backdrop-filter: blur(6px);
+    0 5px 0 #bc7538,
+    inset 0 0 0 2px #ed9c44;
+  min-height: 62px;
+  flex: 1;
 }
-.stats p:first-child {
-  color: #ffe6ac;
-  font-size: 14px;
-  font-weight: 800;
+.stats > svg {
+  color: #c13c28;
+  flex-shrink: 0;
 }
-.stats p:nth-of-type(2) {
-  margin-top: 4px;
-  color: #d5e5db;
-  font-size: 11px;
-}
-.progressTrack {
-  height: 4px;
-  margin-top: 8px;
-  overflow: hidden;
-  border-radius: 8px;
-  background: #e8f2d41c;
-}
-.progressTrack span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #c6a45f, #ffe4a5);
+.stats h2 {
+  font-size: clamp(16px, 1.55vw, 25px);
+  line-height: 1.25;
+  font-weight: 850;
+  color: #50290f;
+  text-align: center;
 }
 .actions {
   display: flex;
+  align-items: center;
   flex-shrink: 0;
-  gap: 8px;
+  gap: 9px;
   pointer-events: auto;
 }
-.hudButton {
+.counter {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 10px;
-  border: 1px solid #e5c9958c;
-  border-radius: 16px;
-  background: linear-gradient(145deg, #23474aec, #15373aef);
-  color: #fff6df;
-  font-size: 12px;
-  font-weight: 700;
+  gap: 6px;
+  padding: 7px 12px;
+  min-height: 48px;
+  border: 3px solid #fff8df;
+  border-radius: 99px;
+  background: linear-gradient(#2b986e, #176446);
+  color: #fffbed;
+  font-size: 19px;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 3px 0 #b5773d;
 }
-.actionLabel {
-  display: none;
+.counterBag {
+  width: 32px;
 }
-.hudButton:focus-visible,
-.exit:focus-visible {
-  outline: 3px solid #fff2a2;
-  outline-offset: 3px;
+.hudButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 3px solid #fff3cd;
+  border-radius: 50%;
+  background: linear-gradient(#2a9162, #176447);
+  color: #fff8de;
+  box-shadow:
+    0 4px 0 #a75d28,
+    inset 0 2px 0 #ffffff40;
+}
+.pauseButton {
+  background: linear-gradient(#ee8d39, #cd4428);
 }
 .hudButton:disabled {
-  opacity: 0.55;
+  opacity: 0.65;
+}
+.playerCard {
+  position: absolute;
+  z-index: 10;
+  left: 24px;
+  top: 138px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px 10px 8px;
+  border: 3px solid #fff3cf;
+  border-radius: 46px;
+  background: linear-gradient(#fff3cc, #ffdda2);
+  box-shadow: 0 5px 0 #b2773c;
+}
+.avatar {
+  width: 70px;
+  height: 70px;
+  border: 3px solid #dda44b;
+  border-radius: 50%;
+  background: #f3cf77 url("/images/siaga-minang/aira-v2.webp") 11% 9% / 1000%
+    auto;
+  clip-path: circle(50%);
+}
+.playerCard strong {
+  color: #246d48;
+  font-size: 21px;
+}
+.posDots {
+  display: flex;
+  gap: 7px;
+  margin-top: 5px;
+}
+.posDots i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #cba65c;
+  color: #8a683d;
+  background: #fff8e7;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+}
+.posDots i[data-done="true"] {
+  background: #359b55;
+  color: white;
+  border-color: #207845;
+}
+.missionPanel {
+  position: absolute;
+  left: 24px;
+  top: 264px;
+  z-index: 14;
+  width: 258px;
+  border: 3px solid #d99429;
+  border-radius: 22px;
+  background: linear-gradient(#fff5d4, #ffe3af);
+  box-shadow:
+    0 6px 0 #b26629,
+    inset 0 0 0 3px #fff2c2;
+  overflow: hidden;
+}
+.missionToggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  width: 100%;
+  min-height: 48px;
+  border-bottom: 3px solid #ffda88;
+  background: linear-gradient(#c95539, #99321e);
+  color: #fff9e1;
+  font-size: 20px;
+  font-weight: 850;
+}
+.missionPanel ul {
+  padding: 10px 16px;
+}
+.missionPanel ul[hidden] {
+  display: none;
+}
+.missionPanel li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px 0;
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 750;
+}
+.missionPanel li + li {
+  border-top: 1px solid #dfb26d;
+}
+.checkBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid #9c6630;
+  border-radius: 7px;
+  flex-shrink: 0;
+  background: #fff9de;
+}
+.checkBox[data-done="true"] {
+  background: #3d9f44;
+  color: white;
+  border-color: #2a7c32;
 }
 .controls {
   position: absolute;
-  left: max(16px, env(safe-area-inset-left));
-  right: max(16px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
+  left: max(28px, env(safe-area-inset-left));
+  right: max(28px, env(safe-area-inset-right));
+  bottom: max(22px, env(safe-area-inset-bottom));
   z-index: 12;
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  align-items: center;
   pointer-events: none;
 }
 .directions {
   display: flex;
-  gap: 12px;
+  gap: 20px;
+}
+.actionControls {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
 }
 .control {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  width: 68px;
-  height: 68px;
-  border: 1px solid #f1d8a7b3;
+  gap: 4px;
+  width: 100px;
+  height: 100px;
+  border: 5px solid #fff2c6;
   border-radius: 50%;
-  background: linear-gradient(150deg, #365a55de, #193b3be8);
-  color: #fff5df;
-  font-weight: 800;
+  background: linear-gradient(145deg, #3ea176, #157147 75%);
+  color: #fff8e0;
+  pointer-events: auto;
   touch-action: none;
   user-select: none;
-  pointer-events: auto;
-  backdrop-filter: blur(6px);
   box-shadow:
-    0 5px 0 #12343280,
-    0 8px 20px #12343230,
-    inset 0 2px 0 #fff4cf26;
-}
-.jump {
-  width: 92px;
-  height: 92px;
-  flex-direction: column;
-  font-size: 12px;
-  background: linear-gradient(145deg, #dd7860, #af3f42);
-  border-color: #ffe6b2bd;
+    0 5px 0 #ac6532,
+    inset 0 0 0 3px #71b083,
+    0 8px 18px #64432244;
+  font-size: 16px;
+  font-weight: 850;
 }
 .control[aria-pressed="true"] {
-  background: linear-gradient(145deg, #b38c50, #6b663e);
-  border-color: #fff1cb;
+  transform: translateY(3px);
+  filter: brightness(0.9);
   box-shadow:
-    0 2px 0 #12343280,
-    inset 0 2px 6px #163e3450;
-}
-.control:focus-visible {
-  outline: 3px solid #fff6b3;
-  outline-offset: 4px;
+    0 2px 0 #9c5b28,
+    inset 0 3px 10px #104a37;
 }
 .control:disabled {
-  opacity: 0.45;
+  opacity: 0.6;
+}
+.jump {
+  width: 124px;
+  height: 124px;
+  flex-direction: column;
+}
+.interact {
+  width: 90px;
+  height: 90px;
+  flex-direction: column;
+  font-size: 14px;
 }
 .feedback {
   position: absolute;
-  top: 124px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9;
-  width: min(570px, calc(100% - 28px));
-  padding: 10px 14px;
-  border: 1px solid #e7ce9d70;
-  border-radius: 14px;
-  background: #1c4043eb;
-  color: #fff0ce;
-  font-size: 12px;
-  line-height: 1.5;
+  left: 290px;
+  right: 300px;
+  bottom: 26px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  min-height: 76px;
+  border: 3px solid #fff3ca;
+  border-radius: 32px;
+  background: linear-gradient(#fff4ce, #ffe0a3);
+  color: #4d2f17;
+  box-shadow:
+    0 5px 0 #bd7e3a,
+    inset 0 0 0 1px #dfa74f;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.45;
   pointer-events: none;
+}
+.feedback > span {
+  font-size: 31px;
+  flex-shrink: 0;
+}
+.quickInventory {
+  position: absolute;
+  bottom: 140px;
+  left: 300px;
+  right: 300px;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  pointer-events: auto;
+}
+.quickInventory button {
+  position: relative;
+  width: min(8%, 48px);
+  min-width: 34px;
+  height: 44px;
+  border: 2px solid #d9aa68;
+  border-radius: 10px;
+  background: #fff7de;
+  opacity: 0.5;
+}
+.quickInventory button[data-collected="true"] {
+  opacity: 1;
+  border-color: #639940;
+}
+.quickInventory .itemIcon {
+  width: 100%;
+}
+.quickInventory button > svg {
+  position: absolute;
+  top: -4px;
+  right: -3px;
+  background: #409441;
+  color: white;
+  border: 1px solid white;
+  border-radius: 50%;
 }
 .pauseBackdrop {
   position: absolute;
@@ -290,122 +568,645 @@
   justify-content: center;
   padding: 18px;
   overflow: auto;
-  background: #000c;
+  background: #143b385b;
   backdrop-filter: blur(5px);
 }
 .pausePanel {
-  width: min(640px, 100%);
+  width: min(730px, 100%);
   max-height: calc(100dvh - 36px);
   overflow: auto;
-  border: 1px solid #ecd198;
-  border-radius: 24px;
-  background: linear-gradient(150deg, #244a4bf7, #102e32fc);
-  padding: 24px;
-  box-shadow: 0 20px 80px #061f2b60;
+  padding: 25px;
+  border: 4px solid #e5a444;
+  border-radius: 26px;
+  background: linear-gradient(#fff9e3, #ffe8b9);
+  box-shadow:
+    0 6px 0 #a95c28,
+    0 20px 60px #16412f4d;
 }
 .pausePanel h2 {
-  color: #f2d28f;
+  color: #7f351d;
+  font-weight: 850;
+  font-size: 23px;
+  outline: none;
+}
+.guideHeading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.nayaPortrait {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid #d4b16f;
+  border-radius: 20px;
+  background: #e3f0d4 url("/images/siaga-minang/naya-v2.webp") center 2% / 100%
+    auto no-repeat;
+}
+.guideHeading p {
+  color: #43744d;
+  font-size: 14px;
+  font-weight: 700;
+}
+.educationTitle {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 12px;
+  border-radius: 99px;
+  background: #a63c27;
+  color: #fff6d9;
+  font-size: 14px;
+  font-weight: 750;
+}
+.questionPrompt {
+  font-size: 21px;
+  line-height: 1.5;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+.quizOptions {
+  display: grid;
+  gap: 10px;
+}
+.quizOptions button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  width: 100%;
+  min-height: 52px;
+  border: 2px solid #cf9d61;
+  border-radius: 22px;
+  text-align: left;
+  background: #fff5dd;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #502c17;
+  font-weight: 650;
+}
+.quizOptions button > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #bb572d;
+  color: white;
+  font-weight: 900;
+}
+.quizOptions button[data-correct="true"] {
+  border-color: #3e9f3c;
+  background: #dcf3b9;
+}
+.quizOptions button[data-correct="true"] > span {
+  background: #3f982f;
+}
+.educationCard {
+  padding: 14px;
+  margin-top: 15px;
+  border: 2px solid #a1bf68;
+  border-radius: 16px;
+  background: #f0f5d1;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #3b5c2b;
 }
 .inventory {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+}
+.inventory button {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.inventory span {
-  padding: 7px 10px;
-  border: 1px solid #79662f;
-  border-radius: 9px;
-  color: #fff0bb;
-  background: #ffffff08;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px;
+  border: 2px solid #ddb573;
+  border-radius: 14px;
+  background: #fff7de;
   font-size: 12px;
+  text-align: center;
 }
-@media (min-width: 640px) {
-  .cover {
-    margin: -32px -32px 24px;
-  }
-  .exitLabel,
-  .actionLabel {
-    display: inline;
-  }
+.inventory button[aria-pressed="true"] {
+  border-color: #35894a;
+  background: #e5efc9;
+}
+.inventory strong {
+  font-size: 13px;
+}
+.result {
+  margin-top: 24px;
+}
+.learningSummary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 22px;
+}
+.learningSummary article {
+  border: 2px solid #dcc58a;
+  border-radius: 18px;
+  padding: 16px;
+  background: #fff7de;
+}
+.learningSummary article[data-learned="true"] {
+  border-color: #8db86e;
+  background: #edf4d5;
+}
+.learningSummary h3 {
+  margin-top: 8px;
+  font-weight: 800;
+  font-size: 17px;
+}
+.learningSummary p {
+  margin-top: 6px;
+  color: #67704b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.classic button:focus-visible,
+.classic a:focus-visible {
+  outline: 3px solid #64391e;
+  outline-offset: 4px;
+}
+@media (max-width: 1250px) {
   .hud {
-    left: calc(220px + env(safe-area-inset-left, 0px));
-    right: max(20px, env(safe-area-inset-right));
+    left: 260px;
+    gap: 12px;
+  }
+  .logoHouse {
+    width: 48px;
+  }
+  .gameLogo strong {
+    font-size: 23px;
   }
   .stats {
-    padding: 12px 18px;
+    padding: 12px;
+    min-height: 56px;
   }
-  .stats p:first-child {
+  .stats h2 {
     font-size: 18px;
   }
-  .controls {
-    left: max(28px, env(safe-area-inset-left));
-    right: max(28px, env(safe-area-inset-right));
-    bottom: max(24px, env(safe-area-inset-bottom));
+  .counter {
+    padding: 6px 9px;
+    font-size: 16px;
+    min-height: 46px;
   }
-  .control {
-    width: 80px;
-    height: 80px;
+  .counter svg {
+    width: 24px;
   }
-  .jump {
-    width: 100px;
-    height: 100px;
-  }
-}
-@media (max-width: 420px) {
-  .stats {
-    padding: 8px;
-  }
-  .stats p:first-child {
-    font-size: 11px;
-  }
-  .stats p:nth-of-type(2) {
-    font-size: 10px;
+  .counterBag {
+    width: 27px;
   }
   .actions {
     gap: 5px;
   }
-  .hud {
-    gap: 6px;
-    right: max(10px, env(safe-area-inset-right));
+  .hudButton {
+    width: 44px;
+    height: 44px;
+  }
+  .missionPanel {
+    width: 232px;
+  }
+  .missionPanel li {
+    font-size: 14px;
+  }
+  .quickInventory {
+    left: 250px;
+    right: 270px;
   }
   .feedback {
-    top: 108px;
+    left: 260px;
+    right: 270px;
+    font-size: 14px;
+  }
+  .control {
+    width: 86px;
+    height: 86px;
+  }
+  .jump {
+    width: 110px;
+    height: 110px;
+  }
+  .interact {
+    width: 82px;
+    height: 82px;
+  }
+}
+@media (max-width: 999px) {
+  .hud {
+    top: 92px;
+    left: 16px;
+    right: 16px;
+  }
+  .stats {
+    flex: 1;
+  }
+  .gameLogo {
+    top: 12px;
+  }
+  .playerCard {
+    left: auto;
+    right: 18px;
+    top: 12px;
+    padding: 5px 12px 5px 5px;
+    gap: 8px;
+  }
+  .avatar {
+    width: 48px;
+    height: 48px;
+  }
+  .playerCard strong {
+    font-size: 16px;
+  }
+  .posDots {
+    gap: 4px;
+    margin-top: 3px;
+  }
+  .posDots i {
+    width: 21px;
+    height: 21px;
     font-size: 11px;
+  }
+  .missionPanel {
+    top: 166px;
+    left: 16px;
+  }
+  .missionToggle {
+    font-size: 16px;
+    min-height: 44px;
+    padding: 8px;
+  }
+  .quickInventory {
+    display: none;
+  }
+  .controls {
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+  }
+  .feedback {
+    left: 220px;
+    right: 240px;
+    min-height: 66px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  .feedback > span {
+    font-size: 25px;
+  }
+}
+@media (max-width: 640px) {
+  .content {
+    width: calc(100% - 24px);
+    padding-top: 14px;
+  }
+  .heading h1 {
+    font-size: 29px;
+  }
+  .introLayout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .introTutorial {
+    padding-left: 0;
+    min-height: 220px;
+  }
+  .tutorialHero {
+    left: -12px;
+    top: -4px;
+    bottom: auto;
+    width: 110px;
+    height: 165px;
+  }
+  .introCard {
+    padding: 18px;
+    border-radius: 22px;
+  }
+  .cover {
+    margin: -18px -18px 16px;
+    height: 180px;
+    border-radius: 19px 19px 0 0;
+  }
+  .exit {
+    top: max(12px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
+    width: 44px;
+    height: 44px;
+  }
+  .gameLogo {
+    left: 62px;
+    top: 12px;
+    gap: 2px;
+  }
+  .logoHouse {
+    display: none;
+  }
+  .gameLogo strong {
+    font-size: 18px;
+  }
+  .gameLogo small {
+    display: none;
+  }
+  .hud {
+    top: 72px;
+    left: 12px;
+    right: 12px;
+  }
+  .stats {
+    min-height: 46px;
+    padding: 10px 12px;
+    gap: 6px;
+    border-width: 2px;
+  }
+  .stats h2 {
+    font-size: 15px;
+  }
+  .stats > svg {
+    width: 19px;
+  }
+  .actions {
+    position: absolute;
+    top: -60px;
+    right: 0;
+    gap: 4px;
+  }
+  .counter {
+    padding: 5px 8px;
+    min-height: 42px;
+    border-width: 2px;
+    font-size: 14px;
+    gap: 3px;
+  }
+  .counter:first-child {
+    display: none;
+  }
+  .counterBag {
+    width: 24px;
+  }
+  .hudButton {
+    width: 44px;
+    height: 44px;
+    border-width: 2px;
+  }
+  .hudButton svg {
+    width: 21px;
+  }
+  .playerCard {
+    top: 137px;
+    left: 12px;
+    right: auto;
+    padding: 4px 9px 4px 4px;
+    border-width: 2px;
+    gap: 5px;
+  }
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-width: 2px;
+  }
+  .playerCard strong {
+    font-size: 14px;
+  }
+  .posDots {
+    margin-top: 0;
+  }
+  .posDots i {
+    width: 19px;
+    height: 19px;
+    font-size: 10px;
+  }
+  .missionPanel {
+    top: 138px;
+    right: 12px;
+    left: auto;
+    width: 175px;
+    border-width: 2px;
+    border-radius: 18px;
+  }
+  .missionPanel ul {
+    padding: 6px 10px;
+  }
+  .missionPanel li {
+    font-size: 13px;
+    padding: 9px 0;
+  }
+  .missionToggle {
+    font-size: 15px;
+    padding: 8px;
+  }
+  .missionToggle svg {
+    width: 19px;
+  }
+  .checkBox {
+    width: 22px;
+    height: 22px;
+  }
+  .controls {
+    left: 12px;
+    right: 12px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .directions {
+    gap: 9px;
+  }
+  .actionControls {
+    gap: 8px;
+  }
+  .control {
+    width: 62px;
+    height: 62px;
+    border-width: 3px;
+  }
+  .control > svg {
+    width: 29px;
+    height: 29px;
+  }
+  .interact {
+    width: 64px;
+    height: 64px;
+    font-size: 11px;
+  }
+  .jump {
+    width: 78px;
+    height: 78px;
+    font-size: 13px;
+  }
+  .feedback {
+    left: 12px;
+    right: 12px;
+    bottom: max(117px, calc(env(safe-area-inset-bottom) + 105px));
+    min-height: 54px;
+    padding: 10px 12px;
+    border-width: 2px;
+    border-radius: 20px;
+    font-size: 12px;
+    line-height: 1.5;
+    gap: 7px;
+  }
+  .feedback > span {
+    font-size: 23px;
+  }
+  .pausePanel {
+    padding: 18px;
+    border-width: 3px;
+    border-radius: 22px;
+  }
+  .pausePanel h2 {
+    font-size: 21px;
+  }
+  .guideHeading {
+    gap: 10px;
+  }
+  .guideHeading > div:first-child {
+    width: 58px;
+    height: 58px;
+  }
+  .guideHeading p {
+    font-size: 12px;
+  }
+  .questionPrompt {
+    font-size: 17px;
+  }
+  .quizOptions button {
+    padding: 10px;
+    gap: 8px;
+    font-size: 14px;
+    border-radius: 16px;
+  }
+  .educationCard {
+    font-size: 14px;
+    padding: 12px;
+  }
+  .inventory {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .learningSummary {
+    grid-template-columns: 1fr;
   }
 }
 @media (max-width: 360px) {
-  .feedback {
-    top: 136px;
+  .gameLogo {
+    display: none;
   }
-}
-@media (max-height: 480px) {
-  .feedback {
-    top: 88px;
-    max-width: 530px;
-    padding: 6px 10px;
-  }
-  .stats {
-    padding: 6px 10px;
-  }
-  .stats p:first-child {
-    font-size: 13px;
+  .missionPanel {
+    width: 150px;
   }
   .control {
     width: 56px;
     height: 56px;
   }
+  .interact {
+    width: 59px;
+    height: 59px;
+    font-size: 10px;
+  }
   .jump {
     width: 70px;
     height: 70px;
   }
+  .feedback {
+    bottom: 104px;
+  }
+}
+@media (max-height: 500px) and (min-width: 641px) {
+  .hud {
+    left: 240px;
+    top: 12px;
+  }
+  .stats {
+    min-height: 44px;
+    padding: 10px;
+  }
+  .stats h2 {
+    font-size: 15px;
+  }
+  .gameLogo {
+    left: 65px;
+    top: 10px;
+  }
+  .gameLogo strong {
+    font-size: 19px;
+  }
+  .gameLogo small {
+    display: none;
+  }
+  .logoHouse {
+    width: 44px;
+  }
+  .playerCard {
+    top: 80px;
+    left: 14px;
+    right: auto;
+  }
+  .missionPanel {
+    top: 156px;
+    left: 14px;
+    width: 190px;
+  }
+  .missionPanel li {
+    padding: 7px 0;
+    font-size: 12px;
+  }
+  .counter {
+    font-size: 13px;
+    padding: 4px 6px;
+    min-height: 42px;
+  }
+  .counter:first-child {
+    display: none;
+  }
+  .counterBag {
+    width: 24px;
+  }
+  .actions {
+    gap: 4px;
+  }
   .controls {
-    bottom: max(10px, env(safe-area-inset-bottom));
+    bottom: 10px;
+    left: 18px;
+    right: 18px;
+  }
+  .control {
+    width: 56px;
+    height: 56px;
+    border-width: 3px;
+  }
+  .jump {
+    width: 74px;
+    height: 74px;
+    font-size: 13px;
+  }
+  .interact {
+    width: 58px;
+    height: 58px;
+    font-size: 11px;
+  }
+  .control svg {
+    width: 27px;
+  }
+  .feedback {
+    left: 170px;
+    right: 190px;
+    bottom: 12px;
+    min-height: 55px;
+    font-size: 11px;
+    padding: 9px 12px;
+    border-radius: 20px;
+  }
+  .feedback > span {
+    font-size: 22px;
   }
 }
 @media (prefers-reduced-motion: no-preference) {
   .control {
     transition:
-      background-color 0.12s,
-      border-color 0.12s;
+      transform 0.1s,
+      filter 0.1s;
   }
 }

@@ -22,11 +22,23 @@ import {
   Flag,
   Volume2,
   VolumeX,
+  Star,
+  Backpack,
+  Hand,
+  ClipboardList,
+  Check,
+  MapPin,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import type { TreeStats } from "@/lib/treeProgress";
 import MinangScene from "@/components/games/MinangScene";
 import MinangCover from "@/components/games/MinangCover";
+import MinangIcon from "@/components/games/MinangIcon";
+import BagGuideDialog from "@/components/games/BagGuideDialog";
+import {
+  MINANG_POS_TITLES,
+  MINANG_TUTORIAL,
+} from "@/lib/games/minangPresentation";
 import styles from "./GameSiagaMinang.module.css";
 import {
   MINANG_ITEMS,
@@ -34,6 +46,9 @@ import {
   MINANG_TARGET,
   MINANG_CHECKPOINTS,
   MINANG_XP,
+  MINANG_VERSION,
+  MINANG_LESSONS,
+  answerMinang,
   createMinangState,
   getMinangSnapshot,
   returnToMinangCheckpoint,
@@ -43,7 +58,7 @@ import {
   type MinangEvent,
 } from "@/lib/games/siagaMinang";
 
-type Phase = "intro" | "playing" | "paused" | "result";
+type Phase = "intro" | "playing" | "paused" | "question" | "result";
 type Control = "left" | "right" | "jump";
 const button =
   "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action disabled:opacity-60";
@@ -71,6 +86,15 @@ export default function GameSiagaMinang() {
   const [phase, setPhase] = useState<Phase>("intro");
   const phaseRef = useRef<Phase>("intro");
   const [starting, setStarting] = useState(false);
+  const [introStep, setIntroStep] = useState(0);
+  const [skipTyping, setSkipTyping] = useState(false);
+  const [questionId, setQuestionId] = useState<string | null>(null);
+  const [answer, setAnswer] = useState<{
+    correct: boolean;
+    explanation: string;
+  } | null>(null);
+  const [inspectedItem, setInspectedItem] = useState<string | null>(null);
+  const [missionExpanded, setMissionExpanded] = useState(false);
   const startingRef = useRef(false);
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
@@ -106,10 +130,19 @@ export default function GameSiagaMinang() {
   const rootRef = useRef<HTMLElement>(null);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const resumeRef = useRef<HTMLButtonElement>(null);
+  const questionHeadingRef = useRef<HTMLHeadingElement>(null);
   const audioRef = useRef<AudioContext | null>(null);
   const soundRef = useRef(true);
   const notesRef = useRef(new Set<OscillatorNode>());
   const musicTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1000px)");
+    const update = () => setMissionExpanded(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -146,6 +179,7 @@ export default function GameSiagaMinang() {
       right: false,
       jump: false,
       jumpQueued: false,
+      interactQueued: false,
     });
     setPressed({ left: false, right: false, jump: false });
   }, []);
@@ -304,9 +338,7 @@ export default function GameSiagaMinang() {
     const down = (event: KeyboardEvent) => {
       if (event.code === "Tab") {
         const area =
-          phaseRef.current === "paused"
-            ? rootRef.current?.querySelector('[aria-label="Menu jeda"]')
-            : rootRef.current;
+          rootRef.current?.querySelector('[role="dialog"]') ?? rootRef.current;
         const targets = area
           ? Array.from(
               area.querySelectorAll<HTMLElement>(
@@ -336,6 +368,17 @@ export default function GameSiagaMinang() {
           event.preventDefault();
           resume();
         }
+        return;
+      }
+      if (
+        event.code === "KeyE" &&
+        phaseRef.current === "playing" &&
+        !(event.target as HTMLElement | null)?.closest(
+          "button,a,input,textarea,select",
+        )
+      ) {
+        event.preventDefault();
+        inputRef.current.interactQueued = true;
         return;
       }
       if (
@@ -382,6 +425,8 @@ export default function GameSiagaMinang() {
     if (phase === "paused") resumeRef.current?.focus({ preventScroll: true });
     if (phase === "result")
       resultHeadingRef.current?.focus({ preventScroll: true });
+    if (phase === "question")
+      questionHeadingRef.current?.focus({ preventScroll: true });
   }, [phase]);
 
   const saveResult = useCallback(
@@ -438,7 +483,11 @@ export default function GameSiagaMinang() {
   );
   const finish = useCallback(
     (next?: MinangSnapshot) => {
-      if (phaseRef.current !== "playing" && phaseRef.current !== "paused")
+      if (
+        phaseRef.current !== "playing" &&
+        phaseRef.current !== "paused" &&
+        phaseRef.current !== "question"
+      )
         return;
       const end =
         next ??
@@ -468,9 +517,18 @@ export default function GameSiagaMinang() {
   const sceneEvent = useCallback(
     (event: MinangEvent) => {
       if (event.message) setFeedback(event.message);
+      if (event.type === "question" && event.id) {
+        inputRef.current.enabled = false;
+        clearControls();
+        stopSounds();
+        setQuestionId(event.id);
+        setAnswer(null);
+        if (gameRef.current) setSnapshot(getMinangSnapshot(gameRef.current));
+        changePhase("question");
+      }
       playSound(event.type);
     },
-    [playSound],
+    [playSound, clearControls, stopSounds, changePhase],
   );
 
   async function start() {
@@ -487,7 +545,11 @@ export default function GameSiagaMinang() {
         const response = await fetch("/api/games/siaga-minang", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "start", mode: "practice" }),
+          body: JSON.stringify({
+            action: "start",
+            mode: "practice",
+            version: MINANG_VERSION,
+          }),
           signal: AbortSignal.timeout(15000),
         });
         const data = await response.json();
@@ -497,6 +559,9 @@ export default function GameSiagaMinang() {
       }
       setAttemptId(id);
       setResult(null);
+      setQuestionId(null);
+      setAnswer(null);
+      setInspectedItem(null);
       setSnapshot(getMinangSnapshot(createMinangState()));
       setSaveState("idle");
       clearControls();
@@ -587,10 +652,70 @@ export default function GameSiagaMinang() {
     resumeRef.current?.focus();
   }
 
+  const stage = ["playing", "paused", "question"].includes(phase);
+  const lesson = MINANG_LESSONS.find((item) => item.id === questionId);
+  const posIndex =
+    phase === "question"
+      ? Math.max(
+          0,
+          MINANG_LESSONS.findIndex((item) => item.id === questionId),
+        )
+      : Math.min(2, snapshot.checkpoints.length);
+  const learned = snapshot.answers?.length ?? 0;
+  const missionTarget = [3, 6, 10][posIndex];
+  const missions = [
+    {
+      label: `Kumpulkan ${missionTarget} perlengkapan (${Math.min(missionTarget, snapshot.collectedPickups.length)}/${missionTarget})`,
+      done: snapshot.collectedPickups.length >= missionTarget,
+    },
+    {
+      label:
+        posIndex === 1
+          ? "Aktifkan jembatan simulasi"
+          : posIndex === 2
+            ? "Capai titik kumpul"
+            : "Temui Kak Naya di pos",
+      done:
+        posIndex === 1
+          ? snapshot.bridgeActivated
+          : snapshot.checkpoints.includes(MINANG_CHECKPOINTS[posIndex].id),
+    },
+    {
+      label: "Belajar dari kuis bersama Kak Naya",
+      done: Boolean(
+        snapshot.answers?.some(
+          (item) => item.questionId === MINANG_CHECKPOINTS[posIndex].id,
+        ),
+      ),
+    },
+  ];
+  function interact() {
+    if (phaseRef.current !== "playing") return;
+    inputRef.current.interactQueued = true;
+    regionRef.current?.querySelector("canvas")?.focus({ preventScroll: true });
+  }
+  function chooseAnswer(id: string) {
+    if (!gameRef.current || answer?.correct) return;
+    const response = answerMinang(gameRef.current, id);
+    if (response) {
+      setAnswer(response);
+      setSnapshot(getMinangSnapshot(gameRef.current));
+    }
+  }
+  function continueLesson() {
+    if (!answer?.correct || document.hidden) return;
+    setFeedback(lesson?.explanation ?? "Lanjutkan mengikuti penanda hijau.");
+    clearControls();
+    inputRef.current.enabled = true;
+    changePhase("playing");
+    if (soundRef.current) playMusic();
+    regionRef.current?.querySelector("canvas")?.focus({ preventScroll: true });
+  }
+
   return (
     <main
       ref={rootRef}
-      data-stage={phase === "playing" || phase === "paused"}
+      data-stage={stage}
       data-phase={phase}
       className={styles.classic}
     >
@@ -598,20 +723,10 @@ export default function GameSiagaMinang() {
         <Link
           href="/dashboard"
           aria-label="Kembali ke Dashboard"
-          className={
-            phase === "playing" || phase === "paused"
-              ? styles.exit
-              : button + " " + styles.back
-          }
+          className={stage ? styles.exit : button + " " + styles.back}
         >
           <ArrowLeft size={18} />
-          <span
-            className={
-              phase === "playing" || phase === "paused"
-                ? styles.exitLabel
-                : undefined
-            }
-          >
+          <span className={stage ? styles.exitLabel : undefined}>
             Kembali ke Dashboard
           </span>
         </Link>
@@ -643,113 +758,88 @@ export default function GameSiagaMinang() {
 
         {phase === "intro" && (
           <AnimatedSection index={0}>
-            <section className={styles.menus + " grid gap-6 md:grid-cols-2"}>
-              <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
+            <section className={styles.introLayout}>
+              <div className={styles.introTutorial}>
+                <BagGuideDialog
+                  key={introStep}
+                  text={MINANG_TUTORIAL[introStep]}
+                  step={introStep}
+                  narration={false}
+                  instant={skipTyping}
+                  busy={starting || isLoading}
+                  startLabel="Mulai Petualangan"
+                  onUnavailable={() => {}}
+                  onNext={() => {
+                    if (introStep === 3) void start();
+                    else setIntroStep(introStep + 1);
+                  }}
+                  onSkip={() => {
+                    setIntroStep(3);
+                    setSkipTyping(true);
+                  }}
+                  portrait={
+                    <div
+                      className={styles.tutorialHero}
+                      role="img"
+                      aria-label="Aira dengan baju hijau dan tas kuning"
+                    />
+                  }
+                />
+              </div>
+              <article className={styles.introCard}>
                 <div className={styles.cover}>
                   <MinangCover />
-                  <span className={styles.coverTag}>JELAJAH RANAH MINANG</span>
                 </div>
-                <h2 className="text-xl font-semibold">Petualangan tiga pos</h2>
-                <p className="mt-3 text-sm leading-relaxed text-fg-muted">
-                  Susuri perbukitan, singgah di pos, dan siapkan bekal bersama.
-                  Kumpulkan 10 perlengkapan dari empat jenis, lalu capai Rumah
-                  Gadang di titik akhir.
+                <h2>Petualangan tiga pos bersama Aira</h2>
+                <p>
+                  Kumpulkan sepuluh perlengkapan berbeda, ikuti penanda jalur,
+                  dan temui Kak Naya di titik kumpul.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => void start()}
-                  disabled={starting || isLoading}
-                  className={`${button} mt-5 w-full bg-action text-white hover:bg-action-hover`}
-                >
-                  <Play size={18} />
-                  {starting ? "Menyiapkan perjalanan…" : "Mulai Petualangan"}
-                </button>
-                <p className="mt-3 text-center text-xs text-fg-muted">
-                  <span className="hidden sm:inline">
-                    A/D atau ←/→ untuk bergerak · Spasi untuk melompat
-                  </span>
-                  <span className="sm:hidden">
-                    Main dengan tombol arah dan Lompat di layar
-                  </span>
-                </p>
-                <ol className="mt-6 space-y-4 text-sm text-fg-muted">
-                  <li>
-                    <strong className="text-fg">1. Coba kontrolnya.</strong>{" "}
-                    Berjalan dan melompat di area awal.
-                  </li>
-                  <li>
-                    <strong className="text-fg">2. Singgah di tiga pos.</strong>{" "}
-                    Setiap pos menjadi tempat melanjutkan jika jatuh.
-                    Perlengkapan tetap dibawa.
-                  </li>
-                  <li>
-                    <strong className="text-fg">3. Lengkapi bekalmu.</strong>{" "}
-                    Barang otomatis diambil saat disentuh karakter. Lompat ke
-                    papan kayu untuk menemukan perlengkapan di atasnya.
-                  </li>
-                </ol>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  {MINANG_ITEMS.map((item) => (
-                    <span
-                      key={item.id}
-                      className="rounded-xl bg-canvas p-3 text-sm"
-                    >
-                      {item.emoji} {item.name}
-                    </span>
+                <ol className={styles.posList}>
+                  {MINANG_POS_TITLES.map((title, index) => (
+                    <li key={title}>
+                      <strong>Pos {index + 1}</strong>
+                      <span>{title}</span>
+                    </li>
                   ))}
-                </div>
-                <p className="mt-5 text-xs leading-relaxed text-fg-muted">
-                  Latar terinspirasi Minangkabau. Titik akhir adalah tujuan
-                  dalam permainan.
+                </ol>
+              </article>
+              <article className={styles.introCard}>
+                <h2>Belajar sesuai ritmemu</h2>
+                <p>
+                  Tanpa batas waktu. Saat jatuh, kembali ke checkpoint dengan
+                  semua barang dan pembelajaran tetap tersimpan selama sesi ini.
                 </p>
-              </div>
-              <div className="space-y-5 rounded-2xl border border-line bg-surface p-6">
-                <h2 className="font-semibold">Cara mengendalikan karakter</h2>
-                <dl className="space-y-3 text-sm">
-                  <div className="rounded-xl bg-canvas p-4">
-                    <dt className="font-semibold">Laptop / PC</dt>
-                    <dd className="mt-2 leading-relaxed text-fg-muted">
-                      ← / A: kiri · → / D: kanan
-                      <br />
-                      Spasi / ↑ / W: lompat
-                      <br />
-                      Esc: jeda atau lanjutkan
-                    </dd>
-                  </div>
-                  <div className="rounded-xl bg-canvas p-4">
-                    <dt className="font-semibold">HP / tablet</dt>
-                    <dd className="mt-2 leading-relaxed text-fg-muted">
-                      Tahan tombol kiri/kanan di kiri bawah. Ketuk Lompat di
-                      kanan bawah. Bisa memakai dua jari sekaligus.
-                    </dd>
-                  </div>
-                </dl>
-                <p className="rounded-xl bg-tint p-4 text-sm text-fg-brand">
-                  Penyelesaian pertama setiap hari mendapat {MINANG_XP} XP.
-                  Tidak ada pengurangan poin saat jatuh.
+                <p>
+                  <strong>Keyboard:</strong> A/D atau panah untuk berjalan,
+                  Spasi/W/panah atas untuk melompat, E untuk interaksi, Esc
+                  untuk jeda.
                 </p>
-                <p className="text-xs text-fg-muted">
-                  Musik klasik dimulai setelah kamu menekan Mulai Petualangan
-                  dan bisa dimatikan kapan saja. Kamera tidak diperlukan.
+                <p>
+                  <strong>HP:</strong> tahan arah, ketuk Lompat atau Interaksi.
+                  Dua jari bisa dipakai bersama.
+                </p>
+                <p className={styles.learningNote}>
+                  Tiga bintang menunjukkan tiga pembelajaran, tanpa penilaian
+                  kecepatan. Hingga {MINANG_XP} XP per hari untuk akun login.
+                </p>
+                <p className={styles.small}>
+                  Saklar dan lompatan adalah mekanik virtual. Saat bencana
+                  nyata, tetap ikuti pendamping dan petugas.
                 </p>
                 {!user && !isLoading && (
-                  <p className="text-sm text-fg-muted">
+                  <p className={styles.small}>
                     Bisa dimainkan tanpa login.{" "}
-                    <Link
-                      href="/login?next=/game-siagaminang"
-                      className="font-semibold text-fg-brand underline"
-                    >
-                      Masuk
-                    </Link>{" "}
-                    agar hasil tersimpan.
+                    <Link href="/login?next=/game-siagaminang">Masuk</Link>{" "}
+                    sebelum mulai agar hasil tersimpan.
                   </p>
                 )}
-              </div>
+              </article>
             </section>
           </AnimatedSection>
         )}
 
-        {(phase === "playing" || phase === "paused") && (
+        {stage && (
           <section
             ref={regionRef}
             aria-label="Permainan Siaga Minang"
@@ -765,60 +855,154 @@ export default function GameSiagaMinang() {
                 onFinish={sceneFinished}
               />
             </div>
+            <div className={styles.gameLogo} aria-label="Siaga Minang">
+              <MinangIcon index={11} className={styles.logoHouse} />
+              <div>
+                <strong>
+                  SIAGA <span>MINANG</span>
+                </strong>
+                <small>Petualangan Edukasi</small>
+              </div>
+            </div>
             <div className={styles.hud}>
               <div className={styles.stats}>
-                <p>
-                  {snapshot.collectedPickups.length} / {MINANG_TARGET}{" "}
-                  perlengkapan · {snapshot.checkpoints.length} / 3 pos
-                </p>
-                <p>
-                  {Math.floor(snapshot.activeMs / 1000)} detik aktif · tanpa
-                  batas waktu
-                </p>
-                <div className={styles.progressTrack} aria-hidden="true">
-                  <span
-                    style={{
-                      width: `${(snapshot.collectedPickups.length / MINANG_TARGET) * 100}%`,
-                    }}
-                  />
-                </div>
+                <MapPin size={24} aria-hidden="true" />
+                <h2>
+                  Pos {posIndex + 1} – {MINANG_POS_TITLES[posIndex]}
+                </h2>
               </div>
               <div className={styles.actions}>
+                <span
+                  className={styles.counter}
+                  aria-label={learned + " dari 3 bintang belajar"}
+                >
+                  <Star fill="#ffcf32" color="#a77117" size={30} /> {learned} /
+                  3
+                </span>
+                <span className={styles.counter}>
+                  <MinangIcon index={10} className={styles.counterBag} />{" "}
+                  {snapshot.collectedPickups.length} / 10
+                </span>
+                <button
+                  type="button"
+                  className={styles.hudButton}
+                  aria-label="Buka inventori"
+                  disabled={phase !== "playing"}
+                  onClick={() => {
+                    setInspectedItem(snapshot.items[0] ?? null);
+                    pause(
+                      "Lihat perlengkapan dan pelajari kegunaannya. Barang tetap dibawa saat kembali ke checkpoint.",
+                    );
+                  }}
+                >
+                  <Backpack size={23} />
+                </button>
                 <button
                   type="button"
                   aria-label={sound ? "Matikan Suara" : "Nyalakan Suara"}
                   aria-pressed={sound}
-                  disabled={soundBusy}
+                  disabled={soundBusy || phase !== "playing"}
+                  className={styles.hudButton}
                   onClick={() => {
                     void toggleSound();
                     regionRef.current
                       ?.querySelector("canvas")
                       ?.focus({ preventScroll: true });
                   }}
-                  className={styles.hudButton}
                 >
-                  {sound ? <Volume2 size={20} /> : <VolumeX size={20} />}
-                  <span className={styles.actionLabel}>
-                    {sound ? "Matikan Suara" : "Nyalakan Suara"}
-                  </span>
+                  {sound ? <Volume2 size={23} /> : <VolumeX size={23} />}
                 </button>
                 <button
                   type="button"
                   aria-label="Jeda"
-                  disabled={phase === "paused"}
+                  className={styles.hudButton + " " + styles.pauseButton}
+                  disabled={phase !== "playing"}
                   onClick={() =>
                     pause(
-                      "Permainan dijeda. Kamu boleh beristirahat atau kembali ke pos yang sudah dilewati.",
+                      "Permainan dijeda. Perlengkapan dan bintang belajarmu tetap tersimpan selama sesi ini.",
                     )
                   }
-                  className={styles.hudButton}
                 >
-                  <Pause size={18} />
-                  <span className={styles.actionLabel}>Jeda</span>
+                  <Pause size={24} fill="currentColor" />
                 </button>
               </div>
             </div>
+            <div className={styles.playerCard}>
+              <span className={styles.avatar} aria-hidden="true" />
+              <div>
+                <strong>Aira</strong>
+                <span
+                  className={styles.posDots}
+                  aria-label={
+                    snapshot.checkpoints.length + " dari 3 pos tercapai"
+                  }
+                >
+                  {[0, 1, 2].map((index) => (
+                    <i
+                      key={index}
+                      data-done={snapshot.checkpoints.length > index}
+                    >
+                      {snapshot.checkpoints.length > index ? "✓" : index + 1}
+                    </i>
+                  ))}
+                </span>
+              </div>
+            </div>
+            <aside className={styles.missionPanel} aria-label="Misi pos">
+              <button
+                type="button"
+                className={styles.missionToggle}
+                aria-expanded={missionExpanded}
+                onClick={() => {
+                  clearControls();
+                  setMissionExpanded(!missionExpanded);
+                }}
+              >
+                <ClipboardList size={23} /> Misi Pos {posIndex + 1}
+              </button>
+              <ul hidden={!missionExpanded}>
+                {missions.map((mission) => (
+                  <li key={mission.label}>
+                    <span
+                      className={styles.checkBox}
+                      data-done={Boolean(mission.done)}
+                    >
+                      {mission.done && <Check size={20} />}
+                    </span>
+                    <span>{mission.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+            <div
+              className={styles.quickInventory}
+              aria-label="Perlengkapan terkumpul"
+            >
+              {MINANG_ITEMS.map((item, index) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  title={item.name}
+                  aria-label={
+                    item.name +
+                    (snapshot.items.includes(item.id)
+                      ? ", sudah dibawa"
+                      : ", belum dibawa")
+                  }
+                  data-collected={snapshot.items.includes(item.id)}
+                  disabled={phase !== "playing"}
+                  onClick={() => {
+                    setInspectedItem(item.id);
+                    pause("Kenali kegunaan perlengkapan bersama Kak Naya.");
+                  }}
+                >
+                  <MinangIcon index={index} />
+                  {snapshot.items.includes(item.id) && <Check size={12} />}
+                </button>
+              ))}
+            </div>
             <p role="status" aria-live="polite" className={styles.feedback}>
+              <span aria-hidden="true">📣</span>
               {feedback}
             </p>
             <div
@@ -846,32 +1030,121 @@ export default function GameSiagaMinang() {
                     className={styles.control}
                   >
                     {action === "left" ? (
-                      <ArrowLeft size={28} />
+                      <ArrowLeft size={36} strokeWidth={3.5} />
                     ) : (
-                      <ArrowRight size={28} />
+                      <ArrowRight size={36} strokeWidth={3.5} />
                     )}
                   </button>
                 ))}
               </div>
-              <button
-                type="button"
-                aria-label="Lompat"
-                aria-pressed={pressed.jump}
-                disabled={phase !== "playing"}
-                onPointerDown={(event) => pointerDown(event, "jump")}
-                onPointerUp={pointerUp}
-                onPointerCancel={pointerUp}
-                onLostPointerCapture={pointerUp}
-                onContextMenu={(event) => event.preventDefault()}
-                onKeyDown={(event) => controlKey(event, "jump", true)}
-                onKeyUp={(event) => controlKey(event, "jump", false)}
-                onBlur={() => controlBlur("jump")}
-                className={styles.control + " " + styles.jump}
-              >
-                <ArrowUp size={26} />
-                Lompat
-              </button>
+              <div className={styles.actionControls}>
+                <button
+                  type="button"
+                  className={styles.control + " " + styles.interact}
+                  aria-label="Interaksi"
+                  disabled={phase !== "playing"}
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    interact();
+                  }}
+                  onClick={(event) => {
+                    if (event.detail === 0) interact();
+                  }}
+                >
+                  <Hand size={30} /> <span>Interaksi</span>
+                </button>
+                <button
+                  type="button"
+                  aria-label="Lompat"
+                  aria-pressed={pressed.jump}
+                  disabled={phase !== "playing"}
+                  onPointerDown={(event) => pointerDown(event, "jump")}
+                  onPointerUp={pointerUp}
+                  onPointerCancel={pointerUp}
+                  onLostPointerCapture={pointerUp}
+                  onContextMenu={(event) => event.preventDefault()}
+                  onKeyDown={(event) => controlKey(event, "jump", true)}
+                  onKeyUp={(event) => controlKey(event, "jump", false)}
+                  onBlur={() => controlBlur("jump")}
+                  className={styles.control + " " + styles.jump}
+                >
+                  <ArrowUp size={38} strokeWidth={3.5} />
+                  Lompat
+                </button>
+              </div>
             </div>
+            {phase === "question" && lesson && (
+              <div className={styles.pauseBackdrop}>
+                <section
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="minang-question-title"
+                  className={styles.pausePanel}
+                >
+                  <header className={styles.guideHeading}>
+                    <div
+                      role="img"
+                      aria-label="Kak Naya menyapa dengan rompi hijau dan papan catatan"
+                      className={styles.nayaPortrait}
+                    />
+                    <div>
+                      <p>Kak Naya · Pendamping</p>
+                      <h2
+                        ref={questionHeadingRef}
+                        tabIndex={-1}
+                        id="minang-question-title"
+                      >
+                        Pertanyaan Siaga · Pos {posIndex + 1}
+                      </h2>
+                    </div>
+                  </header>
+                  <p className={styles.educationTitle}>
+                    Kartu Edukasi · {lesson.topic}
+                  </p>
+                  <h3 className={styles.questionPrompt}>{lesson.prompt}</h3>
+                  <div className={styles.quizOptions}>
+                    {lesson.options.map((option, index) => (
+                      <button
+                        type="button"
+                        key={option.id}
+                        disabled={Boolean(answer?.correct)}
+                        data-correct={
+                          answer?.correct && lesson.correct === option.id
+                        }
+                        onClick={() => chooseAnswer(option.id)}
+                      >
+                        <span>{String.fromCharCode(65 + index)}</span>
+                        {option.text}
+                      </button>
+                    ))}
+                  </div>
+                  {answer && (
+                    <p role="status" className={styles.educationCard}>
+                      {answer.correct
+                        ? "Langkah yang tepat. "
+                        : "Kita coba lagi, ya. "}
+                      {answer.explanation}
+                    </p>
+                  )}
+                  {answer?.correct && (
+                    <button
+                      type="button"
+                      className={button + " mt-4 w-full bg-action text-white"}
+                      onClick={continueLesson}
+                    >
+                      Lanjutkan Perjalanan
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className={button + " mt-3 w-full text-fg-muted"}
+                    onClick={() => finish()}
+                  >
+                    Akhiri Perjalanan
+                  </button>
+                </section>
+              </div>
+            )}
             {phase === "paused" && (
               <div className={styles.pauseBackdrop}>
                 <div
@@ -890,7 +1163,9 @@ export default function GameSiagaMinang() {
                       ref={resumeRef}
                       type="button"
                       onClick={resume}
-                      className={button + " w-full sm:w-auto bg-action text-white"}
+                      className={
+                        button + " w-full sm:w-auto bg-action text-white"
+                      }
                     >
                       <Play size={17} />
                       Lanjutkan
@@ -898,7 +1173,10 @@ export default function GameSiagaMinang() {
                     <button
                       type="button"
                       onClick={() => finish()}
-                      className={button + " w-full sm:w-auto border border-line text-fg-muted"}
+                      className={
+                        button +
+                        " w-full sm:w-auto border border-line text-fg-muted"
+                      }
                     >
                       Akhiri Perjalanan
                     </button>
@@ -907,19 +1185,39 @@ export default function GameSiagaMinang() {
                     className={styles.inventory}
                     aria-label="Perlengkapan perjalanan"
                   >
-                    {MINANG_ITEMS.map((item) => (
-                      <span key={item.id}>
-                        {item.emoji} {item.name} ·{" "}
-                        {
-                          MINANG_PICKUPS.filter(
-                            (p) =>
-                              p.type === item.id &&
-                              snapshot.collectedPickups.includes(p.id),
-                          ).length
-                        }
-                      </span>
+                    {MINANG_ITEMS.map((item, index) => (
+                      <button
+                        type="button"
+                        key={item.id}
+                        onClick={() => setInspectedItem(item.id)}
+                        aria-pressed={inspectedItem === item.id}
+                      >
+                        <MinangIcon index={index} />
+                        <strong>{item.name}</strong>
+                        <span>
+                          {snapshot.items.includes(item.id)
+                            ? "Sudah dibawa ✓"
+                            : "Belum dibawa"}
+                        </span>
+                      </button>
                     ))}
                   </div>
+                  {inspectedItem && (
+                    <div className={styles.educationCard} role="status">
+                      <strong>
+                        {
+                          MINANG_ITEMS.find((item) => item.id === inspectedItem)
+                            ?.name
+                        }
+                      </strong>
+                      <p>
+                        {
+                          MINANG_ITEMS.find((item) => item.id === inspectedItem)
+                            ?.lesson
+                        }
+                      </p>
+                    </div>
+                  )}
                   <p className="text-xs text-fg-muted">
                     Cari barang yang terlewat dari pos yang sudah dibuka.
                     Beberapa perlengkapan berada di atas papan kayu.
@@ -968,7 +1266,7 @@ export default function GameSiagaMinang() {
                 </h2>
                 <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-fg-muted">
                   {result.completed
-                    ? "Kamu sudah mengumpulkan 10 perlengkapan dari empat jenis dan melewati tiga pos. Ajak keluarga mengenali perlengkapan siaga bersama."
+                    ? "Kamu sudah mengenal sepuluh perlengkapan, mengikuti jalur yang diarahkan, dan belajar di tiga pos bersama Kak Naya. Ajak keluarga menyiapkan bekal bersama."
                     : "Setiap langkah adalah kesempatan belajar. Kamu boleh mencoba perjalanan baru kapan saja."}
                 </p>
                 <p className="mt-3 text-sm text-fg-muted">
@@ -977,15 +1275,40 @@ export default function GameSiagaMinang() {
                   {Math.floor(result.activeMs / 1000)} detik aktif
                 </p>
               </div>
+              <div
+                className={styles.learningSummary}
+                aria-label="Ringkasan pembelajaran"
+              >
+                {MINANG_LESSONS.map((item) => {
+                  const done = result.answers?.some(
+                    (answer) =>
+                      answer.questionId === item.id &&
+                      answer.optionId === item.correct,
+                  );
+                  return (
+                    <article key={item.id} data-learned={Boolean(done)}>
+                      <Star
+                        fill={done ? "#ffcf32" : "none"}
+                        color="#af7e2b"
+                        size={32}
+                      />
+                      <h3>{item.topic}</h3>
+                      <p>
+                        {done
+                          ? "Sudah dipelajari bersama Kak Naya"
+                          : "Bisa dipelajari pada perjalanan berikutnya"}
+                      </p>
+                    </article>
+                  );
+                })}
+              </div>
               <ul className="my-6 grid gap-3 sm:grid-cols-2">
-                {MINANG_ITEMS.map((item) => (
+                {MINANG_ITEMS.map((item, index) => (
                   <li
                     key={item.id}
                     className="flex gap-3 rounded-xl bg-canvas p-4"
                   >
-                    <span aria-hidden="true" className="text-2xl">
-                      {item.emoji}
-                    </span>
+                    <MinangIcon index={index} />
                     <div>
                       <p className="text-sm font-semibold">
                         {item.name}{" "}
@@ -1032,6 +1355,8 @@ export default function GameSiagaMinang() {
                   disabled={saveState === "saving" || saveState === "error"}
                   onClick={() => {
                     setNotice("");
+                    setIntroStep(0);
+                    setSkipTyping(false);
                     changePhase("intro");
                   }}
                   className={`${button} w-full sm:w-auto bg-action text-white`}

@@ -48,7 +48,15 @@ export function collectRuntimeAssetUrls(): string[] {
     "/PickAndDrop.html",
     "/SiagaMinang.html",
     "/game-siagaminang",
+    "/images/siaga-minang/village-v2.webp",
+    "/images/siaga-minang/route-v2.webp",
+    "/images/siaga-minang/evacuation-v2.webp",
+    "/images/siaga-minang/aira-v2.webp",
+    "/images/siaga-minang/items-v2.webp",
+    "/images/siaga-minang/terrain-v2.webp",
+    "/images/siaga-minang/naya-v2.webp",
     "/roleplay",
+    "/images/roleplay/characters-v2.webp",
   ]);
 
   document.querySelectorAll("link[href], script[src]").forEach((el) => {

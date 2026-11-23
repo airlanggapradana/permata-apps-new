@@ -23,9 +23,13 @@ const {
   MINANG_PICKUPS,
   MINANG_TARGET,
   MINANG_GROUND_Y,
+  MINANG_HERO_HEIGHT,
   MINANG_WORLD_WIDTH,
   MINANG_HEIGHT,
   MINANG_GOAL_X,
+  MINANG_LESSONS,
+  answerMinang,
+  isMinangComplete,
 } = await import(
   `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
 );
@@ -39,6 +43,11 @@ const input = (values = {}) => ({
 function walkRoute(state) {
   const events = [];
   for (let frame = 0; frame < 9000 && !state.won; frame++) {
+    if (state.question)
+      answerMinang(
+        state,
+        MINANG_LESSONS.find((lesson) => lesson.id === state.question).correct,
+      );
     const obstacle = MINANG_PLATFORMS.some(
       (p) => p.kind === "wood" && p.x - state.x > 10 && p.x - state.x < 80,
     );
@@ -52,7 +61,11 @@ function walkRoute(state) {
     events.push(
       ...stepMinang(
         state,
-        input({ right: true, jump: state.onGround && (obstacle || edge) }),
+        input({
+          right: true,
+          jump: state.onGround && (obstacle || edge),
+          interactQueued: !state.bridgeActivated && state.x > 2250,
+        }),
       ),
     );
   }
@@ -94,7 +107,7 @@ test("falling returns to the last checkpoint with inventory intact", () => {
   state.y = MINANG_HEIGHT + 100;
   const events = stepMinang(state, input());
   assert.equal(state.x, MINANG_CHECKPOINTS[0].x);
-  assert.equal(state.y, MINANG_GROUND_Y - 48);
+  assert.equal(state.y, MINANG_GROUND_Y - MINANG_HERO_HEIGHT);
   assert.equal(state.falls, 1);
   assert.deepEqual(state.items, ["water"]);
   assert.equal(
@@ -139,7 +152,7 @@ test("a short tap released between frames is queued and still jumps", () => {
 });
 test("jump buffer accepts a press just before landing", () => {
   const state = createMinangState();
-  state.y = MINANG_GROUND_Y - 51;
+  state.y = MINANG_GROUND_Y - MINANG_HERO_HEIGHT - 3;
   state.vy = 100;
   state.onGround = false;
   state.coyote = 0;
@@ -189,4 +202,61 @@ test("snapshot arrays do not change after subsequent game updates", () => {
   assert.deepEqual(snapshot.items, []);
   assert.deepEqual(snapshot.collectedPickups, []);
   assert.deepEqual(snapshot.checkpoints, []);
+});
+
+test("each checkpoint pauses learning until a correct, retryable answer", () => {
+  const state = createMinangState();
+  state.x = MINANG_CHECKPOINTS[0].x;
+  const events = stepMinang(state, input());
+  assert.equal(state.question, "pos-1");
+  assert.ok(events.some((event) => event.type === "question"));
+  const before = JSON.stringify(state);
+  for (let frame = 0; frame < 100; frame++)
+    stepMinang(state, input({ right: true, jump: true, interactQueued: true }));
+  assert.equal(JSON.stringify(state), before);
+  assert.equal(answerMinang(state, "invalid"), null);
+  assert.equal(answerMinang(state, "mainan").correct, false);
+  assert.equal(state.answers.length, 0);
+  assert.equal(answerMinang(state, "bekal").correct, true);
+  assert.equal(state.question, null);
+  assert.equal(answerMinang(state, "bekal"), null);
+});
+
+test("bridge interaction requires proximity and completed learning survives a fall", () => {
+  const state = createMinangState();
+  stepMinang(state, input({ interactQueued: true }));
+  assert.equal(state.bridgeActivated, false);
+  state.answers = [{ questionId: "pos-1", optionId: "bekal" }];
+  state.checkpoints = ["pos-1"];
+  state.x = 2360;
+  stepMinang(state, input({ right: true }));
+  assert.ok(state.x <= 2360);
+  stepMinang(state, input({ interactQueued: true }));
+  assert.equal(state.bridgeActivated, true);
+  state.answers = [{ questionId: "pos-1", optionId: "bekal" }];
+  state.items = ["water"];
+  state.collectedPickups = ["water-1"];
+  state.checkpoints = ["pos-1"];
+  state.y = MINANG_HEIGHT + 100;
+  stepMinang(state, input());
+  assert.equal(state.answers.length, 1);
+  assert.equal(state.bridgeActivated, true);
+  assert.deepEqual(state.collectedPickups, ["water-1"]);
+});
+
+test("ten different supplies, the bridge and all three lessons are required for v2 completion", () => {
+  assert.equal(new Set(MINANG_PICKUPS.map((pickup) => pickup.type)).size, 10);
+  const state = createMinangState();
+  walkRoute(state);
+  const result = getMinangSnapshot(state);
+  assert.equal(isMinangComplete(result), true);
+  assert.equal(isMinangComplete({ ...result, answers: [] }), false);
+  assert.equal(isMinangComplete({ ...result, bridgeActivated: false }), false);
+  assert.equal(
+    isMinangComplete({ ...result, items: result.items.slice(0, 4) }),
+    false,
+  );
+  const snapshot = getMinangSnapshot(state);
+  state.answers[0].optionId = "mainan";
+  assert.equal(snapshot.answers[0].optionId, "bekal");
 });

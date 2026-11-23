@@ -1,8 +1,10 @@
 export const MINANG_GAME_ID = "siaga-minang";
 export const MINANG_XP = 20;
+export const MINANG_VERSION = 2;
 export const MINANG_WORLD_WIDTH = 5000;
 export const MINANG_HEIGHT = 600;
 export const MINANG_GROUND_Y = 520;
+export const MINANG_HERO_HEIGHT = 96;
 export const MINANG_GOAL_X = 4840;
 export const MINANG_SPEED = 340;
 export const MINANG_MIN_COMPLETION_MS = 12000;
@@ -44,24 +46,156 @@ export const MINANG_ITEMS = [
     lesson:
       "Senter membantu saat listrik padam. Siapkan juga baterai cadangan bersama keluarga.",
   },
+  {
+    id: "power-bank",
+    name: "Pengisi daya portabel",
+    emoji: "🔋",
+    x: 1715,
+    y: 395,
+    lesson:
+      "Pengisi daya portabel membantu menjaga alat komunikasi tetap menyala. Siapkan dayanya bersama keluarga.",
+  },
+  {
+    id: "raincoat",
+    name: "Jas hujan",
+    emoji: "🧥",
+    x: 2150,
+    y: 492,
+    lesson:
+      "Jas hujan membantu melindungi tubuh dari hujan saat mengikuti pendamping menuju tempat aman.",
+  },
+  {
+    id: "mask",
+    name: "Masker",
+    emoji: "😷",
+    x: 2945,
+    y: 400,
+    lesson:
+      "Masker membantu mengurangi debu yang terhirup. Pilih ukuran yang sesuai bersama pendamping.",
+  },
+  {
+    id: "blanket",
+    name: "Selimut",
+    emoji: "🛏️",
+    x: 3400,
+    y: 492,
+    lesson:
+      "Selimut membantu menjaga tubuh tetap hangat saat beristirahat di tempat pengungsian.",
+  },
+  {
+    id: "whistle",
+    name: "Peluit",
+    emoji: "📣",
+    x: 4330,
+    y: 395,
+    lesson:
+      "Peluit bisa membantu memberi tanda saat membutuhkan bantuan. Gunakan sesuai arahan pendamping.",
+  },
+  {
+    id: "radio",
+    name: "Radio portabel",
+    emoji: "📻",
+    x: 4650,
+    y: 492,
+    lesson:
+      "Radio membantu keluarga mendengarkan informasi petugas saat jaringan komunikasi terbatas.",
+  },
 ] as const;
 export const MINANG_CHECKPOINTS = [
   { id: "pos-1", name: "Pos 1", x: 1270 },
   { id: "pos-2", name: "Pos 2", x: 2580 },
-  { id: "pos-3", name: "Pos 3", x: 3880 },
+  { id: "pos-3", name: "Pos 3", x: 4760 },
 ] as const;
 export const MINANG_PICKUPS = [
   { id: "water-1", type: "water", x: 260, y: 492 },
   { id: "food-1", type: "food", x: 505, y: 400 },
   { id: "first-aid-1", type: "first-aid", x: 900, y: 492 },
   { id: "flashlight-1", type: "flashlight", x: 1500, y: 492 },
-  { id: "water-2", type: "water", x: 1715, y: 395 },
-  { id: "food-2", type: "food", x: 2150, y: 492 },
-  { id: "first-aid-2", type: "first-aid", x: 2945, y: 400 },
-  { id: "flashlight-2", type: "flashlight", x: 3400, y: 492 },
-  { id: "water-3", type: "water", x: 4330, y: 395 },
-  { id: "food-3", type: "food", x: 4650, y: 492 },
+  { id: "water-2", type: "power-bank", x: 1715, y: 395 },
+  { id: "food-2", type: "raincoat", x: 2150, y: 492 },
+  { id: "first-aid-2", type: "mask", x: 2945, y: 400 },
+  { id: "flashlight-2", type: "blanket", x: 3400, y: 492 },
+  { id: "water-3", type: "whistle", x: 4330, y: 395 },
+  { id: "food-3", type: "radio", x: 4650, y: 492 },
 ] as const;
+
+export const MINANG_BRIDGE = {
+  x: 2400,
+  y: 520,
+  width: 110,
+  height: 20,
+  switchX: 2310,
+};
+export const MINANG_LESSONS = [
+  {
+    id: "pos-1",
+    title: "Bekal untuk bersama",
+    topic: "Mengenal perlengkapan",
+    prompt: "Mengapa kita menyiapkan tas siaga bersama keluarga?",
+    options: [
+      {
+        id: "bekal",
+        text: "Agar kebutuhan penting siap dibawa saat mengikuti arahan evakuasi.",
+      },
+      { id: "mainan", text: "Agar semua mainan bisa dibawa sekaligus." },
+      { id: "sendiri", text: "Agar anak bisa pergi sendiri tanpa pendamping." },
+    ],
+    correct: "bekal",
+    explanation:
+      "Siapkan kebutuhan penting bersama keluarga. Saat darurat, tetap bersama pendamping dan ikuti arahan petugas.",
+  },
+  {
+    id: "pos-2",
+    title: "Pilih jalur yang diarahkan",
+    topic: "Mengenali jalur aman",
+    prompt:
+      "Guncangan sudah berhenti. Pendamping menunjukkan jalur yang aman. Apa pilihanmu?",
+    options: [
+      {
+        id: "retak",
+        text: "Mendekati bangunan retak untuk melihat keadaannya.",
+      },
+      {
+        id: "arahan",
+        text: "Ikuti pendamping dan jalur yang sudah dinyatakan aman.",
+      },
+      { id: "lari", text: "Berlari sendiri mencari jalan pintas." },
+    ],
+    correct: "arahan",
+    explanation:
+      "Ikuti jalur yang ditentukan pendamping dan petugas. Saklar dan lompatan di sini adalah mekanik permainan, bukan tindakan yang perlu ditiru saat bencana.",
+  },
+  {
+    id: "pos-3",
+    title: "Titik kumpul bersama",
+    topic: "Mengetahui tempat berkumpul",
+    prompt: "Setelah keluar bersama pendamping, di mana sebaiknya menunggu?",
+    options: [
+      { id: "rumah", text: "Kembali ke rumah untuk mengambil barang." },
+      { id: "dinding", text: "Di dekat dinding bangunan yang retak." },
+      {
+        id: "kumpul",
+        text: "Di titik kumpul terbuka yang diarahkan petugas, jauh dari benda yang dapat roboh.",
+      },
+    ],
+    correct: "kumpul",
+    explanation:
+      "Tunggu bersama pendamping di titik kumpul yang diarahkan petugas. Jangan masuk kembali ke bangunan sebelum dinyatakan aman.",
+  },
+] as const;
+export type MinangAnswer = { questionId: string; optionId: string };
+
+export function answerMinang(state: MinangState, optionId: string) {
+  const lesson = MINANG_LESSONS.find((item) => item.id === state.question);
+  if (!lesson || !lesson.options.some((option) => option.id === optionId))
+    return null;
+  const correct = lesson.correct === optionId;
+  if (correct) {
+    state.answers.push({ questionId: lesson.id, optionId });
+    state.question = null;
+  }
+  return { correct, explanation: lesson.explanation };
+}
 export const MINANG_TARGET = MINANG_PICKUPS.length;
 export const MINANG_PLATFORMS = [
   { x: 0, y: 520, width: 1100, height: 240, kind: "ground" },
@@ -80,8 +214,12 @@ export type MinangInput = {
   jump: boolean;
   enabled: boolean;
   jumpQueued?: boolean;
+  interactQueued?: boolean;
 };
 export type MinangSnapshot = {
+  version?: number;
+  answers?: MinangAnswer[];
+  bridgeActivated?: boolean;
   items: string[];
   collectedPickups: string[];
   checkpoints: string[];
@@ -91,6 +229,10 @@ export type MinangSnapshot = {
   completed: boolean;
 };
 export type MinangState = {
+  answers: MinangAnswer[];
+  question: string | null;
+  bridgeActivated: boolean;
+  bridgeNotified: boolean;
   x: number;
   y: number;
   vx: number;
@@ -109,16 +251,30 @@ export type MinangState = {
   goalNotified: boolean;
 };
 export type MinangEvent = {
-  type: "jump" | "item" | "checkpoint" | "fall" | "missing" | "win";
+  type:
+    | "jump"
+    | "item"
+    | "checkpoint"
+    | "fall"
+    | "missing"
+    | "win"
+    | "question"
+    | "bridge"
+    | "guide";
   message: string;
   x?: number;
   y?: number;
+  id?: string;
 };
 
 export function createMinangState(): MinangState {
   return {
+    answers: [],
+    question: null,
+    bridgeActivated: false,
+    bridgeNotified: false,
     x: 80,
-    y: MINANG_GROUND_Y - 48,
+    y: MINANG_GROUND_Y - MINANG_HERO_HEIGHT,
     vx: 0,
     vy: 0,
     onGround: true,
@@ -137,7 +293,15 @@ export function createMinangState(): MinangState {
 }
 
 export function isMinangComplete(
-  result: Pick<MinangSnapshot, "items" | "checkpoints" | "reachedGoal"> & {
+  result: Pick<
+    MinangSnapshot,
+    | "items"
+    | "checkpoints"
+    | "reachedGoal"
+    | "version"
+    | "answers"
+    | "bridgeActivated"
+  > & {
     collectedPickups?: string[];
   },
 ): boolean {
@@ -146,13 +310,27 @@ export function isMinangComplete(
     MINANG_PICKUPS.every((pickup) =>
       result.collectedPickups?.includes(pickup.id),
     ) &&
-    MINANG_ITEMS.every((item) => result.items.includes(item.id)) &&
-    MINANG_CHECKPOINTS.every((pos) => result.checkpoints.includes(pos.id))
+    (result.version === MINANG_VERSION
+      ? MINANG_ITEMS.map((item) => item.id)
+      : ["water", "food", "first-aid", "flashlight"]
+    ).every((id) => result.items.includes(id)) &&
+    MINANG_CHECKPOINTS.every((pos) => result.checkpoints.includes(pos.id)) &&
+    (result.version !== MINANG_VERSION ||
+      (result.bridgeActivated === true &&
+        result.answers?.length === MINANG_LESSONS.length &&
+        MINANG_LESSONS.every(
+          (lesson, index) =>
+            result.answers?.[index]?.questionId === lesson.id &&
+            result.answers?.[index]?.optionId === lesson.correct,
+        )))
   );
 }
 
 export function getMinangSnapshot(state: MinangState): MinangSnapshot {
   const result = {
+    version: MINANG_VERSION,
+    answers: state.answers.map((answer) => ({ ...answer })),
+    bridgeActivated: state.bridgeActivated,
     items: [...state.items],
     collectedPickups: [...state.collectedPickups],
     checkpoints: [...state.checkpoints],
@@ -171,7 +349,7 @@ export function returnToMinangCheckpoint(
   if (id !== "start" && (!checkpoint || !state.checkpoints.includes(id)))
     return false;
   state.x = checkpoint?.x ?? 80;
-  state.y = MINANG_GROUND_Y - 48;
+  state.y = MINANG_GROUND_Y - MINANG_HERO_HEIGHT;
   state.vx = 0;
   state.vy = 0;
   state.onGround = true;
@@ -189,15 +367,38 @@ export function stepMinang(
   input: MinangInput,
   dt = 1 / 60,
 ): MinangEvent[] {
-  if (!input.enabled || state.won) {
+  if (!input.enabled || state.won || state.question) {
     input.jumpQueued = false;
     state.jumpHeld = false;
     state.jumpBuffer = 0;
+    input.interactQueued = false;
     return [];
   }
   dt = Math.min(1 / 30, Math.max(0, dt));
   state.elapsedMs += dt * 1000;
   const events: MinangEvent[] = [];
+  if (input.interactQueued) {
+    input.interactQueued = false;
+    if (
+      Math.abs(state.x - MINANG_BRIDGE.switchX) < 180 &&
+      !state.bridgeActivated
+    ) {
+      state.bridgeActivated = true;
+      events.push({
+        type: "bridge",
+        message:
+          "Jembatan simulasi sudah dibuka! Lanjutkan mengikuti penanda jalur aman menuju Kak Naya.",
+      });
+    } else
+      events.push({
+        type: "guide",
+        message:
+          "Kak Naya: Ikuti penanda hijau. Saklar simulasi ada sebelum jembatan di Pos 2; dekati lalu tekan Interaksi atau E.",
+      });
+  }
+  const platforms = state.bridgeActivated
+    ? [...MINANG_PLATFORMS, { ...MINANG_BRIDGE, kind: "wood" }]
+    : MINANG_PLATFORMS;
   const direction = Number(input.right) - Number(input.left);
   const desired = direction * MINANG_SPEED;
   const change = (direction ? 1800 : 3200) * dt;
@@ -218,12 +419,12 @@ export function stepMinang(
     events.push({ type: "jump", message: "" });
   }
   state.x += state.vx * dt;
-  for (const p of MINANG_PLATFORMS) {
+  for (const p of platforms) {
     if (p.kind === "wood") continue;
     if (
       state.x + 15 > p.x &&
       state.x - 15 < p.x + p.width &&
-      state.y + 48 > p.y &&
+      state.y + MINANG_HERO_HEIGHT > p.y &&
       state.y < p.y + p.height
     ) {
       if (state.vx > 0) state.x = p.x - 15;
@@ -232,14 +433,30 @@ export function stepMinang(
     }
   }
   state.x = Math.max(20, Math.min(MINANG_WORLD_WIDTH - 20, state.x));
+  if (!state.bridgeActivated && state.x > 2360) {
+    state.x = 2360;
+    state.vx = 0;
+    if (!state.bridgeNotified) {
+      state.bridgeNotified = true;
+      events.push({
+        type: "missing",
+        message:
+          "Dekati saklar, lalu tekan Interaksi atau E untuk membuka jembatan simulasi.",
+      });
+    }
+  }
   const oldY = state.y;
   state.vy = Math.min(900, state.vy + 1450 * dt);
   state.y += state.vy * dt;
   state.onGround = false;
-  for (const p of MINANG_PLATFORMS) {
+  for (const p of platforms) {
     if (state.x + 15 <= p.x || state.x - 15 >= p.x + p.width) continue;
-    if (state.vy >= 0 && oldY + 48 <= p.y + 0.1 && state.y + 48 >= p.y) {
-      state.y = p.y - 48;
+    if (
+      state.vy >= 0 &&
+      oldY + MINANG_HERO_HEIGHT <= p.y + 0.1 &&
+      state.y + MINANG_HERO_HEIGHT >= p.y
+    ) {
+      state.y = p.y - MINANG_HERO_HEIGHT;
       state.vy = 0;
       state.onGround = true;
     } else if (
@@ -269,7 +486,7 @@ export function stepMinang(
     if (
       !state.collectedPickups.includes(pickup.id) &&
       Math.abs(state.x - pickup.x) < 33 &&
-      state.y + 48 > pickup.y - 15 &&
+      state.y + MINANG_HERO_HEIGHT > pickup.y - 15 &&
       state.y < pickup.y + 15
     ) {
       const first = !state.items.includes(item.id);
@@ -291,6 +508,24 @@ export function stepMinang(
     events.push({
       type: "checkpoint",
       message: `${nextPos.name} tercapai! Jika jatuh, kamu kembali ke sini dengan perlengkapanmu.`,
+    });
+  }
+  const nextLesson = MINANG_LESSONS[state.answers.length];
+  const lessonPos = MINANG_CHECKPOINTS.find((pos) => pos.id === nextLesson?.id);
+  if (
+    nextLesson &&
+    lessonPos &&
+    !state.question &&
+    state.onGround &&
+    state.x >= lessonPos.x &&
+    state.checkpoints.includes(lessonPos.id)
+  ) {
+    state.question = lessonPos.id;
+    state.vx = 0;
+    events.push({
+      type: "question",
+      id: lessonPos.id,
+      message: "Kak Naya: Kita berhenti sebentar untuk belajar bersama, ya.",
     });
   }
   if (state.x < MINANG_GOAL_X - 120) state.goalNotified = false;

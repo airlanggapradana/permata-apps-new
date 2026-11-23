@@ -131,10 +131,10 @@ test("both cultural variants resolve all story placeholders without changing gra
         for (const value of strings)
           assert.ok(!/[{}]/.test(roleplayText(value, culture)));
       }
-  assert.match(roleplayText("{friend} di {place}", "aceh"), /Rafi.*gampong/);
+  assert.match(roleplayText("{friend} di {place}", "aceh"), /Rusdi.*gampong/);
   assert.match(
     roleplayText("{friend} di {place}", "kalimantan"),
-    /Lala.*Betang/,
+    /Evan.*Betang/,
   );
 });
 

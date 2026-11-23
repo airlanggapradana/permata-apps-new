@@ -11,6 +11,8 @@ import {
   MINANG_CHECKPOINTS,
   MINANG_MIN_COMPLETION_MS,
   isMinangComplete,
+  MINANG_VERSION,
+  MINANG_LESSONS,
 } from "@/lib/games/siagaMinang";
 
 export const runtime = "nodejs";
@@ -37,15 +39,24 @@ export async function POST(req: NextRequest) {
       );
     const pool = getPgPool();
     if (body.action === "start") {
-      if (body.mode !== "practice")
+      if (
+        body.mode !== "practice" ||
+        (body.version !== undefined && body.version !== MINANG_VERSION)
+      )
         return NextResponse.json(
           { error: "Pilih mode latihan." },
           { status: 400 },
         );
       const attemptId = randomUUID();
       await pool.query(
-        `INSERT INTO "GameAttempt" ("id", "userId", "childId", "gameId", "mode") VALUES ($1, $2, $3, $4, 'practice')`,
-        [attemptId, session.userId, session.childId, MINANG_GAME_ID],
+        `INSERT INTO "GameAttempt" ("id", "userId", "childId", "gameId", "mode", "metadata") VALUES ($1, $2, $3, $4, 'practice', $5::jsonb)`,
+        [
+          attemptId,
+          session.userId,
+          session.childId,
+          MINANG_GAME_ID,
+          JSON.stringify({ version: body.version ?? "classic" }),
+        ],
       );
       return NextResponse.json({ success: true, attemptId }, { status: 201 });
     }
@@ -53,7 +64,7 @@ export async function POST(req: NextRequest) {
       typeof body.attemptId !== "string" ||
       !/^[\da-f-]{36}$/i.test(body.attemptId) ||
       !Array.isArray(body.items) ||
-      body.items.length > 4 ||
+      body.items.length > MINANG_ITEMS.length ||
       new Set(body.items).size !== body.items.length ||
       body.items.some(
         (id: unknown) => !MINANG_ITEMS.some((item) => item.id === id),
@@ -102,11 +113,37 @@ export async function POST(req: NextRequest) {
           { status: 404 },
         );
       }
+      const version =
+        attempt.metadata?.version === MINANG_VERSION ? MINANG_VERSION : 1;
+      if (
+        version === MINANG_VERSION &&
+        (!Array.isArray(body.answers) ||
+          body.answers.length > MINANG_LESSONS.length ||
+          body.answers.some((answer: unknown, index: number) => {
+            if (!answer || typeof answer !== "object") return true;
+            const value = answer as {
+              questionId?: unknown;
+              optionId?: unknown;
+            };
+            const lesson = MINANG_LESSONS[index];
+            return (
+              value.questionId !== lesson?.id ||
+              !lesson.options.some((option) => option.id === value.optionId)
+            );
+          }) ||
+          typeof body.bridgeActivated !== "boolean")
+      ) {
+        await client.query("ROLLBACK");
+        return NextResponse.json(
+          { error: "Catatan pembelajaran belum valid." },
+          { status: 400 },
+        );
+      }
       if (attempt.finishedAt) {
         alreadySaved = true;
         completed = attempt.status === "COMPLETED";
       } else {
-        completed = isMinangComplete(body);
+        completed = isMinangComplete({ ...body, version });
         if (
           body.activeMs > Number(attempt.wallMs) + 1500 ||
           (completed && body.activeMs < MINANG_MIN_COMPLETION_MS)
@@ -131,7 +168,13 @@ export async function POST(req: NextRequest) {
               falls: body.falls,
               activeMs: body.activeMs,
               collectedPickups: body.collectedPickups ?? [],
-              version: "classic",
+              version: version === MINANG_VERSION ? MINANG_VERSION : "classic",
+              ...(version === MINANG_VERSION
+                ? {
+                    answers: body.answers,
+                    bridgeActivated: body.bridgeActivated,
+                  }
+                : {}),
             }),
             Math.floor(body.activeMs / 1000),
           ],

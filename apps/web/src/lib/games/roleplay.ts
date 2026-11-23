@@ -4,6 +4,92 @@ export const ROLEPLAY_XP = 20;
 export const ROLEPLAY_VERSION = 1;
 export const ROLEPLAY_MAX_ANSWERS = 24;
 export type RoleplayCulture = "aceh" | "kalimantan";
+export type RoleplayCharacterId =
+  "aira" | "rusdi" | "cut" | "evan" | "lani" | "naya" | "sari";
+
+export const ROLEPLAY_CHARACTERS = {
+  aira: {
+    name: "Aira",
+    age: 11,
+    origin: "Fleksibel",
+    role: "Tokoh yang kamu mainkan",
+    row: 0,
+    description:
+      "Ramah dan peduli. Bersama Aira, kamu belajar memahami perasaan teman.",
+  },
+  rusdi: {
+    name: "Rusdi",
+    age: 11,
+    origin: "Aceh",
+    role: "Teman di posko",
+    row: 1,
+    description:
+      "Pemalu dan peka terhadap suara keras. Rusdi ingin ditemani tanpa didesak bercerita.",
+  },
+  cut: {
+    name: "Cut",
+    age: 10,
+    origin: "Aceh",
+    role: "Teman yang rindu rumah",
+    row: 2,
+    description:
+      "Lembut dan suka menggambar. Cut sedang merindukan rumah serta sekolahnya.",
+  },
+  evan: {
+    name: "Evan",
+    age: 9,
+    origin: "Kalimantan",
+    role: "Teman di titik kumpul",
+    row: 3,
+    description:
+      "Aktif dan penuh rasa ingin tahu. Saat panik, Evan perlu ditemani mengikuti arahan pendamping.",
+  },
+  lani: {
+    name: "Lani",
+    age: 12,
+    origin: "Kalimantan",
+    role: "Teman yang memeriksa kabar",
+    row: 4,
+    description:
+      "Penasaran dan suka berbagi informasi. Lani belajar membedakan kabar yang benar dan rumor.",
+  },
+  naya: {
+    name: "Kak Naya",
+    age: 24,
+    origin: "Relawan",
+    role: "Relawan pendamping",
+    row: 5,
+    description:
+      "Tenang dan sabar. Kak Naya membantu anak mencari rasa aman dan mengenali emosi.",
+  },
+  sari: {
+    name: "Bu Sari",
+    age: 35,
+    origin: "Guru",
+    role: "Guru pendamping",
+    row: 6,
+    description:
+      "Peduli dan tidak menghakimi. Bu Sari mendengarkan perasaan anak dan membantu mencari langkah yang aman.",
+  },
+} as const;
+
+// Character identity belongs to the story; the selected culture sets its location.
+const ROLEPLAY_CAST: Record<
+  string,
+  { friend: RoleplayCharacterId; guide: RoleplayCharacterId }
+> = {
+  "teman-di-posko": { friend: "rusdi", guide: "naya" },
+  "rindu-rumah": { friend: "cut", guide: "sari" },
+  "tenang-bersama": { friend: "evan", guide: "naya" },
+  "kabar-di-posko": { friend: "lani", guide: "sari" },
+};
+
+export function getRoleplayCast(scenarioId: string) {
+  return {
+    player: "aira" as const,
+    ...(ROLEPLAY_CAST[scenarioId] ?? ROLEPLAY_CAST["teman-di-posko"]),
+  };
+}
 export type RoleplayAnswer = { nodeId: string; optionId: string };
 export type RoleplayOption = {
   id: string;
@@ -70,7 +156,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     topic: "Empati & mencari bantuan",
     icon: "heart",
     description:
-      "Temani seorang teman yang merasa takut di posko. Belajar hadir, mendengarkan, dan mengajak mencari pendamping.",
+      "Rusdi kaget mendengar suara hujan di posko. Belajar hadir tanpa mendesak, mendengarkan, dan mencari dukungan Kak Naya.",
     takeaway:
       "Menemani berarti menghargai pilihan teman dan menghubungkannya dengan orang dewasa tepercaya. Kamu juga boleh meminta bantuan.",
     nodes: [
@@ -208,8 +294,8 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
         stage: 4,
         title: "Kepedulian yang dibagi",
         situation:
-          "Pendamping mendekat. Semangat {value} berarti saling membantu, termasuk meminta dukungan orang dewasa.",
-        dialogue: "Bisa bantu aku menjelaskan ke pendamping?",
+          "{guide} mendekat. Semangat {value} berarti saling membantu, termasuk meminta dukungan orang dewasa.",
+        dialogue: "Bisa bantu aku menjelaskan ke {guide}?",
         options: [
           option(
             "izin",
@@ -230,7 +316,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
         ],
       },
       end(
-        "Terima kasih sudah menemani. Aku ingin duduk bersama pendamping dulu.",
+        "Terima kasih sudah menemani, {player}. Aku ingin duduk bersama {guide} dulu.",
       ),
     ],
   },
@@ -240,7 +326,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     topic: "Mendengarkan & menghargai perasaan",
     icon: "home",
     description:
-      "Dengarkan teman yang merindukan rumah dan sekolah. Beri ruang untuk bercerita, menggambar, atau beristirahat.",
+      "Cut merindukan rumah dan sekolahnya. Bersama Bu Sari, beri ruang untuk bercerita, menggambar, atau beristirahat.",
     takeaway:
       "Rasa rindu tidak harus segera hilang. Kita bisa menghargainya, memberi pilihan, dan mencari dukungan bersama.",
     nodes: [
@@ -382,7 +468,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     topic: "Keselamatan & dukungan",
     icon: "shield",
     description:
-      "Ikuti arahan pendamping setelah guncangan berhenti, lalu temani adik yang masih merasa kaget di titik kumpul.",
+      "Evan masih panik setelah guncangan berhenti. Ikuti arahan Kak Naya menuju titik kumpul, lalu dengarkan kebutuhan Evan.",
     takeaway:
       "Utamakan keselamatan dan arahan pendamping. Setelah berada di tempat yang diarahkan, tawarkan dukungan tanpa memaksa.",
     nodes: [
@@ -550,7 +636,7 @@ export const ROLEPLAY_SCENARIOS: RoleplayScenario[] = [
     topic: "Informasi & kepedulian",
     icon: "chat",
     description:
-      "Temanmu mendengar kabar yang membuatnya takut. Latih cara mendengarkan dan memeriksa informasi kepada petugas.",
+      "Lani mendengar kabar yang belum jelas sumbernya. Bersama Bu Sari, belajar memeriksa informasi kepada petugas sebelum membagikannya.",
     takeaway:
       "Kita boleh mengakui rasa takut tanpa menganggap setiap kabar sudah benar. Tanyakan kepada petugas dan bagikan informasi yang sudah diperiksa.",
     nodes: [
@@ -748,21 +834,31 @@ export function isRoleplayRun(value: unknown): value is RoleplayRun {
   );
 }
 
-export function roleplayText(text: string, culture: RoleplayCulture): string {
+export function roleplayText(
+  text: string,
+  culture: RoleplayCulture,
+  scenarioId?: string,
+): string {
+  const cast = getRoleplayCast(scenarioId ?? "teman-di-posko");
   const context =
     culture === "kalimantan"
       ? {
-          friend: "Lala",
+          friend: scenarioId ? ROLEPLAY_CHARACTERS[cast.friend].name : "Evan",
           place: "balai warga dekat Rumah Betang",
           value: "Handep, saling membantu",
         }
       : {
-          friend: "Rafi",
+          friend: ROLEPLAY_CHARACTERS[cast.friend].name,
           place: "balai gampong dekat meunasah",
           value: "Meuseuraya, saling membantu",
         };
   return text.replace(
-    /\{(friend|place|value)\}/g,
-    (_, key: keyof typeof context) => context[key],
+    /\{(friend|place|value|guide|player)\}/g,
+    (_, key: string) =>
+      key === "guide"
+        ? ROLEPLAY_CHARACTERS[cast.guide].name
+        : key === "player"
+          ? ROLEPLAY_CHARACTERS.aira.name
+          : context[key as keyof typeof context],
   );
 }

@@ -178,15 +178,18 @@ Seluruh permainan dapat diakses melalui bagian **Game Center Resiliensi** di hal
 | 1 | **Sigap Bencana** | `/game-quake` | Jelajahi rumah simulasi dengan **Phaser 3**, pelajari tiga situasi melalui pertanyaan yang bisa dicoba lagi, lalu capai pintu keluar. Keyboard atau tombol layar HP, jeda otomatis, musik opsional, dan ringkasan hasil. Pengguna yang login menyimpan sesi ke PostgreSQL; penyelesaian pertama memberi **20 XP/hari**. |
 | 2 | **Tas Siaga Bencana (Pick & Drop)** | `/game-healing` | Pilih **Latihan santai** tanpa timer atau **Tantangan 60 detik**, lalu klik **Mulai Bermain**. Ketuk barang lalu tas, atau seret barang ke tas. Kamera pelacak tangan bersifat opsional. Pilihan kurang tepat memberi petunjuk dan kesempatan mencoba lagi. Hasil pengguna yang login tersimpan di PostgreSQL; penyelesaian pertama setiap hari memberi **20 XP** ke Pohon Harapan. |
 | 3 | **Napas Tenang (Breathing Calm)** | `/game-breath` | Pilih ritme **Ringan** (3 detik tarik / 3 detik hembuskan) atau **Santai** (4 / 4), serta 5 atau 8 putaran. Klik **Mulai Latihan** untuk mengikuti lingkaran tanpa menahan napas. Bisa dijeda kapan saja; kamera opsional sebagai cermin. Hasil tersimpan untuk pengguna yang login, dengan maksimal **15 XP/hari** bersama target latihan napas di dashboard. |
-| 4 | **Siaga Minang** | `/game-siagaminang` | Klik **Mulai Petualangan**, jelajahi arena klasik layar penuh, kumpulkan 10 perlengkapan dari empat jenis, lewati tiga checkpoint, lalu capai titik akhir. Kontrol keyboard atau tombol layar HP. Jika jatuh, kembali ke pos terakhir tanpa kehilangan barang. Pengguna yang login menyimpan hasil ke PostgreSQL; penyelesaian pertama mendapat **20 XP/hari**. |
+| 4 | **Siaga Minang** | `/game-siagaminang` | Ikuti tutorial Aira, kumpulkan 10 jenis perlengkapan, aktifkan jembatan simulasi, dan jawab kuis Kak Naya di tiga pos menuju titik kumpul. Kontrol keyboard atau tombol HP. Checkpoint mempertahankan barang dan pembelajaran. Hasil pengguna login tersimpan; penyelesaian pertama mendapat **20 XP/hari**. |
 | 5 | **Adventure Budaya** | `/game-adventure` | Klik tombol **`Mainkan Sekarang`** untuk membuka roleplay naratif mitigasi bencana berbasis kearifan lokal Nusantara (*Knock The Drought Out*). |
 | 6 | **Roleplay Psikoedukasi** | `/roleplay` | Empat cerita bercabang terkurasi: menemani teman di posko, rindu rumah, dukungan setelah guncangan, dan memeriksa kabar. Pilihan dialog, umpan balik empatik, jeda, latihan napas/grounding, dan ringkasan pembelajaran. Tamu dapat bermain; akun menyimpan progres dan maksimal 20 XP roleplay/hari. |
+
+Di roleplay, pemain berperan sebagai **Aira (11 tahun)**. Empat cerita mempertemukan Aira dengan **Rusdi (11, Aceh)** yang takut suara keras, **Cut (10, Aceh)** yang rindu rumah, **Evan (9, Kalimantan)** yang panik setelah guncangan, dan **Lani (12, Kalimantan)** yang belajar memeriksa kabar. **Kak Naya (24, relawan)** mendampingi Rusdi dan Evan; **Bu Sari (35, guru)** mendampingi Cut dan Lani. Identitas tokoh mengikuti cerita, sedangkan lokasi mengikuti tema budaya yang dipilih. Potret dan ekspresi muncul dalam pengenalan, percakapan, respons, dan penutup, serta tersimpan dalam paket offline.
 
 > **Catatan Navigasi**: Gunakan tautan **`Kembali ke Dashboard`** untuk kembali ke `/dashboard`. Pada Tas Siaga Bencana, tautan tersedia di bagian atas halaman dan tombol **`Lihat Pohon Harapan`** tersedia setelah bermain. Alamat lama `/PickAndDrop.html` otomatis membuka permainan yang baru.
 
 #### Walkthrough Tas Siaga Bencana
 
 1. Buka `/game-healing` dari kartu **Tas Siaga Bencana** di Game Center.
+   Aira menyapa dan menjelaskan cara bermain dalam empat balon dialog. Teks muncul bertahap dan mulut karakter bergerak; pilih **Tampilkan semua**, **Lanjut**, atau **Lewati penjelasan** sesuai kebutuhan. Efek mengetik dan animasi mati bila perangkat memakai pengurangan animasi. **Bacakan dialog** memakai suara peramban jika tersedia; suara karakter dan musik awalnya mati serta bisa diaktifkan secara terpisah.
 2. Pilih **Latihan santai** (pilihan awal, tanpa timer) atau **Tantangan 60 detik**. Kontrol **Sentuh / mouse** langsung tersedia; kamera hanya diminta setelah permainan dimulai dengan kontrol kamera.
 3. Klik **Mulai Bermain**. Ketuk/klik barang lalu tas, atau seret barang ke tas. Keyboard juga bisa digunakan dengan Tab dan Enter.
 4. Temukan air minum, senter, makanan siap santap, kotak P3K, jas hujan, dan masker. Barang tambahan memberi petunjuk tanpa mengakhiri permainan atau mengurangi poin.
@@ -258,13 +261,13 @@ Task deteksi kamera:
 
 1. Buka kartu **Siaga Minang** di Game Center, baca petunjuk, lalu klik **Mulai Petualangan**. Alamat lama `/SiagaMinang.html` mengarah ke `/game-siagaminang`.
 2. Berlatih bergerak dan melompat di area awal. Jalur dan penempatan barang tetap, sehingga semua rintangan dan perlengkapan dapat dijangkau. Tidak ada batas waktu.
-3. Kumpulkan **10 perlengkapan**: tiga air minum, tiga makanan siap santap, dua kotak P3K, dan dua senter. Sentuh barang menggunakan karakter untuk mengambilnya otomatis; beberapa berada di atas papan kayu yang harus dilompati. Penjelasan kegunaan muncul saat jenis barang pertama kali ditemukan. HUD menghitung semua barang, sedangkan menu jeda menampilkan jumlah per jenis.
-4. Lewati **Pos 1**, **Pos 2**, dan **Pos 3**. Jika jatuh, karakter kembali ke checkpoint terakhir; perlengkapan yang sudah terkumpul tetap dibawa selama sesi.
+3. Kumpulkan **10 jenis perlengkapan**: air minum, makanan siap santap, P3K, senter, power bank, jas hujan, masker, selimut, peluit, dan radio. Sentuh barang untuk mengambilnya; sebagian berada di atas platform. Buka inventori atau ketuk ikon barang untuk membaca kegunaannya sambil permainan dijeda.
+4. Lewati **Pos 1 — Kumpulkan Perlengkapan**, **Pos 2 — Tantangan Jalur Aman**, dan **Pos 3 — Misi Evakuasi**. Kak Naya memberi satu kuis di setiap pos. Gerakan berhenti saat kuis; jawaban kurang tepat dapat dicoba lagi tanpa pengurangan poin. Jawaban benar memberi satu bintang pembelajaran. Jika jatuh, barang, jawaban, dan status jembatan tetap tersimpan selama sesi.
 5. Jika perlu istirahat, tekan **Jeda** atau **Esc**. Hitungan, gerakan, dan input berhenti; berpindah tab atau meninggalkan jendela juga menjeda permainan. **Lanjutkan** memulai kembali tanpa mempertahankan tombol yang sebelumnya ditekan.
 6. Dari menu jeda, gunakan **Kembali ke Awal** atau kembali ke pos yang telah dibuka untuk mencari barang yang terlewat. Pos yang belum dilewati tetap terkunci. Perjalanan tidak perlu diulang dari nol.
 7. Melodi klasik dimulai setelah menekan **Mulai Petualangan**, jika browser mengizinkan audio. Gunakan **Matikan Suara** / **Nyalakan Suara** sesuai kebutuhan. Musik dan efek berhenti saat jeda atau keluar.
-8. Capai Rumah Gadang di titik akhir setelah mengumpulkan **10 perlengkapan** dan melewati ketiga pos. Jika belum lengkap, petunjuk barang yang kurang ditampilkan; pemain tetap bisa kembali mencarinya.
-9. Lihat ringkasan perlengkapan, pos, waktu aktif, dan penjelasan barang. **Akhiri Perjalanan** dari menu jeda juga menghasilkan ringkasan yang ramah tanpa hadiah XP.
+8. Dekati saklar pada Pos 2, lalu tekan **E** atau **Interaksi** untuk membuka jembatan simulasi. Capai titik kumpul setelah mendapatkan 10 barang, melewati tiga pos, dan menyelesaikan tiga kuis. Petunjuk menunjukkan persyaratan yang belum lengkap.
+9. Lihat ringkasan tiga pembelajaran, perlengkapan, pos, dan waktu aktif. **Akhiri Perjalanan** dari menu jeda atau kuis juga menghasilkan ringkasan yang ramah tanpa hadiah XP.
 10. Untuk pengguna yang login, hasil dan detail checkpoint disimpan ke PostgreSQL saat perjalanan ditamatkan atau diakhiri. Penyelesaian pertama setiap hari memberi **20 XP** (Asia/Makassar); pengulangan dan pengiriman hasil bersamaan tidak menggandakan hadiah. Penyimpanan yang gagal bisa diulang lewat **Coba Simpan Lagi**.
 11. Pilih **Main Lagi** atau **Lihat Pohon Harapan**. Tamu bisa memainkan seluruh jalur; login sebelum sesi berikutnya untuk menyimpan hasil. Checkpoint mempertahankan progres selama halaman sesi tetap terbuka, bukan pemulihan otomatis setelah menutup atau memuat ulang tab.
 
@@ -273,6 +276,7 @@ Task deteksi kamera:
 | Bergerak kiri | Panah kiri / A | Tahan **◀** |
 | Bergerak kanan | Panah kanan / D | Tahan **▶** |
 | Melompat | Spasi / panah atas / W | Ketuk **Lompat** |
+| Mengaktifkan saklar | E saat dekat saklar | Ketuk **Interaksi** |
 | Jeda / lanjut | Esc atau tombol di layar | Tombol **Jeda** / **Lanjutkan** |
 
 Tombol arah berada di kiri dan lompat di kanan, mendukung dua jari sekaligus. Pelepasan, pembatalan sentuhan, dan kehilangan pointer capture membersihkan input agar karakter tidak terus berjalan. Kamera tidak diperlukan.
@@ -280,13 +284,14 @@ Tombol arah berada di kiri dan lompat di kanan, mendukung dua jari sekaligus. Pe
 Task implementasi Siaga Minang:
 
 - [x] Nama dan bahasa Indonesia konsisten pada halaman dan kartu Game Center.
-- [x] Pertahankan identitas klasik merah–hitam–emas dan melodi game lama; gambar ulang karakter, perlengkapan, serta Rumah Gadang dengan bentuk dan detail yang lebih rapi.
-- [x] Animasi sendi tangan/kaki, transisi diam–lari–lompat, kedipan, gerak mendarat, dan bayangan karakter.
+- [x] Visual cerah bernuansa Minangkabau, panel merah–hijau–emas, tiga latar pos, Aira berseragam hijau, serta melodi opsional.
+- [x] Sprite diam–lari–lompat, peralihan arah, gerak mendarat, dan bayangan karakter; tutorial dialog Aira sebelum bermain.
 - [x] Interpolasi posisi antar-tick fisika agar pergerakan halus pada layar dengan refresh rate tinggi; perpindahan checkpoint langsung menuju pos.
 - [x] Latar pegunungan berlapis, terasering, kelapa, langit, serta tekstur rumput dan platform; dukungan pengurangan animasi mengikuti pengaturan perangkat.
 - [x] Ilustrasi halaman pembuka, panel dan tombol senada, serta bar progres perlengkapan.
 - [x] Arena layar penuh dengan HUD dan tombol yang menyesuaikan desktop, HP tegak, serta HP mendatar.
-- [x] Jalur terencana, 10 perlengkapan dari empat jenis, papan kayu, tiga checkpoint, dan petunjuk barang yang kurang.
+- [x] Jalur terencana, 10 jenis perlengkapan, platform, jembatan interaktif, tiga checkpoint/kuis, dan petunjuk barang yang kurang.
+- [x] Tiga bintang berdasarkan pembelajaran, kuis yang bisa dicoba kembali, inventori edukatif, dan ringkasan capaian.
 - [x] Gerakan dengan timestep tetap, lompatan yang dapat diulang, serta pergerakan layar halus.
 - [x] Kontrol keyboard dan tombol layar besar dengan dukungan multi-sentuh.
 - [x] Checkpoint, jeda otomatis, pilihan kembali ke pos, serta musik dan efek yang bisa dimatikan.
@@ -306,6 +311,7 @@ Sebelum menjalankan versi ini pada database lain, jalankan `pnpm db:deploy` untu
 4. Lanjutkan melewati kotak kayu dengan tombol **Lompat**. Kunjungi penanda **2** di koridor untuk mempelajari pilihan setelah guncangan berhenti, lalu penanda **3** dekat pintu untuk mempelajari titik kumpul. Melompat adalah kontrol petualangan virtual; materi respons gempa dijelaskan pada pertanyaan.
 5. Gunakan **Jeda** atau **Esc** untuk beristirahat. Perpindahan tab atau jendela juga menjeda perjalanan. Menu jeda menyediakan **Kembali ke Ruang Terakhir** tanpa menghapus langkah yang sudah dipelajari, serta **Akhiri Latihan** untuk selesai lebih awal tanpa hadiah penyelesaian.
 6. Musik mati saat awal. Gunakan **Nyalakan Suara** / **Matikan Suara** sesuai kebutuhan. Musik berhenti selama jeda, pertanyaan, hasil, atau setelah meninggalkan halaman.
+   Arena memakai ilustrasi rumah yang hangat dan karakter chibi beranimasi. Pada adegan gempa sebelum langkah berlindung dipelajari, kamera berguncang singkat secara berkala. Tombol dan pertanyaan tetap diam. Gunakan **Getaran aktif/mati** untuk menonaktifkan efek; pengaturan pengurangan animasi perangkat mematikannya otomatis. Guncangan berhenti selama jeda, pertanyaan, dan setelah langkah pertama selesai.
 7. Setelah ketiga pertanyaan selesai, capai pintu bertanda **KELUAR**. Ringkasan menampilkan langkah yang dipelajari, waktu aktif, dan penjelasan materi. Pengguna yang login menyimpan jawaban, ruangan, jumlah percobaan keliru, dan hasil ke PostgreSQL.
 8. Penyelesaian pertama setiap hari memperoleh **20 XP** untuk Pohon Harapan (Asia/Makassar). Pengulangan atau pengiriman hasil bersamaan tidak menggandakan hadiah. Jika koneksi gagal, gunakan **Coba Simpan Lagi**. Pilih **Main Lagi** atau **Lihat Pohon Harapan** setelah selesai.
 

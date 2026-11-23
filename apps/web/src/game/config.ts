@@ -11,7 +11,7 @@ export default function quakeConfig(
     parent,
     width: parent.clientWidth || 900,
     height: parent.clientHeight || 620,
-    backgroundColor: "#dce3cf",
+    backgroundColor: "#f4cdb1",
     scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH },
     render: { antialias: true, roundPixels: false },
     audio: { noAudio: true },
