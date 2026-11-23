@@ -611,38 +611,40 @@ export default function GameQuake() {
                     Kamu boleh beristirahat. Langkah yang sudah dipelajari tetap
                     tercatat selama sesi ini.
                   </p>
-                  <button
-                    ref={resumeButton}
-                    type="button"
-                    className={button + " bg-action text-white"}
-                    onClick={resume}
-                  >
-                    <Play size={18} />
-                    Lanjutkan
-                  </button>
-                  <button
-                    type="button"
-                    className={button + " bg-tint text-fg-brand"}
-                    onClick={() => {
-                      if (gameRef.current) {
-                        revisitQuakeRoom(gameRef.current);
-                        setSnapshot(quakeSnapshot(gameRef.current));
-                      }
-                      clearControls();
-                      resume();
-                    }}
-                  >
-                    <RotateCcw size={17} />
-                    Kembali ke Ruang Terakhir
-                  </button>
-                  <button
-                    type="button"
-                    className={button + " bg-canvas text-fg-muted"}
-                    onClick={() => finish()}
-                  >
-                    <Flag size={17} />
-                    Akhiri Latihan
-                  </button>
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-2.5">
+                    <button
+                      ref={resumeButton}
+                      type="button"
+                      className={button + " w-full sm:w-auto bg-action text-white"}
+                      onClick={resume}
+                    >
+                      <Play size={18} />
+                      Lanjutkan
+                    </button>
+                    <button
+                      type="button"
+                      className={button + " w-full sm:w-auto bg-tint text-fg-brand"}
+                      onClick={() => {
+                        if (gameRef.current) {
+                          revisitQuakeRoom(gameRef.current);
+                          setSnapshot(quakeSnapshot(gameRef.current));
+                        }
+                        clearControls();
+                        resume();
+                      }}
+                    >
+                      <RotateCcw size={17} />
+                      Kembali ke Ruang Terakhir
+                    </button>
+                    <button
+                      type="button"
+                      className={button + " w-full sm:w-auto bg-canvas text-fg-muted"}
+                      onClick={() => finish()}
+                    >
+                      <Flag size={17} />
+                      Akhiri Latihan
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -706,7 +708,7 @@ export default function GameQuake() {
                   )}
                   <button
                     type="button"
-                    className={button + " bg-canvas text-fg-muted"}
+                    className={button + " w-full sm:w-auto bg-canvas text-fg-muted"}
                     onClick={() => finish()}
                   >
                     Akhiri Latihan
@@ -765,16 +767,16 @@ export default function GameQuake() {
               {saveState === "error" && (
                 <button
                   type="button"
-                  className={button + " bg-tint text-fg-brand"}
+                  className={button + " w-full sm:w-auto bg-tint text-fg-brand"}
                   onClick={() => void save(result)}
                 >
                   Coba Simpan Lagi
                 </button>
               )}
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3">
                 <button
                   type="button"
-                  className={button + " bg-action text-white"}
+                  className={button + " w-full sm:w-auto bg-action text-white"}
                   disabled={saveState === "saving"}
                   onClick={() => changePhase("intro")}
                 >
@@ -788,7 +790,7 @@ export default function GameQuake() {
                     if (event.key === "Enter") audioRef.current?.pause();
                   }}
                   onClick={() => audioRef.current?.pause()}
-                  className={button + " bg-tint text-fg-brand"}
+                  className={button + " w-full sm:w-auto bg-tint text-fg-brand"}
                 >
                   Lihat Pohon Harapan
                 </Link>

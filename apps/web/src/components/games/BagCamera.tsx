@@ -255,13 +255,13 @@ export default function BagCamera({
 
   return (
     <div className="rounded-xl border border-line bg-surface p-4">
-      <div className="flex items-start gap-4">
+      <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
         <video
           ref={videoRef}
           autoPlay
           muted
           playsInline
-          className="w-28 rounded-lg bg-sunken -scale-x-100"
+          className="w-full max-w-[180px] sm:w-28 rounded-lg bg-sunken -scale-x-100"
           aria-label="Pratinjau kamera untuk gerakan tangan"
         />
         <div className="text-sm text-fg-muted">

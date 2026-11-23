@@ -885,12 +885,12 @@ export default function GameSiagaMinang() {
                     Permainan dijeda
                   </h2>
                   <p className="text-sm text-fg-muted">{pauseMessage}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-2">
                     <button
                       ref={resumeRef}
                       type="button"
                       onClick={resume}
-                      className={button + " bg-action text-white"}
+                      className={button + " w-full sm:w-auto bg-action text-white"}
                     >
                       <Play size={17} />
                       Lanjutkan
@@ -898,7 +898,7 @@ export default function GameSiagaMinang() {
                     <button
                       type="button"
                       onClick={() => finish()}
-                      className={button + " border border-line text-fg-muted"}
+                      className={button + " w-full sm:w-auto border border-line text-fg-muted"}
                     >
                       Akhiri Perjalanan
                     </button>
@@ -1012,7 +1012,7 @@ export default function GameSiagaMinang() {
                   <button
                     type="button"
                     onClick={() => void saveResult(result)}
-                    className={`${button} mt-3 bg-action text-white`}
+                    className={`${button} mt-3 w-full sm:w-auto bg-action text-white`}
                   >
                     Coba Simpan Lagi
                   </button>
@@ -1026,7 +1026,7 @@ export default function GameSiagaMinang() {
                   </Link>
                 )}
               </div>
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <div className="mt-6 flex flex-col sm:flex-row flex-wrap justify-center gap-3">
                 <button
                   type="button"
                   disabled={saveState === "saving" || saveState === "error"}
@@ -1034,14 +1034,14 @@ export default function GameSiagaMinang() {
                     setNotice("");
                     changePhase("intro");
                   }}
-                  className={`${button} bg-action text-white`}
+                  className={`${button} w-full sm:w-auto bg-action text-white`}
                 >
                   <RotateCcw size={17} />
                   Main Lagi
                 </button>
                 <Link
                   href="/dashboard"
-                  className={`${button} border border-line text-fg-brand`}
+                  className={`${button} w-full sm:w-auto border border-line text-fg-brand`}
                 >
                   Lihat Pohon Harapan
                 </Link>

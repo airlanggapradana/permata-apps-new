@@ -80,16 +80,14 @@ export default function BreathingCamera({
           {guidance}
         </p>
       )}
-      <div
-        className={`flex gap-4 ${detectBreathing ? "flex-col sm:flex-row sm:items-center" : "items-center"}`}
-      >
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
         <video
           ref={videoRef}
           autoPlay
           muted
           playsInline
           aria-label="Cermin kamera latihan napas"
-          className={`aspect-[4/3] shrink-0 -scale-x-100 rounded-xl bg-sunken object-cover ${detectBreathing ? "w-full sm:w-64" : "w-28"}`}
+          className={`aspect-[4/3] shrink-0 -scale-x-100 rounded-xl bg-sunken object-cover ${detectBreathing ? "w-full sm:w-64" : "w-36 sm:w-28"}`}
         />
         <div className="text-sm">
           <p role="status" className="font-semibold">

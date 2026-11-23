@@ -42,6 +42,17 @@ export default function Journal() {
     null,
   );
 
+  useEffect(() => {
+    if (!selectedEntry) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSelectedEntry(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedEntry]);
+
   // Toast notification state
   const [toast, setToast] = useState<{ visible: boolean; message: string }>({
     visible: false,
@@ -420,17 +431,17 @@ export default function Journal() {
   const progressPercent = Math.min(100, Math.round((treeXp / 1000) * 100));
 
   return (
-    <div className="w-full bg-[#f7f9fb] text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen flex flex-col justify-between">
+    <div className="w-full bg-canvas text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen-safe flex flex-col justify-between">
       {/* Interactive Notification Toast */}
       <div
-        className={`fixed bottom-6 right-6 z-50 transform transition-all duration-300 flex items-center gap-3 px-5 py-3.5 rounded-xl bg-[#012d1d] text-white shadow-xl ${
+        className={`fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 transform transition-all duration-300 flex items-center gap-3 px-4 py-3.5 rounded-xl bg-emphasis text-white shadow-xl ${
           toast.visible
             ? "translate-y-0 opacity-100 pointer-events-auto"
             : "translate-y-24 opacity-0 pointer-events-none"
         }`}
         id="toastNotification"
       >
-        <span className="material-symbols-outlined text-[#92f7c3] text-[22px]">
+        <span className="material-symbols-outlined text-[#92f7c3] text-[22px] shrink-0">
           check_circle
         </span>
         <span className="font-label-md text-label-md" id="toastMessage">
@@ -440,13 +451,13 @@ export default function Journal() {
 
 
       {/* MAIN CONTENT AREA */}
-      <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
+      <main className="w-full bg-canvas min-h-[calc(100dvh-20rem)] py-5 sm:py-8">
         <div className="flex flex-col w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full flex flex-col gap-6 md:gap-8">
             {/* Breadcrumb & Protocol Badges */}
             <AnimatedSection index={0}>
               <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-              <nav className="flex items-center gap-2 font-label-md text-label-md text-[#414844]">
+              <nav className="flex flex-wrap items-center gap-x-2 gap-y-1 font-label-md text-label-md text-[#414844]">
                 <Link
                   className="hover:text-[#012d1d] transition-colors flex items-center gap-1"
                   href="/"
@@ -518,16 +529,16 @@ export default function Journal() {
               <div className="lg:col-span-8 flex flex-col gap-6">
                 {/* CARD 1: Write Journal Entry */}
                 <AnimatedSection index={1}>
-                  <section className="p-6 sm:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6">
+                  <section className="p-4 sm:p-6 lg:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#1b4332] text-white flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-xl bg-emphasis text-white flex items-center justify-center shrink-0">
                         <span className="material-symbols-outlined text-[22px]">
                           edit_note
                         </span>
                       </div>
-                      <div className="flex flex-col">
-                        <h2 className="font-headline-md text-headline-md text-[#012d1d] leading-tight">
+                      <div className="flex flex-col min-w-0">
+                        <h2 className="font-headline-md text-headline-md text-fg-brand leading-tight">
                           Tulis Refleksi &amp; Jurnal Jiwa
                         </h2>
                         <span className="font-label-sm text-label-sm text-[#414844]">
@@ -549,7 +560,7 @@ export default function Journal() {
 
                   {/* Section A: 5-Mood Scale Selector */}
                   <div className="flex flex-col gap-3">
-                    <label className="font-headline-sm text-headline-sm text-[#012d1d] flex items-center gap-2">
+                    <label className="font-headline-sm text-headline-sm text-fg-brand flex flex-wrap items-center gap-x-2 gap-y-0.5">
                       <span>Bagaimana perasaanmu saat ini?</span>
                       <span className="font-body-sm text-body-sm text-[#414844] font-normal">
                         (Pilih yang paling mewakili)
@@ -568,11 +579,11 @@ export default function Journal() {
                             key={item.value}
                             type="button"
                             onClick={() => setMood(item.value)}
-                            className={`group flex flex-col items-center p-3 rounded-xl transition-all ${
+                            className={`group flex flex-col items-center justify-center min-h-[84px] p-3 rounded-xl transition-all ${
                               isColSpan2 ? "col-span-2 sm:col-span-1" : ""
                             } ${
                               isActive
-                                ? "bg-[#1b4332] text-white shadow-sm"
+                                ? "bg-emphasis text-white shadow-sm"
                                 : "bg-[#f2f4f6] text-[#414844] hover:bg-[#eceef0]"
                             }`}
                           >
@@ -588,7 +599,7 @@ export default function Journal() {
                             </span>
                             <span
                               className={`font-label-sm text-label-sm ${
-                                isActive ? "text-[#86af99]" : "text-[#717973]"
+                                isActive ? "text-white/80" : "text-[#717973]"
                               }`}
                             >
                               {item.sub}
@@ -611,9 +622,9 @@ export default function Journal() {
                           key={pill.label}
                           type="button"
                           onClick={() => handlePromptClick(pill.text)}
-                          className="px-3.5 py-1.5 rounded-full bg-[#eceef0] text-[#191c1e] hover:bg-[#c1ecd4] hover:text-[#274e3d] transition-all font-label-md text-label-md flex items-center gap-1.5"
+                          className="min-h-11 px-3.5 py-2 rounded-full bg-[#eceef0] text-[#191c1e] hover:bg-tint hover:text-fg-brand transition-all font-label-md text-label-md flex items-center gap-1.5 text-left"
                         >
-                          <span className="material-symbols-outlined text-[16px] text-[#006c48]">
+                          <span className="material-symbols-outlined text-[16px] text-fg-brand shrink-0">
                             {pill.icon}
                           </span>
                           <span>{pill.label}</span>
@@ -626,8 +637,8 @@ export default function Journal() {
                   <div className="flex flex-col gap-2 relative">
                     <textarea
                       id="journalInput"
-                      className="w-full p-4 sm:p-5 rounded-xl text-[#191c1e] font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-[#006c48]/50 placeholder:text-[#717973] transition-all shadow-inner bg-[#f2f4f6]"
-                      rows={7}
+                      className="w-full p-4 sm:p-5 rounded-xl text-[#191c1e] font-body-md text-base sm:text-body-md focus:outline-none focus:ring-2 focus:ring-action/50 placeholder:text-[#717973] transition-all shadow-inner bg-[#f2f4f6]"
+                      rows={6}
                       placeholder="Ceritakan apa yang kamu rasakan, alami, atau syukuri hari ini... Tulisanmu sepenuhnya aman dan terlindungi di sini."
                       value={msg}
                       onChange={(e) => {
@@ -635,15 +646,15 @@ export default function Journal() {
                         if (guardrailNotice) setGuardrailNotice(null);
                       }}
                     />
-                    <div className="flex items-center justify-between text-[#414844] font-label-sm text-label-sm px-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[#414844] font-label-sm text-label-sm px-1">
                       <span className="flex items-center gap-1 text-[#006c48]">
-                        <span className="material-symbols-outlined text-[16px]">
+                        <span className="material-symbols-outlined text-[16px] shrink-0">
                           lock
                         </span>
                         Pemeriksaan privasi aktif: Bebas dari nama lengkap &amp;
                         nomor telepon publik
                       </span>
-                      <span id="charCount">{msg.length} karakter</span>
+                      <span id="charCount" className="shrink-0">{msg.length} karakter</span>
                     </div>
 
                     {guardrailNotice && (
@@ -671,10 +682,10 @@ export default function Journal() {
                           </div>
                         </div>
                         {guardrailNotice.type === "crisis" && (
-                          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 pt-1">
                             <a
                               href="tel:119"
-                              className="px-4 py-2 rounded-lg bg-[#ba1a1a] text-white text-xs font-bold inline-flex items-center gap-1.5 hover:opacity-90"
+                              className="min-h-11 px-4 py-2.5 rounded-lg bg-[#ba1a1a] text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 hover:opacity-90"
                             >
                               <span className="material-symbols-outlined text-[16px]">
                                 call
@@ -683,7 +694,7 @@ export default function Journal() {
                             </a>
                             <Link
                               href="/tele-screening"
-                              className="px-4 py-2 rounded-lg bg-white text-[#93000a] text-xs font-semibold border border-red-200 hover:bg-red-50"
+                              className="min-h-11 px-4 py-2.5 rounded-lg bg-white text-[#93000a] text-xs font-semibold border border-red-200 hover:bg-red-50 inline-flex items-center justify-center"
                             >
                               Skrining Triase DASS-21
                             </Link>
@@ -711,15 +722,15 @@ export default function Journal() {
                         </span>
                       </div>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <label className="relative inline-flex items-center min-h-11 cursor-pointer shrink-0">
                       <input
                         type="checkbox"
                         className="sr-only peer"
                         checked={shareCareCircle}
                         onChange={(e) => setShareCareCircle(e.target.checked)}
                       />
-                      <div className="w-11 h-6 bg-[#e0e3e5] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#006c48]" />
-                      <span className="ml-2 font-label-sm text-label-sm text-[#414844] hidden sm:inline">
+                      <div className="relative w-11 h-6 bg-[#e0e3e5] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-action" />
+                      <span className="ml-2.5 font-label-sm text-label-sm text-[#414844]">
                         Izinkan Care Circle
                       </span>
                     </label>
@@ -730,13 +741,13 @@ export default function Journal() {
                     <button
                       type="button"
                       onClick={handleToggleVoice}
-                      className={`inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-label-md text-label-md transition-colors ${
+                      className={`inline-flex items-center justify-center gap-2 min-h-12 px-5 py-3 rounded-xl font-label-md text-label-md transition-colors ${
                         isRecording
                           ? "bg-[#ffdad6] text-[#93000a]"
                           : "bg-[#eceef0] text-[#012d1d] hover:bg-[#e6e8ea]"
                       }`}
                     >
-                      <span className="material-symbols-outlined text-[#006c48] text-[20px]">
+                      <span className="material-symbols-outlined text-[#006c48] text-[20px] shrink-0">
                         mic
                       </span>
                       <span>
@@ -752,18 +763,18 @@ export default function Journal() {
                       type="button"
                       disabled={isAnalyzing || !msg.trim()}
                       onClick={handleSaveAndAnalyze}
-                      className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#012d1d] text-white hover:bg-[#1b4332] disabled:opacity-50 font-label-md text-label-md font-semibold transition-all shadow-[0_4px_14px_rgba(1,45,29,0.2)] active:scale-[0.99]"
+                      className="inline-flex items-center justify-center gap-2 min-h-12 px-6 py-3 rounded-xl bg-action text-white hover:bg-action-hover disabled:opacity-50 font-label-md text-label-md font-semibold transition-all shadow-[0_4px_14px_rgba(1,45,29,0.2)] active:scale-[0.99]"
                     >
                       {isAnalyzing ? (
                         <>
-                          <span className="material-symbols-outlined text-[20px] animate-spin">
+                          <span className="material-symbols-outlined text-[20px] animate-spin shrink-0">
                             refresh
                           </span>
                           <span>Memproses Makna Budaya...</span>
                         </>
                       ) : (
                         <>
-                          <span className="material-symbols-outlined text-[#92f7c3] text-[20px]">
+                          <span className="material-symbols-outlined text-[#92f7c3] text-[20px] shrink-0">
                             auto_awesome
                           </span>
                           <span>
@@ -778,9 +789,9 @@ export default function Journal() {
 
                 {/* CARD 2: AI Cultural Insight & Wisdom Reflection */}
                 <AnimatedSection index={2}>
-                  <section className="p-6 sm:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6 relative overflow-hidden">
+                  <section className="p-4 sm:p-6 lg:p-8 rounded-xl bg-white shadow-sm flex flex-col gap-6 relative overflow-hidden">
                   {/* Subtle decorative amber cultural banner strip */}
-                  <div className="w-full h-1.5 bg-gradient-to-r from-[#ffb77d] via-[#f48c24] to-[#006c48] rounded-t-xl -mt-6 sm:-mt-8 -mx-6 sm:-mx-8" />
+                  <div className="w-auto h-1.5 bg-gradient-to-r from-[#ffb77d] via-[#f48c24] to-[#006c48] rounded-t-xl -mt-4 sm:-mt-6 lg:-mt-8 -mx-4 sm:-mx-6 lg:-mx-8" />
 
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5">
@@ -842,14 +853,14 @@ export default function Journal() {
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       {/* Action 1: Latihan Napas Tenang */}
-                      <div className="p-4 rounded-xl bg-[#f2f4f6] flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
+                      <div className="p-4 rounded-xl bg-[#f2f4f6] flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-xl bg-[#92f7c3] text-[#002113] flex items-center justify-center shrink-0">
                             <span className="material-symbols-outlined text-[20px]">
                               airwave
                             </span>
                           </div>
-                          <div className="flex flex-col">
+                          <div className="flex flex-col min-w-0">
                             <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
                               Latihan Napas Tenang
                             </span>
@@ -861,7 +872,7 @@ export default function Journal() {
                         <button
                           type="button"
                           onClick={handleStartBreathing}
-                          className="px-3.5 py-1.5 rounded-lg bg-[#012d1d] text-white font-label-sm text-label-sm font-semibold hover:bg-[#1b4332] transition-colors shrink-0"
+                          className="min-h-11 px-4 py-2 rounded-lg bg-action text-white font-label-sm text-label-sm font-semibold hover:bg-action-hover transition-colors shrink-0"
                         >
                           {breathingStatus === "breathing"
                             ? "Bernapas..."
@@ -872,14 +883,14 @@ export default function Journal() {
                       </div>
 
                       {/* Action 2: Siram Pohon Harapan */}
-                      <div className="p-4 rounded-xl bg-[#f2f4f6] flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
+                      <div className="p-4 rounded-xl bg-[#f2f4f6] flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-xl bg-[#c1ecd4] text-[#274e3d] flex items-center justify-center shrink-0">
                             <span className="material-symbols-outlined text-[20px]">
                               water_drop
                             </span>
                           </div>
-                          <div className="flex flex-col">
+                          <div className="flex flex-col min-w-0">
                             <span className="font-label-md text-label-md text-[#012d1d] font-semibold">
                               Siram Pohon Harapan
                             </span>
@@ -892,10 +903,10 @@ export default function Journal() {
                           type="button"
                           disabled={treeWatered}
                           onClick={handleWaterTree}
-                          className={`px-3.5 py-1.5 rounded-lg font-label-sm text-label-sm font-semibold transition-opacity shrink-0 ${
+                          className={`min-h-11 px-4 py-2 rounded-lg font-label-sm text-label-sm font-semibold transition-opacity shrink-0 ${
                             treeWatered
                               ? "bg-[#eceef0] text-[#717973] cursor-not-allowed opacity-70"
-                              : "bg-[#006c48] text-white hover:opacity-90"
+                              : "bg-action text-white hover:bg-action-hover"
                           }`}
                         >
                           {treeWatered ? "Tersiram ✓" : "Klaim"}
@@ -1138,10 +1149,18 @@ export default function Journal() {
                         return (
                           <article
                             key={entry.id}
+                            role="button"
+                            tabIndex={0}
                             onClick={() => setSelectedEntry(entry)}
-                            className="p-3.5 rounded-xl bg-[#f2f4f6] hover:bg-[#eceef0] transition-colors flex flex-col gap-1.5 cursor-pointer"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setSelectedEntry(entry);
+                              }
+                            }}
+                            className="p-3.5 rounded-xl bg-[#f2f4f6] hover:bg-[#eceef0] transition-colors flex flex-col gap-1.5 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
                           >
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap items-center justify-between gap-1.5">
                               <div className="flex items-center gap-1.5">
                                 <span className="text-sm">
                                   {moodObj?.emoji || "😐"}
@@ -1173,7 +1192,7 @@ export default function Journal() {
                         setSelectedEntry(savedEntries[0]);
                       }
                     }}
-                    className="w-full py-2.5 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#012d1d] font-label-md text-label-md font-semibold transition-colors flex items-center justify-center gap-1.5"
+                    className="w-full min-h-11 py-2.5 px-4 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#012d1d] font-label-md text-label-md font-semibold transition-colors flex items-center justify-center gap-1.5"
                   >
                     <span>
                       Lihat Semua Riwayat ({savedEntries.length} Catatan)
@@ -1187,9 +1206,9 @@ export default function Journal() {
 
                 {/* WIDGET 3: SafeConnect PFA & Crisis Guard */}
                 <AnimatedSection index={4}>
-                  <section className="p-6 rounded-xl bg-[#f2f4f6] shadow-sm flex flex-col gap-4">
+                  <section className="p-5 sm:p-6 rounded-xl bg-[#f2f4f6] shadow-sm flex flex-col gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#012d1d] text-white flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-emphasis text-white flex items-center justify-center shrink-0">
                       <span className="material-symbols-outlined text-[#92f7c3] text-[22px]">
                         health_and_safety
                       </span>
@@ -1210,7 +1229,7 @@ export default function Journal() {
                   </p>
                   <div className="flex flex-col gap-2.5 pt-1">
                     <a
-                      className="w-full py-3 rounded-xl bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-2 hover:opacity-95 transition-opacity shadow-sm"
+                      className="w-full min-h-12 py-3 px-4 rounded-xl bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-2 hover:opacity-95 transition-opacity shadow-sm"
                       href="tel:119"
                     >
                       <span className="material-symbols-outlined text-[20px]">
@@ -1220,7 +1239,7 @@ export default function Journal() {
                     </a>
                     <Link
                       href="/ai-companion"
-                      className="w-full py-2.5 rounded-xl bg-white text-[#012d1d] hover:bg-[#eceef0] font-label-md text-label-md font-semibold flex items-center justify-center gap-2 transition-colors text-center"
+                      className="w-full min-h-11 py-2.5 px-4 rounded-xl bg-white text-[#012d1d] hover:bg-[#eceef0] font-label-md text-label-md font-semibold flex items-center justify-center gap-2 transition-colors text-center"
                     >
                       <span className="material-symbols-outlined text-[#006c48] text-[20px]">
                         chat
@@ -1256,22 +1275,35 @@ export default function Journal() {
 
       {/* Entry Modal View if clicked */}
       {selectedEntry && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-surface rounded-xl max-w-lg w-full p-6 shadow-lg border border-line flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-line">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="journal-modal-title"
+          onClick={() => setSelectedEntry(null)}
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-surface rounded-t-2xl sm:rounded-xl max-w-lg w-full p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:p-6 shadow-lg border border-line flex flex-col gap-4 max-h-[90dvh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between gap-2 pb-3 border-b border-line">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xl shrink-0">
                   {moodOptions.find((m) => m.value === selectedEntry.mood)
                     ?.emoji || "😐"}
                 </span>
-                <span className="font-headline-sm text-headline-sm text-[#012d1d]">
+                <span
+                  id="journal-modal-title"
+                  className="font-headline-sm text-headline-sm text-fg-brand truncate"
+                >
                   Refleksi {selectedEntry.date}
                 </span>
               </div>
               <button
                 type="button"
+                aria-label="Tutup detail refleksi"
                 onClick={() => setSelectedEntry(null)}
-                className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-fg-muted hover:text-fg transition-colors"
+                className="min-w-11 min-h-11 rounded-full bg-surface-container flex items-center justify-center text-fg-muted hover:text-fg transition-colors shrink-0"
               >
                 ✕
               </button>
@@ -1303,7 +1335,7 @@ export default function Journal() {
                 <p className="leading-relaxed">{selectedEntry.aiInsight}</p>
               </div>
             )}
-            <div className="flex items-center justify-between text-xs text-fg-subtle pt-2 border-t border-line">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-fg-subtle pt-2 border-t border-line">
               <span className="truncate max-w-[200px]">
                 ID: {selectedEntry.id}
               </span>
@@ -1317,7 +1349,7 @@ export default function Journal() {
             <button
               type="button"
               onClick={() => setSelectedEntry(null)}
-              className="mt-2 w-full py-2.5 rounded-xl bg-[#1b4332] text-white font-semibold text-sm hover:bg-[#006c48] transition-colors"
+              className="mt-2 w-full min-h-11 py-2.5 rounded-xl bg-action text-white font-semibold text-sm hover:bg-action-hover transition-colors"
             >
               Tutup
             </button>
@@ -1327,9 +1359,9 @@ export default function Journal() {
 
       {/* FOOTER matching desain_jurnal_hikmah.html */}
       <footer className="w-full bg-[#f2f4f6] border-t border-[#c1c8c2]/20 mt-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-10">
           {/* Emergency Alert Banner */}
-          <div className="mb-6 p-4 rounded-xl bg-[#ffdad6] text-[#93000a] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="mb-6 p-4 rounded-xl bg-[#ffdad6] text-[#93000a] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#ba1a1a] text-white flex items-center justify-center shrink-0">
                 <span className="material-symbols-outlined text-[20px]">
@@ -1347,7 +1379,7 @@ export default function Journal() {
               </div>
             </div>
             <a
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold hover:opacity-95 transition-opacity shrink-0"
+              className="inline-flex items-center justify-center gap-2 min-h-11 px-5 py-2.5 rounded-xl bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold hover:opacity-95 transition-opacity shrink-0"
               href="tel:119"
             >
               <span className="material-symbols-outlined text-[18px]">

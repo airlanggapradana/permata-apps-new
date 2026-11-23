@@ -331,7 +331,7 @@ export default function GameBreathing() {
   }
 
   return (
-    <main className="min-h-screen bg-canvas px-4 py-6 sm:px-6 sm:py-10">
+    <main className="min-h-screen-safe bg-canvas px-4 py-5 sm:px-6 sm:py-10">
       <div className="mx-auto max-w-4xl space-y-6">
         <Link href="/dashboard" className={`${button} px-0 text-fg-brand`}>
           <ArrowLeft size={18} />
@@ -450,11 +450,11 @@ export default function GameBreathing() {
                 </fieldset>
                 <fieldset disabled={starting}>
                   <legend className="mb-3 font-semibold">Jumlah putaran</legend>
-                  <div className="flex gap-3">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
                     {BREATHING_ROUNDS.map((count) => (
                       <label
                         key={count}
-                        className={`flex flex-1 cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm ${rounds === count ? "border-action bg-tint" : "border-line"}`}
+                        className={`flex min-h-11 flex-col sm:flex-row cursor-pointer items-center justify-center gap-1.5 sm:gap-2 rounded-xl border p-2.5 sm:p-3 text-center text-xs sm:text-sm ${rounds === count ? "border-action bg-tint" : "border-line"}`}
                       >
                         <input
                           type="radio"
@@ -464,7 +464,7 @@ export default function GameBreathing() {
                           onChange={() => setRounds(count)}
                           className="accent-action"
                         />
-                        {count} putaran
+                        <span>{count} putaran</span>
                       </label>
                     ))}
                   </div>
@@ -526,7 +526,7 @@ export default function GameBreathing() {
                   setCamera(!camera);
                   setNotice("");
                 }}
-                className={`${button} bg-sunken text-fg`}
+                className={`${button} w-full sm:w-auto bg-sunken text-fg`}
               >
                 <Camera size={17} />
                 {camera ? "Matikan Kamera" : "Nyalakan Kamera"}
@@ -581,7 +581,7 @@ export default function GameBreathing() {
                       ? "Tarik napas"
                       : "Hembuskan napas"}
               </p>
-              <div className="relative mx-auto my-5 flex h-64 w-64 max-w-full items-center justify-center">
+              <div className="relative mx-auto my-5 flex h-52 w-52 sm:h-64 sm:w-64 max-w-full items-center justify-center">
                 <span
                   aria-hidden="true"
                   className="absolute inset-0 rounded-full border border-line"
@@ -590,7 +590,7 @@ export default function GameBreathing() {
                   ref={circleRef}
                   data-breath-circle="true"
                   aria-hidden="true"
-                  className="absolute h-56 w-56 rounded-full border border-action/30 bg-tint will-change-transform"
+                  className="absolute h-44 w-44 sm:h-56 sm:w-56 rounded-full border border-action/30 bg-tint will-change-transform"
                   style={{
                     transform: reducedMotion ? "scale(1)" : "scale(0.65)",
                   }}
@@ -620,7 +620,7 @@ export default function GameBreathing() {
                 value={frame.completedRounds}
                 className="mt-5 h-2 w-full max-w-sm accent-action"
               />
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <div className="mt-6 flex flex-col sm:flex-row flex-wrap justify-center gap-3">
                 {phase === "running" || phase === "preparing" ? (
                   <button
                     type="button"
@@ -629,7 +629,7 @@ export default function GameBreathing() {
                         "Ambil waktu sejenak. Kamera dimatikan; lanjutkan saat kamu siap.",
                       )
                     }
-                    className={`${button} bg-action text-white`}
+                    className={`${button} w-full sm:w-auto bg-action text-white`}
                   >
                     <Pause size={17} />
                     Jeda
@@ -642,7 +642,7 @@ export default function GameBreathing() {
                       startedRef.current = performance.now();
                       setPhase("running");
                     }}
-                    className={`${button} bg-action text-white`}
+                    className={`${button} w-full sm:w-auto bg-action text-white`}
                   >
                     <Play size={17} />
                     Lanjutkan
@@ -651,7 +651,7 @@ export default function GameBreathing() {
                 <button
                   type="button"
                   onClick={() => finish()}
-                  className={`${button} border border-line text-fg-muted`}
+                  className={`${button} w-full sm:w-auto border border-line text-fg-muted`}
                 >
                   Akhiri Latihan
                 </button>
@@ -723,7 +723,7 @@ export default function GameBreathing() {
                   <button
                     type="button"
                     onClick={() => void saveResult(result)}
-                    className={`${button} mt-3 bg-action text-white`}
+                    className={`${button} mt-3 w-full sm:w-auto bg-action text-white`}
                   >
                     Coba Simpan Lagi
                   </button>
@@ -737,7 +737,7 @@ export default function GameBreathing() {
                   </Link>
                 )}
               </div>
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <div className="mt-6 flex flex-col sm:flex-row flex-wrap justify-center gap-3">
                 <button
                   type="button"
                   disabled={saveState === "saving" || saveState === "error"}
@@ -745,14 +745,14 @@ export default function GameBreathing() {
                     setPhase("intro");
                     setNotice("");
                   }}
-                  className={`${button} bg-action text-white`}
+                  className={`${button} w-full sm:w-auto bg-action text-white`}
                 >
                   <RotateCcw size={17} />
                   Latihan Lagi
                 </button>
                 <Link
                   href="/dashboard"
-                  className={`${button} border border-line text-fg-brand`}
+                  className={`${button} w-full sm:w-auto border border-line text-fg-brand`}
                 >
                   Lihat Pohon Harapan
                 </Link>

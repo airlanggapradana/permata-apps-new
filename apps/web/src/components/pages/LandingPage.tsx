@@ -939,6 +939,11 @@ html { scrollbar-gutter: stable; }
   .pm-label { display: none; }
 }
 
+/* Mobile (< 768px): sembunyikan HopeScrollbar bawah agar tidak bertabrakan dengan Mobile Bottom Nav */
+@media (max-width: 767px) {
+  .pm-tree { display: none; }
+}
+
 @keyframes pm-rise   { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pm-zoom   { from { transform: scale(1.12); } to { transform: scale(1); } }
 @keyframes pm-fade   { from { opacity: 0; } to { opacity: 1; } }
@@ -960,7 +965,7 @@ html { scrollbar-gutter: stable; }
 
 /* Konten hero mengecil mengikuti tinggi layar agar selalu muat dalam satu layar.
    Kelas Tailwind di elemen tetap jadi nilai cadangan bila svh tidak didukung. */
-.pm-hero-content { --pm-logo: clamp(3rem, 8svh, 5rem); padding-top: calc(clamp(1rem, 5svh, 6rem) + 5rem); padding-bottom: clamp(4.5rem, 11svh, 7rem); }
+.pm-hero-content { --pm-logo: clamp(3rem, 8svh, 5rem); padding-top: calc(clamp(1rem, 5svh, 6rem) + 4.5rem + env(safe-area-inset-top, 0px)); padding-bottom: clamp(3rem, 9svh, 7rem); }
 .pm-hero-logobox { margin-bottom: clamp(.75rem, 2.4svh, 1.5rem); }
 .pm-hero-logo    { width: var(--pm-logo); height: var(--pm-logo); }
 .pm-hero-ring    { width: calc(var(--pm-logo) * 2); height: calc(var(--pm-logo) * 2); }
@@ -1194,10 +1199,13 @@ html { scrollbar-gutter: stable; }
 /* Tombol panah (gaya Uiverse "Learn More"): lingkaran berisi panah melebar memenuhi tombol saat hover.
    Posisi relatif ada di .pm-ab-in (bukan .pm-ab) agar link meregang kartu (after:absolute) tetap memakai kartu sebagai acuan. */
 .pm-ab { --ab-fill: var(--color-brand-900, #0f2d21); --ab-text: var(--color-brand-900, #0f2d21); --ab-text-hover: #fff; --ab-arrow: #fff;
-  display: inline-flex; vertical-align: middle; border-radius: 999px; text-decoration: none; }
+  display: inline-flex; max-width: 100%; vertical-align: middle; border-radius: 999px; text-decoration: none; }
 .pm-ab-light { --ab-fill: #fff; --ab-text: #fff; --ab-text-hover: var(--color-brand-900, #0f2d21); --ab-arrow: var(--color-brand-900, #0f2d21); }
-.pm-ab-in { position: relative; display: flex; flex: 1; align-items: center; justify-content: center; min-height: 3rem; padding: 0 1.25rem 0 3.5rem;
+.pm-ab-in { position: relative; display: flex; flex: 1; max-width: 100%; align-items: center; justify-content: center; min-height: 3rem; padding: 0 1.25rem 0 3.5rem;
   color: var(--ab-text); white-space: nowrap; transition: color 450ms cubic-bezier(.65,0,.076,1); }
+@media (max-width: 400px) {
+  .pm-ab-in { white-space: normal; text-align: left; padding: .5rem 1rem .5rem 3.5rem; line-height: 1.3; }
+}
 .pm-ab-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 3rem; border-radius: 999px; background: var(--ab-fill);
   transition: width 450ms cubic-bezier(.65,0,.076,1); }
 .pm-ab-arrow { position: absolute; top: 0; bottom: 0; left: .625rem; margin: auto 0; width: 1.125rem; height: .125rem; background: none;
@@ -1889,15 +1897,16 @@ export default function LandingPage({
     return () => io.disconnect();
   }, []);
 
-  // Hero setinggi tepat satu layar: tinggi viewport dikurangi apa pun yang ada di atas hero (mis. navbar)
+  // Hero setinggi minimal satu layar: tinggi viewport dikurangi apa pun yang ada di atas hero (mis. navbar)
+  // Menggunakan minHeight agar konten tidak terpotong di layar HP pendek (320px/360px)
   useEffect(() => {
     const fit = () => {
       const el = heroRef.current;
       if (!el) return;
       const offsetTop = el.getBoundingClientRect().top + window.scrollY;
       const top = Math.round(offsetTop);
-      el.style.height = `calc(100vh - ${top}px)`; // fallback browser lama
-      el.style.height = `calc(100svh - ${top}px)`; // diabaikan jika svh tidak didukung
+      el.style.minHeight = `calc(100vh - ${top}px)`; // fallback browser lama
+      el.style.minHeight = `calc(100svh - ${top}px)`; // diabaikan jika svh tidak didukung
     };
     fit();
     window.addEventListener("resize", fit);
@@ -2024,7 +2033,7 @@ export default function LandingPage({
           ))}
         </div>
 
-        <div className="pm-hero-content relative z-10 max-w-4xl mx-auto px-6 py-20 sm:py-24 text-center text-white">
+        <div className="pm-hero-content relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center text-white">
           <div className="pm-hero-logobox relative flex justify-center mb-6">
             {/* Cincin napas: mengembang & mengempis pelan, merujuk ke modul Breathing Calm */}
             <div
@@ -2046,7 +2055,7 @@ export default function LandingPage({
               style={{ opacity: play ? 1 : 0 }}
             />
           </div>
-          <h1 className="pm-hero-title mt-14 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] text-balance">
+          <h1 className="pm-hero-title mt-6 sm:mt-14 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] text-balance">
             {HERO_TITLE_WORDS.map((w, i) => (
               <React.Fragment key={`${w}-${i}`}>
                 <span
@@ -2128,7 +2137,7 @@ export default function LandingPage({
 
       {/* BEGIN: Tentang */}
       <section className="py-20 bg-white border-b border-slate-100" id="about">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div
             ref={aboutRef}
             data-show={aboutShow}
@@ -2290,7 +2299,7 @@ export default function LandingPage({
         className="py-20 bg-white border-t border-slate-100"
         id="programs"
       >
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div
             ref={modHeadRef}
             data-show={modHeadShow}
@@ -2401,24 +2410,24 @@ export default function LandingPage({
 
       {/* BEGIN: Simulator Hope Tree */}
       <section
-        className="py-20 bg-white border-t border-slate-100"
+        className="py-14 sm:py-20 bg-white border-t border-slate-100"
         id="calculator"
       >
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div
             ref={simRef}
             data-show={simShow}
-            className="pm-flow relative overflow-hidden rounded-2xl border border-brand-100 bg-cover bg-center p-8 sm:p-12"
+            className="pm-flow relative overflow-hidden rounded-2xl border border-brand-100 bg-cover bg-center p-5 sm:p-8 lg:p-12"
             style={{ backgroundImage: `url(${hutanPinus.src})` }}
           >
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-950/70 via-brand-950/45 to-brand-950/25"
             />
-            {/* Partikel WebGL (React Bits) di atas hutan; muncul perlahan saat section terlihat */}
+            {/* Partikel WebGL (React Bits) di atas hutan; disembunyikan di mobile (< sm) untuk hemat baterai & GPU */}
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0"
+              className="pointer-events-none absolute inset-0 hidden sm:block"
               style={{
                 opacity: simShow ? 1 : 0,
                 transition: "opacity 900ms ease",
@@ -2547,7 +2556,7 @@ export default function LandingPage({
                             className="peer sr-only"
                           />
                           <span
-                            className={`block rounded-lg px-2 py-2 text-center transition-colors duration-300 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white ${duration === d.v
+                            className={`flex min-h-11 flex-col justify-center rounded-lg px-2 py-2 text-center transition-colors duration-300 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white ${duration === d.v
                               ? "text-brand-900"
                               : "text-white/85 hover:text-white"
                               }`}
@@ -2654,7 +2663,7 @@ export default function LandingPage({
                     </ol>
 
                     <dl className="mt-5 space-y-3 text-sm">
-                      <div className="flex justify-between items-center gap-4">
+                      <div className="flex flex-wrap justify-between items-center gap-x-4 gap-y-1">
                         <dt className="text-slate-600">Tingkat resiliensi</dt>
                         <dd
                           key={level.name}
@@ -2664,7 +2673,7 @@ export default function LandingPage({
                           {level.name}
                         </dd>
                       </div>
-                      <div className="flex justify-between items-center gap-4">
+                      <div className="flex flex-wrap justify-between items-center gap-x-4 gap-y-1">
                         <dt className="text-slate-600">
                           Indeks ketahanan psikologis
                         </dt>
@@ -2676,7 +2685,7 @@ export default function LandingPage({
                           {level.status}
                         </dd>
                       </div>
-                      <div className="flex justify-between items-center gap-4">
+                      <div className="flex flex-wrap justify-between items-center gap-x-4 gap-y-1">
                         <dt className="text-slate-600">
                           Kesiapsiagaan tanggap bencana
                         </dt>
@@ -2973,15 +2982,15 @@ export default function LandingPage({
       {/* END: Testimoni */}
 
       {/* BEGIN: CTA */}
-      <section className="py-12 bg-white">
+      <section className="py-10 sm:py-12 bg-white">
         <div
           ref={ctaInRef}
           data-show={ctaShow}
-          className="pm-flow max-w-7xl mx-auto px-6"
+          className="pm-flow max-w-7xl mx-auto px-4 sm:px-6"
         >
           <div
             ref={ctaRef}
-            className="pm-hz pm-pop bg-brand-900 relative isolate overflow-hidden rounded-2xl p-8 sm:p-14 text-white"
+            className="pm-hz pm-pop bg-brand-900 relative isolate overflow-hidden rounded-2xl p-5 sm:p-10 lg:p-14 text-white"
           >
             {/* Latar aura Horizon: dekoratif, di bawah konten */}
             <div className="pm-hz-stage" aria-hidden="true">
@@ -3062,7 +3071,7 @@ export default function LandingPage({
           className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-300 to-transparent"
           aria-hidden="true"
         />
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-12">
             <div className="pm-sim-in lg:col-span-4 space-y-5" style={idx(0)}>
               <Link
@@ -3156,7 +3165,7 @@ export default function LandingPage({
                     onSubmit={handleNewsletterSubmit}
                   >
                     <input
-                      className="min-h-11 w-full rounded-full border border-slate-300 bg-white px-5 text-sm text-slate-800 placeholder:text-slate-500 transition-[border-color,box-shadow] duration-200 focus:outline-none focus:border-brand-600 focus:ring-4 focus:ring-brand-100"
+                      className="min-h-11 w-full rounded-full border border-slate-300 bg-white px-5 text-base sm:text-sm text-slate-800 placeholder:text-slate-500 transition-[border-color,box-shadow] duration-200 focus:outline-none focus:border-brand-600 focus:ring-4 focus:ring-brand-100"
                       placeholder="Alamat email"
                       aria-label="Alamat email"
                       autoComplete="email"
@@ -3192,19 +3201,19 @@ export default function LandingPage({
             </p>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
               <Link
-                className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
+                className={`inline-flex items-center min-h-11 sm:min-h-0 py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
                 href="#privacy"
               >
                 Perlindungan data anak
               </Link>
               <Link
-                className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
+                className={`inline-flex items-center min-h-11 sm:min-h-0 py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
                 href="#terms"
               >
                 Ketentuan layanan
               </Link>
               <Link
-                className={`py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
+                className={`inline-flex items-center min-h-11 sm:min-h-0 py-1 rounded-sm hover:text-brand-800 transition-colors duration-200 ${focusRing}`}
                 href="#security"
               >
                 Protokol rujukan darurat 119

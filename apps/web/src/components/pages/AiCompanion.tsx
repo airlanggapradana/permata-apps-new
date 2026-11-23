@@ -150,8 +150,25 @@ export default function AiCompanion() {
 
   // Real tree stats from database
   const [treeStats, setTreeStats] = useState<TreeStats | null>(null);
+  const [mobileChatHeight, setMobileChatHeight] = useState<number | null>(null);
 
   const streamRef = useRef<HTMLDivElement>(null);
+  const chatCardRef = useRef<HTMLDivElement>(null);
+
+  // SSR-safe visualViewport resize listener for mobile virtual keyboard
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const handleViewportResize = () => {
+      if (window.innerWidth < 1024 && window.innerHeight - vv.height > 120) {
+        setMobileChatHeight(Math.max(300, Math.floor(vv.height - 84)));
+      } else {
+        setMobileChatHeight(null);
+      }
+    };
+    vv.addEventListener("resize", handleViewportResize);
+    return () => vv.removeEventListener("resize", handleViewportResize);
+  }, []);
 
   // Fetch real Hope Tree stats on mount
   useEffect(() => {
@@ -491,14 +508,14 @@ ${buildPersonaGreeting(persona)}`,
   ];
 
   return (
-    <div className="w-full bg-[#f7f9fb] text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen flex flex-col justify-between">
+    <div className="w-full bg-canvas text-[#191c1e] antialiased selection:bg-action selection:text-white min-h-screen-safe flex flex-col justify-between">
       {/* MAIN CONTENT */}
-      <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 flex flex-col gap-8 pb-12">
+      <main className="w-full bg-canvas min-h-[calc(100dvh-20rem)] py-5 sm:py-8">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 flex flex-col gap-5 sm:gap-8 pb-8 sm:pb-12">
           {/* Section 1: Header, Breadcrumbs & Security Badges */}
           <AnimatedSection index={0}>
-            <div className="flex flex-col gap-4">
-              <nav className="flex items-center gap-2 font-label-sm text-label-sm text-[#414844]">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <nav className="flex flex-wrap items-center gap-1.5 sm:gap-2 font-label-sm text-label-sm text-[#414844]">
                 <Link
                   className="hover:text-[#012d1d] transition-colors flex items-center gap-1"
                   href="/"
@@ -561,10 +578,10 @@ ${buildPersonaGreeting(persona)}`,
 
           {/* Section 1b: Persona Picker */}
           <AnimatedSection index={1}>
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 md:p-6 flex flex-col gap-4">
+            <div className="bg-white rounded-xl shadow-sm border border-line p-4 sm:p-5 md:p-6 flex flex-col gap-3 sm:gap-4">
               <div className="flex flex-col gap-1">
-                <h2 className="font-headline-sm text-headline-sm text-[#012d1d] font-bold flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#006c48] text-[22px]">
+                <h2 className="font-headline-sm text-headline-sm text-fg-brand font-bold flex items-center gap-2">
+                  <span className="material-symbols-outlined text-fg-brand text-[22px]">
                     diamond
                   </span>
                   Pilih Teman Bicaramu
@@ -578,7 +595,7 @@ ${buildPersonaGreeting(persona)}`,
               <div
                 role="radiogroup"
                 aria-label="Pilih persona chatbot"
-                className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3"
+                className="grid grid-cols-2 xl:grid-cols-4 gap-2.5 sm:gap-3"
               >
                 {AI_PERSONAS.map((p) => {
                   const active = p.id === personaId;
@@ -590,7 +607,7 @@ ${buildPersonaGreeting(persona)}`,
                       aria-checked={active}
                       disabled={loading}
                       onClick={() => handleSelectPersona(p.id)}
-                      className={`text-left p-4 rounded-xl border-2 transition-all flex items-start gap-3 disabled:opacity-60 ${
+                      className={`text-left p-3 sm:p-4 rounded-xl border-2 transition-all flex flex-col sm:flex-row items-start gap-2 sm:gap-3 min-h-14 disabled:opacity-60 ${
                         active
                           ? "shadow-sm"
                           : "border-slate-100 bg-[#f7f9fb] hover:bg-white hover:shadow-sm"
@@ -601,23 +618,23 @@ ${buildPersonaGreeting(persona)}`,
                           : undefined
                       }
                     >
-                      <PersonaAvatar persona={p} size={64} />
+                      <PersonaAvatar persona={p} size={48} className="sm:w-16 sm:h-16" />
                       <span className="flex flex-col gap-0.5 min-w-0">
                         <span
-                          className="font-headline-sm text-base font-bold flex items-center gap-1.5"
+                          className="font-headline-sm text-sm sm:text-base font-bold flex items-center gap-1"
                           style={{ color: active ? p.softText : "#012d1d" }}
                         >
-                          {p.name}
+                          <span className="truncate">{p.name}</span>
                           {active && (
-                            <span className="material-symbols-outlined text-[18px]">
+                            <span className="material-symbols-outlined text-[16px] sm:text-[18px] shrink-0">
                               check_circle
                             </span>
                           )}
                         </span>
-                        <span className="text-xs font-semibold text-[#414844]">
+                        <span className="text-[11px] sm:text-xs font-semibold text-[#414844] line-clamp-2">
                           {p.tagline}
                         </span>
-                        <span className="text-xs text-[#414844]/80 italic">
+                        <span className="hidden sm:inline text-xs text-[#414844]/80 italic">
                           “{p.slogan}”
                         </span>
                       </span>
@@ -626,8 +643,32 @@ ${buildPersonaGreeting(persona)}`,
                 })}
               </div>
 
+              <details className="sm:hidden rounded-xl overflow-hidden" style={{ backgroundColor: persona.soft, color: persona.softText }}>
+                <summary className="min-h-11 px-4 py-2.5 text-sm font-semibold cursor-pointer flex items-center justify-between gap-2">
+                  <span>Tentang {persona.name}: {persona.tagline}</span>
+                  <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                </summary>
+                <div className="px-4 pb-4 pt-1 flex flex-col gap-2.5">
+                  <p className="text-sm leading-relaxed">{persona.persona}</p>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {persona.traits.map((trait) => (
+                      <span
+                        key={trait}
+                        className="px-2.5 py-1 rounded-full bg-white/75 text-xs font-semibold"
+                      >
+                        {trait}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-xs opacity-90">
+                    <strong>{persona.name}</strong> terinspirasi dari{" "}
+                    {persona.gem.toLowerCase()}: {persona.meaning} {persona.fit}
+                  </p>
+                </div>
+              </details>
+
               <div
-                className="rounded-xl p-4 flex flex-col sm:flex-row items-center gap-4"
+                className="hidden sm:flex rounded-xl p-4 flex-col sm:flex-row items-center gap-4"
                 style={{
                   backgroundColor: persona.soft,
                   color: persona.softText,
@@ -666,67 +707,78 @@ ${buildPersonaGreeting(persona)}`,
             {/* COLUMN 1: Interaktif Chat Workspace (Col-span-8) */}
             <section className="lg:col-span-8 flex flex-col gap-4">
               <AnimatedSection index={2}>
-                <div className="bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col overflow-hidden">
+                <div
+                  ref={chatCardRef}
+                  style={
+                    mobileChatHeight
+                      ? { height: `${mobileChatHeight}px` }
+                      : undefined
+                  }
+                  className="bg-white rounded-xl shadow-sm border border-line flex flex-col overflow-hidden h-[calc(100dvh-10.5rem)] min-h-[460px] lg:h-auto lg:min-h-0"
+                >
                   {/* Workspace Header & Cultural Selector */}
-                  <div className="bg-[#f2f4f6]/80 px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-slate-100">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <PersonaAvatar persona={persona} size={44} />
-                        <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#006c48] ring-2 ring-white"></span>
+                  <div className="bg-[#f2f4f6]/80 px-3.5 sm:px-6 py-3 sm:py-4 flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 border-b border-line shrink-0">
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                      <div className="relative shrink-0">
+                        <PersonaAvatar persona={persona} size={40} className="sm:w-11 sm:h-11" />
+                        <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-action ring-2 ring-white"></span>
                       </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className="font-headline-sm text-headline-sm text-[#012d1d] font-bold">
+                      <div className="flex flex-col min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                          <span className="font-headline-sm text-base sm:text-headline-sm text-fg-brand font-bold truncate">
                             {persona.name}
                           </span>
-                          <span className="px-2 py-0.5 rounded-full bg-[#c1ecd4] text-[#274e3d] font-label-sm text-label-sm font-semibold">
+                          <span className="px-2 py-0.5 rounded-full bg-tint text-fg-brand font-label-sm text-xs font-semibold shrink-0">
                             Ramah Anak
                           </span>
                         </div>
-                        <span className="font-label-sm text-label-sm text-[#414844]">
+                        <span className="font-label-sm text-xs text-[#414844] truncate">
                           {persona.slogan}
                         </span>
                       </div>
                     </div>
 
                     {/* Cultural Modality Switcher & Reset */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                       <span className="font-label-sm text-label-sm text-[#414844] hidden sm:inline">
                         Sentuhan:
                       </span>
-                      <div className="inline-flex p-1 rounded-xl bg-[#eceef0] gap-1">
+                      <div className="inline-flex p-1 rounded-xl bg-[#eceef0] gap-1 flex-1 sm:flex-initial">
                         <button
                           type="button"
                           onClick={() => setCulture("aceh")}
-                          className={`px-3 py-1 rounded-lg text-label-sm font-label-sm font-semibold transition-all flex items-center gap-1.5 ${
+                          className={`flex-1 sm:flex-initial min-h-11 sm:min-h-9 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                             culture === "aceh"
-                              ? "bg-white text-[#012d1d] shadow-sm"
-                              : "text-[#414844] hover:text-[#012d1d]"
+                              ? "bg-white text-fg-brand shadow-sm"
+                              : "text-[#414844] hover:text-fg"
                           }`}
                         >
-                          <span className="w-2 h-2 rounded-full bg-[#006c48]"></span>
-                          <span>Aceh (Meuseuraya)</span>
+                          <span className="w-2 h-2 rounded-full bg-[#006c48] shrink-0"></span>
+                          <span className="truncate">Aceh</span>
+                          <span className="hidden sm:inline">(Meuseuraya)</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setCulture("kalimantan")}
-                          className={`px-3 py-1 rounded-lg text-label-sm font-label-sm font-medium transition-all flex items-center gap-1.5 ${
+                          className={`flex-1 sm:flex-initial min-h-11 sm:min-h-9 px-2.5 sm:px-3 py-1 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
                             culture === "kalimantan"
-                              ? "bg-white text-[#012d1d] shadow-sm font-semibold"
-                              : "text-[#414844] hover:text-[#012d1d]"
+                              ? "bg-white text-fg-brand shadow-sm font-semibold"
+                              : "text-[#414844] hover:text-fg"
                           }`}
                         >
-                          <span className="w-2 h-2 rounded-full bg-[#a62b1f]"></span>
-                          <span>Kalimantan (Dayak)</span>
+                          <span className="w-2 h-2 rounded-full bg-[#a62b1f] shrink-0"></span>
+                          <span className="truncate">Kalimantan</span>
+                          <span className="hidden sm:inline">(Dayak)</span>
                         </button>
                       </div>
                       <button
                         type="button"
                         onClick={handleResetSession}
-                        className="w-9 h-9 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#414844] hover:text-[#012d1d] flex items-center justify-center transition-colors"
+                        aria-label="Bersihkan Percakapan dan Mulai Sesi Baru"
+                        className="min-w-11 min-h-11 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#414844] hover:text-fg flex items-center justify-center transition-colors shrink-0"
                         title="Bersihkan Percakapan & Mulai Sesi Baru"
                       >
-                        <span className="material-symbols-outlined text-[18px]">
+                        <span className="material-symbols-outlined text-[20px]">
                           restart_alt
                         </span>
                       </button>
@@ -734,17 +786,17 @@ ${buildPersonaGreeting(persona)}`,
                   </div>
 
                   {/* Safe Space Psychological Affirmation Banner */}
-                  <div className="px-6 py-2.5 bg-[#c1ecd4]/40 flex items-center justify-between gap-3 text-[#274e3d] font-label-sm text-label-sm border-b border-[#c1ecd4]/60">
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[#006c48] text-[18px]">
+                  <div className="px-3.5 sm:px-6 py-2 bg-tint flex items-center justify-between gap-3 text-fg-brand font-label-sm text-xs border-b border-line shrink-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="material-symbols-outlined text-fg-brand text-[18px] shrink-0">
                         spa
                       </span>
-                      <span>
+                      <span className="leading-snug">
                         Tempat ini adalah ruang amanmu. Apapun yang kamu
                         rasakan, perasaanmu valid, nyata, dan kamu berharga.
                       </span>
                     </div>
-                    <span className="hidden md:inline font-semibold text-[#006c48]">
+                    <span className="hidden md:inline font-semibold text-fg-brand shrink-0">
                       Protokol PFA Anak
                     </span>
                   </div>
@@ -752,7 +804,7 @@ ${buildPersonaGreeting(persona)}`,
                   {/* Conversation Stream Area */}
                   <div
                     ref={streamRef}
-                    className="p-6 md:p-8 flex flex-col gap-6 overflow-y-auto max-h-[640px] bg-[#f7f9fb] min-h-[380px]"
+                    className="flex-1 min-h-0 p-3.5 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 overflow-y-auto lg:max-h-[640px] bg-canvas lg:min-h-[380px]"
                   >
                     {/* Context Date Indicator */}
                     <div className="flex items-center justify-center">
@@ -770,9 +822,9 @@ ${buildPersonaGreeting(persona)}`,
                             key={msg.id}
                             className="p-5 rounded-xl bg-[#ffdad6] text-[#93000a] flex flex-col gap-3 max-w-2xl border border-red-200"
                           >
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
                               <div className="flex items-center gap-2 font-bold text-sm">
-                                <span className="material-symbols-outlined text-[20px]">
+                                <span className="material-symbols-outlined text-[20px] shrink-0">
                                   emergency
                                 </span>
                                 <span>
@@ -780,17 +832,17 @@ ${buildPersonaGreeting(persona)}`,
                                   Menemanimu
                                 </span>
                               </div>
-                              <span className="px-2 py-0.5 rounded-full bg-[#93000a] text-white text-[11px] font-bold">
+                              <span className="px-2 py-0.5 rounded-full bg-[#93000a] text-white text-[11px] font-bold shrink-0">
                                 24 Jam Bebas Pulsa
                               </span>
                             </div>
                             <p className="text-sm leading-relaxed">
                               {msg.content}
                             </p>
-                            <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-red-300">
+                            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2.5 pt-2 border-t border-red-300">
                               <a
                                 href="tel:119"
-                                className="px-4 py-2 rounded-xl bg-[#ba1a1a] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:opacity-90"
+                                className="min-h-11 px-4 py-2 rounded-xl bg-[#ba1a1a] text-white text-xs sm:text-sm font-bold inline-flex items-center justify-center gap-1.5 shadow-sm hover:opacity-90"
                               >
                                 <span className="material-symbols-outlined text-[16px]">
                                   call
@@ -799,7 +851,7 @@ ${buildPersonaGreeting(persona)}`,
                               </a>
                               <Link
                                 href="/tele-screening"
-                                className="px-4 py-2 rounded-xl bg-white text-[#93000a] text-xs font-semibold hover:bg-red-50 border border-red-200"
+                                className="min-h-11 px-4 py-2 rounded-xl bg-white text-[#93000a] text-xs sm:text-sm font-semibold hover:bg-red-50 border border-red-200 inline-flex items-center justify-center"
                               >
                                 Skrining Triase DASS-21
                               </Link>
@@ -842,19 +894,19 @@ ${buildPersonaGreeting(persona)}`,
                         return (
                           <div
                             key={msg.id}
-                            className="flex items-start gap-3.5 max-w-2xl animate-fade-in"
+                            className="flex items-start gap-2.5 sm:gap-3.5 max-w-2xl animate-fade-in min-w-0"
                           >
                             <PersonaAvatar
                               persona={msgPersona}
-                              size={44}
-                              className="mt-1"
+                              size={36}
+                              className="mt-1 sm:w-11 sm:h-11"
                             />
-                            <div className="flex flex-col gap-2 flex-1">
+                            <div className="flex flex-col gap-1.5 sm:gap-2 flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-headline-sm text-sm text-[#012d1d] font-semibold">
+                                <span className="font-headline-sm text-sm text-fg-brand font-semibold">
                                   {msgPersona.name}
                                 </span>
-                                <span className="px-2 py-0.5 rounded-full bg-[#92f7c3]/60 text-[#005235] font-label-sm text-xs font-medium">
+                                <span className="px-2 py-0.5 rounded-full bg-tint text-fg-brand font-label-sm text-xs font-medium">
                                   {culture === "kalimantan"
                                     ? "Resonansi Kalimantan"
                                     : "Resonansi Aceh"}
@@ -864,20 +916,20 @@ ${buildPersonaGreeting(persona)}`,
                                 </span>
                               </div>
 
-                              <div className="bg-white p-5 rounded-xl rounded-tl-sm shadow-sm text-[#191c1e] font-body-md text-body-md flex flex-col gap-3.5 border border-slate-100">
+                              <div className="bg-white p-3.5 sm:p-5 rounded-xl rounded-tl-sm shadow-sm text-[#191c1e] text-sm sm:text-base flex flex-col gap-3 sm:gap-3.5 border border-line break-words">
                                 <RichText text={msg.content} />
 
                                 {/* Cultural Wisdom Card Callout */}
                                 {msg.culturalWisdom && (
-                                  <div className="p-3.5 rounded-lg bg-[#f2f4f6] flex items-start gap-3 border-l-3 border-[#006c48]">
-                                    <span className="material-symbols-outlined text-[#f48c24] text-[22px] shrink-0 mt-0.5">
+                                  <div className="p-3 sm:p-3.5 rounded-lg bg-[#f2f4f6] flex items-start gap-2.5 sm:gap-3 border-l-3 border-action">
+                                    <span className="material-symbols-outlined text-[#f48c24] text-[20px] sm:text-[22px] shrink-0 mt-0.5">
                                       auto_awesome
                                     </span>
-                                    <div className="flex flex-col gap-1">
-                                      <span className="font-headline-sm text-sm text-[#012d1d] font-bold">
+                                    <div className="flex flex-col gap-1 min-w-0">
+                                      <span className="font-headline-sm text-sm text-fg-brand font-bold">
                                         {msg.culturalWisdom.title}
                                       </span>
-                                      <p className="italic text-xs text-[#012d1d] font-medium">
+                                      <p className="italic text-xs text-fg font-medium">
                                         {msg.culturalWisdom.quote}
                                       </p>
                                       <p className="font-body-sm text-body-sm text-[#414844] text-xs">
@@ -889,11 +941,11 @@ ${buildPersonaGreeting(persona)}`,
 
                                 {/* Action Buttons inside Bubble */}
                                 {msg.hasActionButtons && (
-                                  <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                                  <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 pt-1">
                                     <button
                                       type="button"
                                       onClick={() => setBreathingActive(true)}
-                                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#012d1d] text-white font-label-md text-label-md font-semibold hover:opacity-95 shadow-sm transition-transform active:scale-95 text-xs sm:text-sm"
+                                      className="inline-flex items-center justify-center gap-2 min-h-11 px-4 py-2 rounded-xl bg-action text-white font-label-md font-semibold hover:bg-action-hover shadow-sm transition-transform active:scale-95 text-xs sm:text-sm"
                                     >
                                       <span className="material-symbols-outlined text-[18px]">
                                         air
@@ -902,7 +954,7 @@ ${buildPersonaGreeting(persona)}`,
                                     </button>
                                     <Link
                                       href="/journal"
-                                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#c1ecd4] text-[#274e3d] font-label-md text-label-md font-semibold hover:bg-[#92f7c3] transition-colors text-xs sm:text-sm"
+                                      className="inline-flex items-center justify-center gap-2 min-h-11 px-4 py-2 rounded-xl bg-tint text-fg-brand font-label-md font-semibold hover:opacity-90 transition-colors text-xs sm:text-sm"
                                     >
                                       <span className="material-symbols-outlined text-[18px]">
                                         edit_note
@@ -996,7 +1048,8 @@ ${buildPersonaGreeting(persona)}`,
                         <button
                           type="button"
                           onClick={() => setBreathingActive(false)}
-                          className="text-[#414844] hover:text-[#012d1d] p-1 rounded-lg hover:bg-black/5"
+                          aria-label="Tutup Panduan Napas"
+                          className="text-[#414844] hover:text-[#012d1d] min-w-11 min-h-11 inline-flex items-center justify-center rounded-lg hover:bg-black/5 shrink-0"
                           title="Tutup Panduan Napas"
                         >
                           <span className="material-symbols-outlined text-[20px]">
@@ -1007,14 +1060,14 @@ ${buildPersonaGreeting(persona)}`,
                     )}
 
                     {/* Crisis Safety Guardrail Banner */}
-                    <div className="p-3.5 rounded-xl bg-[#ffdad6]/80 text-[#93000a] flex items-center justify-between gap-4 border border-red-200">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#ba1a1a] text-white flex items-center justify-center shrink-0">
+                    <div className="p-3.5 rounded-xl bg-[#ffdad6]/90 text-[#93000a] flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-red-200">
+                      <div className="flex items-start sm:items-center gap-3 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-[#ba1a1a] text-white flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
                           <span className="material-symbols-outlined text-[18px]">
                             favorite
                           </span>
                         </div>
-                        <p className="font-body-sm text-body-sm text-xs sm:text-sm">
+                        <p className="font-body-sm text-body-sm text-xs sm:text-sm leading-relaxed">
                           Jika kamu merasa sangat kewalahan, sedih mendalam,
                           atau butuh teman bicara manusia langsung, konselor
                           psikologis anak di <strong>SafeConnect 119</strong>{" "}
@@ -1022,7 +1075,7 @@ ${buildPersonaGreeting(persona)}`,
                         </p>
                       </div>
                       <a
-                        className="px-3.5 py-1.5 rounded-lg bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold shrink-0 hover:opacity-90 text-xs shadow-sm"
+                        className="w-full sm:w-auto min-h-11 px-4 py-2 rounded-lg bg-[#ba1a1a] text-white font-label-md font-semibold inline-flex items-center justify-center shrink-0 hover:opacity-90 text-xs sm:text-sm shadow-sm"
                         href="tel:119"
                       >
                         Panggil 119
@@ -1031,7 +1084,7 @@ ${buildPersonaGreeting(persona)}`,
                   </div>
 
                   {/* Quick Suggestion Action Pills (Prompt Starters) */}
-                  <div className="px-6 pt-3 pb-2 bg-white flex items-center gap-2 overflow-x-auto border-t border-slate-100 no-scrollbar">
+                  <div className="px-3.5 sm:px-6 py-2 bg-white flex items-center gap-2 overflow-x-auto border-t border-line no-scrollbar shrink-0">
                     <span className="font-label-sm text-label-sm text-[#414844] shrink-0 flex items-center gap-1 font-semibold">
                       <span className="material-symbols-outlined text-[14px]">
                         tips_and_updates
@@ -1043,7 +1096,7 @@ ${buildPersonaGreeting(persona)}`,
                         key={i}
                         type="button"
                         onClick={() => handleSendMessage(starter.text)}
-                        className="shrink-0 px-3 py-1.5 rounded-full bg-[#eceef0] text-[#414844] hover:bg-[#c1ecd4] hover:text-[#012d1d] transition-colors font-label-sm text-label-sm font-medium"
+                        className="shrink-0 min-h-11 sm:min-h-9 px-3.5 py-1.5 rounded-full bg-[#eceef0] text-[#414844] hover:bg-tint hover:text-fg-brand transition-colors font-label-sm text-xs font-medium"
                       >
                         {starter.label}
                       </button>
@@ -1051,11 +1104,11 @@ ${buildPersonaGreeting(persona)}`,
                   </div>
 
                   {/* Chat Input Area */}
-                  <div className="p-4 md:p-6 bg-[#f2f4f6] flex flex-col gap-2 border-t border-slate-100">
+                  <div className="p-3 sm:p-4 md:p-6 bg-[#f2f4f6] flex flex-col gap-2 border-t border-line shrink-0">
                     {isRecording && (
-                      <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#ffdad6] text-[#93000a] text-xs font-semibold animate-pulse">
+                      <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-[#ffdad6] text-[#93000a] text-xs font-semibold animate-pulse">
                         <span className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-red-600"></span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0"></span>
                           Merekam Suara (0:
                           {recordingSeconds < 10
                             ? `0${recordingSeconds}`
@@ -1065,21 +1118,26 @@ ${buildPersonaGreeting(persona)}`,
                         <button
                           type="button"
                           onClick={() => setIsRecording(false)}
-                          className="underline"
+                          className="underline min-h-11 px-2"
                         >
                           Batal
                         </button>
                       </div>
                     )}
 
-                    <div className="relative flex items-center gap-3">
+                    <div className="relative flex items-center gap-2 sm:gap-3">
                       <button
                         type="button"
                         onClick={toggleMicRecording}
+                        aria-label={
+                          isRecording
+                            ? "Berhenti Merekam"
+                            : "Gunakan Catatan Suara"
+                        }
                         className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-all ${
                           isRecording
                             ? "bg-[#ba1a1a] text-white animate-pulse"
-                            : "bg-white text-[#414844] hover:text-[#006c48]"
+                            : "bg-white text-[#414844] hover:text-fg-brand"
                         }`}
                         title={
                           isRecording
@@ -1092,18 +1150,27 @@ ${buildPersonaGreeting(persona)}`,
                         </span>
                       </button>
 
-                      <div className="relative flex-1">
+                      <div className="relative flex-1 min-w-0">
                         <input
                           type="text"
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={handleKeyDown}
+                          onFocus={() => {
+                            if (window.innerWidth < 1024) {
+                              chatCardRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "nearest",
+                              });
+                            }
+                          }}
                           disabled={loading}
                           placeholder={`Tulis pesan untuk ${persona.name}...`}
-                          className="w-full h-12 pl-4 pr-12 rounded-xl bg-white text-[#191c1e] font-body-md text-body-md placeholder:text-[#414844]/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#006c48]/50 border border-slate-200"
+                          className="w-full h-12 pl-3.5 sm:pl-4 pr-11 rounded-xl bg-white text-[#191c1e] text-base font-body-md placeholder:text-[#414844]/60 shadow-sm focus:outline-none focus:ring-2 focus:ring-action/50 border border-slate-200"
                         />
                         <button
                           type="button"
+                          aria-label="Sisipkan simbol emosi tenang"
                           onClick={() =>
                             setInput((prev) =>
                               prev
@@ -1111,7 +1178,7 @@ ${buildPersonaGreeting(persona)}`,
                                 : "Saya merasa butuh menenangkan diri 🌿",
                             )
                           }
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#414844] hover:text-[#012d1d]"
+                          className="absolute right-0.5 top-1/2 -translate-y-1/2 w-11 h-11 inline-flex items-center justify-center text-[#414844] hover:text-fg-brand rounded-lg"
                           title="Simbol Emosi Alami"
                         >
                           <span className="material-symbols-outlined text-[20px]">
@@ -1124,10 +1191,11 @@ ${buildPersonaGreeting(persona)}`,
                         type="button"
                         onClick={() => handleSendMessage()}
                         disabled={loading || !input.trim()}
+                        aria-label="Kirim Pesan"
                         className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-transform active:scale-95 group ${
                           input.trim() && !loading
-                            ? "bg-[#1b4332] hover:bg-[#006c48] text-white"
-                            : "bg-[#eceef0] text-[#c1c8c2] cursor-not-allowed"
+                            ? "bg-action hover:bg-action-hover text-white"
+                            : "bg-[#eceef0] text-[#717973] cursor-not-allowed"
                         }`}
                         title="Kirim Pesan"
                       >
@@ -1342,21 +1410,23 @@ ${buildPersonaGreeting(persona)}`,
                     ].map((step, idx) => {
                       const isDone = groundingChecked[idx];
                       return (
-                        <div
+                        <button
                           key={step.count}
+                          type="button"
+                          aria-pressed={isDone}
                           onClick={() => toggleGroundingItem(idx)}
-                          className={`p-2.5 rounded-lg flex items-center justify-between gap-3 cursor-pointer transition-all border ${
+                          className={`w-full text-left min-h-11 p-2.5 rounded-lg flex items-center justify-between gap-3 cursor-pointer transition-all border ${
                             isDone
-                              ? "bg-[#c1ecd4]/50 border-emerald-300 text-[#005235]"
+                              ? "bg-tint border-action text-fg-brand"
                               : "bg-[#f2f4f6] border-transparent text-[#191c1e] hover:bg-[#eceef0]"
                           }`}
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
                             <span
-                              className={`w-6 h-6 rounded-full font-label-sm text-xs flex items-center justify-center font-bold ${
+                              className={`w-6 h-6 rounded-full font-label-sm text-xs flex items-center justify-center font-bold shrink-0 ${
                                 isDone
-                                  ? "bg-[#006c48] text-white"
-                                  : "bg-[#012d1d] text-white"
+                                  ? "bg-action text-white"
+                                  : "bg-emphasis text-white"
                               }`}
                             >
                               {step.count}
@@ -1366,13 +1436,13 @@ ${buildPersonaGreeting(persona)}`,
                             </span>
                           </div>
                           <span
-                            className={`material-symbols-outlined text-[18px] ${
-                              isDone ? "text-[#006c48]" : "text-slate-300"
+                            className={`material-symbols-outlined text-[18px] shrink-0 ${
+                              isDone ? "text-fg-brand" : "text-slate-400"
                             }`}
                           >
                             {isDone ? "check_circle" : "radio_button_unchecked"}
                           </span>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
@@ -1487,7 +1557,7 @@ ${buildPersonaGreeting(persona)}`,
                     psikologis darurat atau evakuasi medis krisis:
                   </p>
                   <a
-                    className="w-full py-2.5 rounded-xl bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-2 hover:opacity-95 shadow-sm transition-opacity text-sm"
+                    className="w-full min-h-11 py-2.5 rounded-xl bg-[#ba1a1a] text-white font-label-md text-label-md font-semibold flex items-center justify-center gap-2 hover:opacity-95 shadow-sm transition-opacity text-sm"
                     href="tel:119"
                   >
                     <span className="material-symbols-outlined text-[18px]">

@@ -311,13 +311,13 @@ export default function OfflineSurvival() {
   );
 
   return (
-    <main className="min-h-screen bg-canvas text-fg pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 space-y-8">
+    <main className="min-h-screen-safe bg-canvas text-fg pb-12 sm:pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-10 space-y-6 sm:space-y-8">
         {/* ================= ZONE 1: HEADER & OFFLINE READINESS ================= */}
         <AnimatedSection index={0}>
           <section
             aria-labelledby="survival-heading"
-            className="bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-xs"
+            className="bg-surface border border-line rounded-xl p-4 sm:p-6 lg:p-8 shadow-xs"
           >
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             <div className="space-y-3 max-w-[65ch]">
@@ -468,7 +468,7 @@ export default function OfflineSurvival() {
           <div
             role="tablist"
             aria-label="Kategori panduan keselamatan offline"
-            className="flex flex-wrap gap-2 bg-surface border border-line p-1.5 rounded-lg"
+            className="grid grid-cols-1 sm:flex sm:flex-wrap gap-1.5 sm:gap-2 bg-surface border border-line p-1.5 rounded-lg"
           >
             {(
               [
@@ -544,7 +544,7 @@ export default function OfflineSurvival() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari: gempa, luka bakar, panik..."
-                className={`w-full min-h-11 bg-surface border border-line-input rounded-md pl-10 pr-4 text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
+                className={`w-full min-h-11 bg-surface border border-line-input rounded-md pl-10 pr-4 text-base sm:text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
               />
             </div>
           </div>
@@ -600,7 +600,7 @@ export default function OfflineSurvival() {
               <>
                 {/* Disaster Topic Selector */}
                 <div
-                  className="flex flex-wrap gap-2.5"
+                  className="flex flex-nowrap overflow-x-auto no-scrollbar pb-1 -mx-1 px-1 sm:mx-0 sm:px-0 sm:pb-0 sm:flex-wrap gap-2 sm:gap-2.5"
                   role="group"
                   aria-label="Pilih situasi bencana atau pertolongan pertama"
                 >
@@ -612,7 +612,7 @@ export default function OfflineSurvival() {
                         type="button"
                         onClick={() => setSelectedTopicId(guide.id)}
                         aria-pressed={isSelected}
-                        className={`inline-flex items-center gap-2 min-h-11 px-4 py-2 rounded-full border text-sm font-medium transition-colors ${focusRing} ${
+                        className={`shrink-0 inline-flex items-center gap-2 min-h-11 px-4 py-2 rounded-full border text-sm font-medium transition-colors ${focusRing} ${
                           isSelected
                             ? "bg-tint border-action text-fg-brand"
                             : "bg-surface border-line-strong text-fg-muted hover:bg-sunken hover:text-fg"
@@ -629,7 +629,7 @@ export default function OfflineSurvival() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   {/* Left: Immediate Steps & First Aid */}
                   <div className="lg:col-span-8 space-y-6">
-                    <article className="bg-surface border border-line rounded-lg p-6 sm:p-8 shadow-xs space-y-6">
+                    <article className="bg-surface border border-line rounded-lg p-4 sm:p-6 lg:p-8 shadow-xs space-y-5 sm:space-y-6">
                       <div className="space-y-2 border-b border-line pb-5">
                         <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-fg-brand">
                           {TOPIC_ICONS[activePhysicalGuide.id]}
@@ -1245,7 +1245,7 @@ export default function OfflineSurvival() {
                         }))
                       }
                       placeholder="Nama lengkap atau nama panggilan"
-                      className={`w-full min-h-11 bg-surface border border-line-input rounded-md px-4 text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
+                      className={`w-full min-h-11 bg-surface border border-line-input rounded-md px-4 text-base sm:text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
                     />
                   </div>
 
@@ -1267,7 +1267,7 @@ export default function OfflineSurvival() {
                         }))
                       }
                       placeholder="Contoh: Lapangan Balai Desa / Halaman Masjid"
-                      className={`w-full min-h-11 bg-surface border border-line-input rounded-md px-4 text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
+                      className={`w-full min-h-11 bg-surface border border-line-input rounded-md px-4 text-base sm:text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
                     />
                   </div>
 
@@ -1289,7 +1289,7 @@ export default function OfflineSurvival() {
                         }))
                       }
                       placeholder="Contoh: Ibu / Wali - 08xx-xxxx-xxxx"
-                      className={`w-full min-h-11 bg-surface border border-line-input rounded-md px-4 text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
+                      className={`w-full min-h-11 bg-surface border border-line-input rounded-md px-4 text-base sm:text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
                     />
                   </div>
 
@@ -1311,14 +1311,14 @@ export default function OfflineSurvival() {
                         }))
                       }
                       placeholder="Contoh: Golongan darah O, asma (bawa inhaler)"
-                      className={`w-full bg-surface border border-line-input rounded-md p-3.5 text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
+                      className={`w-full bg-surface border border-line-input rounded-md p-3.5 text-base sm:text-sm text-fg placeholder:text-fg-subtle ${focusRing}`}
                     />
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-3">
                     <button
                       type="submit"
-                      className={`inline-flex items-center justify-center min-h-11 px-5 rounded-md bg-action hover:bg-action-hover text-white text-sm font-medium transition-colors ${focusRing}`}
+                      className={`w-full sm:w-auto inline-flex items-center justify-center min-h-11 px-5 rounded-md bg-action hover:bg-action-hover text-white text-sm font-medium transition-colors ${focusRing}`}
                     >
                       Simpan di Perangkat
                     </button>
@@ -1405,14 +1405,14 @@ export default function OfflineSurvival() {
 
                       <a
                         href={item.dialHref}
-                        className={`inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-md bg-surface border border-line-strong hover:bg-sunken text-fg text-sm font-medium shrink-0 transition-colors ${focusRing}`}
+                        className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-md bg-action hover:bg-action-hover text-white sm:bg-surface sm:border sm:border-line-strong sm:hover:bg-sunken sm:text-fg text-sm font-semibold sm:font-medium shrink-0 transition-colors ${focusRing}`}
                       >
                         <Phone
                           size={15}
                           strokeWidth={1.75}
                           aria-hidden="true"
                         />
-                        <span>Panggil</span>
+                        <span>Panggil {item.number}</span>
                       </a>
                     </div>
                   ))}

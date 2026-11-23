@@ -34,7 +34,7 @@
   position: relative;
   width: min(1120px, calc(100% - 32px));
   margin: auto;
-  padding: 24px 0;
+  padding: max(20px, env(safe-area-inset-top)) max(0px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(0px, env(safe-area-inset-left));
 }
 .heading {
   margin: 22px 0 28px;
@@ -92,7 +92,7 @@
 .exit {
   position: absolute;
   top: max(14px, env(safe-area-inset-top));
-  left: 14px;
+  left: max(14px, env(safe-area-inset-left));
   z-index: 24;
   display: flex;
   align-items: center;
@@ -129,8 +129,8 @@
 .hud {
   position: absolute;
   top: max(14px, env(safe-area-inset-top));
-  left: 68px;
-  right: 14px;
+  left: calc(68px + env(safe-area-inset-left, 0px));
+  right: max(14px, env(safe-area-inset-right));
   z-index: 12;
   display: flex;
   justify-content: space-between;
@@ -139,6 +139,9 @@
   pointer-events: none;
 }
 .stats {
+  min-width: 0;
+  flex: 1;
+  max-width: 340px;
   border: 1px solid #efd39b9c;
   border-radius: 18px;
   padding: 10px 14px;
@@ -174,6 +177,7 @@
 }
 .actions {
   display: flex;
+  flex-shrink: 0;
   gap: 8px;
   pointer-events: auto;
 }
@@ -205,8 +209,8 @@
 }
 .controls {
   position: absolute;
-  left: 16px;
-  right: 16px;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
   bottom: max(18px, env(safe-area-inset-bottom));
   z-index: 12;
   display: flex;
@@ -324,8 +328,8 @@
     display: inline;
   }
   .hud {
-    left: 220px;
-    right: 20px;
+    left: calc(220px + env(safe-area-inset-left, 0px));
+    right: max(20px, env(safe-area-inset-right));
   }
   .stats {
     padding: 12px 18px;
@@ -334,9 +338,9 @@
     font-size: 18px;
   }
   .controls {
-    left: 28px;
-    right: 28px;
-    bottom: 24px;
+    left: max(28px, env(safe-area-inset-left));
+    right: max(28px, env(safe-area-inset-right));
+    bottom: max(24px, env(safe-area-inset-bottom));
   }
   .control {
     width: 80px;
@@ -362,7 +366,7 @@
   }
   .hud {
     gap: 6px;
-    right: 10px;
+    right: max(10px, env(safe-area-inset-right));
   }
   .feedback {
     top: 108px;
@@ -395,7 +399,7 @@
     height: 70px;
   }
   .controls {
-    bottom: 10px;
+    bottom: max(10px, env(safe-area-inset-bottom));
   }
 }
 @media (prefers-reduced-motion: no-preference) {

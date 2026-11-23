@@ -338,6 +338,28 @@ h1, h2, h3, h4, .font-display {
   text-wrap: balance;
 }
 
+/* Mobile-first utilities: dynamic viewport height, safe areas, iOS input zoom guard */
+.min-h-screen-safe {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+}
+
 @keyframes bounceSubtle {
   0%, 100% {
     transform: translateY(0);

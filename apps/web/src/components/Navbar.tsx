@@ -2,7 +2,16 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { LogOut, User } from "lucide-react";
+import {
+  BookOpen,
+  Home,
+  LayoutGrid,
+  LogOut,
+  MessageCircle,
+  ShieldAlert,
+  ShieldCheck,
+  User,
+} from "lucide-react";
 import { useCulture } from "@/context/CultureContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -27,6 +36,40 @@ const LOCATIONS = [
   { key: "aceh", label: "Aceh", note: "Meuseuraya" },
   { key: "kalimantan", label: "Kalimantan", note: "Gotong Royong Dayak" },
 ] as const;
+
+const MOBILE_BOTTOM_NAV = [
+  { href: "/", label: "Beranda", icon: Home, match: (p: string) => p === "/" },
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: LayoutGrid,
+    match: (p: string) => p === "/dashboard",
+  },
+  {
+    href: "/jurnal",
+    label: "Jurnal",
+    icon: BookOpen,
+    match: (p: string) => p === "/jurnal" || p === "/journal",
+  },
+  {
+    href: "/ai-companion",
+    label: "Sahabat AI",
+    icon: MessageCircle,
+    match: (p: string) => p === "/ai-companion",
+  },
+  {
+    href: "/offline-survival",
+    label: "Siaga",
+    icon: ShieldAlert,
+    match: (p: string) => p === "/offline-survival",
+  },
+] as const;
+
+const MOBILE_EXTRA_LINKS = [
+  { href: "/tele-screening", label: "Tele-Screening DASS-21" },
+  { href: "/mood-food", label: "Mood + Food Analyzer" },
+  { href: "/roleplay", label: "Roleplay Psikoedukasi" },
+];
 
 type Tone = "light" | "dark";
 
@@ -274,10 +317,14 @@ export default function Navbar({
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [overHero, setOverHero] = useState(true);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const progressRef = useRef<HTMLSpanElement>(null);
+  const { culture, setCulture } = useCulture();
   const { user, isLoading: authLoading, logout } = useAuth();
 
   const isLanding = currentPath === "/";
+  const isGameRoute = currentPath.startsWith("/game-");
+  const showBottomNav = !isGameRoute && !keyboardOpen;
   // Gelap hanya saat kapsul masih menumpang di atas foto hero dan menu seluler tertutup.
   const tone: Tone = isLanding && overHero && !menuOpen ? "dark" : "light";
   const dark = tone === "dark";
@@ -291,6 +338,29 @@ export default function Navbar({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [menuOpen]);
+
+  // Sembunyikan bottom nav saat keyboard virtual terbuka di perangkat seluler (aman-SSR).
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const updateKeyboard = () => {
+      const active = document.activeElement;
+      const isTextField =
+        active instanceof HTMLInputElement ||
+        active instanceof HTMLTextAreaElement ||
+        (active instanceof HTMLElement && active.isContentEditable);
+      const heightDiff = window.innerHeight - vv.height;
+      setKeyboardOpen(isTextField && heightDiff > 140);
+    };
+    vv.addEventListener("resize", updateKeyboard);
+    window.addEventListener("focusin", updateKeyboard);
+    window.addEventListener("focusout", updateKeyboard);
+    return () => {
+      vv.removeEventListener("resize", updateKeyboard);
+      window.removeEventListener("focusin", updateKeyboard);
+      window.removeEventListener("focusout", updateKeyboard);
+    };
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -354,22 +424,22 @@ export default function Navbar({
 
   // Landing: kapsul melayang. Halaman lain: bilah menempel di atas seperti sebelumnya.
   const headerClass = isLanding
-    ? "fixed inset-x-0 top-0 z-50 px-3 sm:px-6 pt-3 pointer-events-none"
-    : `sticky top-0 z-50 border-b backdrop-blur-md transition-[background-color,box-shadow,border-color] duration-300 ${scrolled
-      ? "bg-white/80 border-slate-200/80 shadow-sm shadow-slate-900/5"
+    ? "fixed inset-x-0 top-0 z-50 px-3 sm:px-6 pt-[max(0.75rem,env(safe-area-inset-top,0px))] pointer-events-none"
+    : `sticky top-0 z-50 pt-[env(safe-area-inset-top,0px)] border-b backdrop-blur-md transition-[background-color,box-shadow,border-color] duration-300 ${scrolled
+      ? "bg-white/85 border-slate-200/80 shadow-sm shadow-slate-900/5"
       : "bg-white/95 border-slate-200"
     }`;
 
   const shellClass = isLanding
     ? `pointer-events-auto relative max-w-7xl mx-auto rounded-[2rem] border backdrop-blur-xl transition-[background-color,border-color,box-shadow] duration-300 ${dark
       ? "bg-slate-950/35 border-white/15 shadow-lg shadow-black/20"
-      : "bg-white/85 border-slate-200/80 shadow-lg shadow-slate-900/10"
+      : "bg-white/90 border-slate-200/80 shadow-lg shadow-slate-900/10"
     }`
     : "";
 
   const rowClass = isLanding
-    ? "h-16 pl-4 pr-2.5 sm:pl-5 sm:pr-3 flex items-center justify-between gap-4"
-    : `max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4 transition-[height] duration-300 ${ease} ${scrolled ? "h-16" : "h-20"
+    ? "h-15 sm:h-16 pl-3 pr-2 sm:pl-5 sm:pr-3 flex items-center justify-between gap-2 sm:gap-4"
+    : `max-w-7xl mx-auto px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4 transition-[height] duration-300 ${ease} ${scrolled ? "h-15 sm:h-16" : "h-16 sm:h-20"
     }`;
 
   const navLinkTone = (isActive: boolean) =>
@@ -377,14 +447,18 @@ export default function Navbar({
       ? `text-white/90 hover:text-white after:bg-white ${isActive ? "text-white after:scale-x-100" : ""}`
       : `hover:text-brand-800 after:bg-brand-700 ${isActive ? "text-brand-800 after:scale-x-100" : ""}`;
 
+  const nextCulture = culture === "aceh" ? "kalimantan" : "aceh";
+  const currentCultureLabel = culture === "kalimantan" ? "Kalimantan" : "Aceh";
+
   return (
+    <>
     <header className={headerClass}>
       <div className={shellClass}>
         <div className={rowClass}>
           <Link
             href="/"
             onClick={closeMenu}
-            className={`group flex items-center gap-3 shrink-0 rounded-sm ${ring}`}
+            className={`group flex items-center gap-2 sm:gap-3 shrink-0 min-h-11 rounded-sm ${ring}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -392,18 +466,18 @@ export default function Navbar({
               alt="Logo PERMATA"
               width={40}
               height={40}
-              className={`w-10 h-10 object-contain shrink-0 transition-[transform,filter] duration-500 ${ease} group-hover:scale-105 group-hover:-rotate-3 ${dark ? "brightness-0 invert" : ""
+              className={`w-8 h-8 sm:w-10 sm:h-10 object-contain shrink-0 transition-[transform,filter] duration-500 ${ease} group-hover:scale-105 group-hover:-rotate-3 ${dark ? "brightness-0 invert" : ""
                 }`}
             />
             <div className="flex flex-col">
               <span
-                className={`text-lg sm:text-xl font-extrabold tracking-tight leading-none transition-colors duration-300 ${dark ? "text-white" : "text-slate-900"
+                className={`text-base sm:text-xl font-extrabold tracking-tight leading-none transition-colors duration-300 ${dark ? "text-white" : "text-slate-900"
                   }`}
               >
                 PERMATA
               </span>
               <span
-                className={`text-[11px] font-medium mt-1 transition-colors duration-300 ${dark ? "text-white/75" : "text-slate-600"
+                className={`hidden min-[380px]:block text-[11px] font-medium mt-0.5 sm:mt-1 transition-colors duration-300 ${dark ? "text-white/75" : "text-slate-600"
                   }`}
               >
                 Resiliensi Jiwa &amp; PFA Anak
@@ -487,32 +561,52 @@ export default function Navbar({
             )}
           </div>
 
-          <button
-            type="button"
-            className={`lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border transition-colors ${ring} ${dark
-              ? "border-white/30 text-white hover:bg-white/15"
-              : "border-slate-300 text-slate-800 hover:bg-slate-100"
-              }`}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            <span className="relative block w-5 h-4" aria-hidden="true">
-              <span
-                className={`absolute left-0 w-full h-0.5 rounded-full bg-current transition-all duration-300 ${ease} ${menuOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-0"
-                  }`}
-              />
-              <span
-                className={`absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 rounded-full bg-current transition-opacity duration-200 ${menuOpen ? "opacity-0" : "opacity-100"
-                  }`}
-              />
-              <span
-                className={`absolute left-0 w-full h-0.5 rounded-full bg-current transition-all duration-300 ${ease} ${menuOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0"
-                  }`}
-              />
-            </span>
-          </button>
+          <div className="lg:hidden flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setCulture(nextCulture)}
+              aria-label={`Lokasi budaya aktif: ${currentCultureLabel}. Ketuk untuk beralih ke ${nextCulture === "kalimantan" ? "Kalimantan" : "Aceh"}`}
+              className={`inline-flex items-center justify-center gap-1.5 min-h-11 min-w-11 px-2.5 sm:px-3.5 rounded-full border text-xs font-semibold transition-colors ${ring} ${dark
+                ? "border-white/30 bg-white/10 text-white hover:bg-white/20"
+                : "border-slate-300 bg-white text-slate-800 hover:bg-slate-100"
+                }`}
+            >
+              <PinIcon className="w-3.5 h-3.5 shrink-0" />
+              <span className="max-w-[74px] sm:max-w-none truncate">
+                {currentCultureLabel}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className={`inline-flex items-center justify-center gap-1.5 min-w-11 h-11 px-2.5 sm:px-3.5 rounded-full border transition-colors ${ring} ${dark
+                ? "border-white/30 text-white hover:bg-white/15"
+                : "border-slate-300 text-slate-800 hover:bg-slate-100"
+                }`}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              aria-label={menuOpen ? "Tutup menu" : "Buka menu"}
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span className="relative block w-5 h-4 shrink-0" aria-hidden="true">
+                <span
+                  className={`absolute left-0 w-full h-0.5 rounded-full bg-current transition-all duration-300 ${ease} ${menuOpen ? "top-1/2 -translate-y-1/2 rotate-45" : "top-0"
+                    }`}
+                />
+                <span
+                  className={`absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 rounded-full bg-current transition-opacity duration-200 ${menuOpen ? "opacity-0" : "opacity-100"
+                    }`}
+                />
+                <span
+                  className={`absolute left-0 w-full h-0.5 rounded-full bg-current transition-all duration-300 ${ease} ${menuOpen ? "top-1/2 -translate-y-1/2 -rotate-45" : "bottom-0"
+                    }`}
+                />
+              </span>
+              <span className="hidden min-[420px]:inline text-xs font-semibold">
+                {menuOpen ? "Tutup" : "Menu"}
+              </span>
+            </button>
+          </div>
         </div>
 
         <div
@@ -523,14 +617,34 @@ export default function Navbar({
         >
           <div className="overflow-hidden">
             <div
-              className={`border-t border-slate-200 px-4 sm:px-6 py-4 flex flex-col gap-1 ${isLanding ? "" : "bg-white"
+              className={`border-t border-slate-200 px-4 sm:px-6 py-4 flex flex-col gap-2 max-h-[calc(100dvh-5.5rem)] overflow-y-auto ${isLanding ? "rounded-b-[2rem] bg-white/95" : "bg-white"
                 }`}
             >
+              {/* Akses Darurat & Keselamatan Cepat */}
+              <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-200">
+                <Link
+                  href="/offline-survival"
+                  onClick={closeMenu}
+                  className={`inline-flex items-center justify-center gap-1.5 min-h-11 px-3 rounded-xl bg-tint border border-[var(--brand-200)] text-fg-brand text-xs font-semibold transition-colors ${focusRing}`}
+                >
+                  <ShieldAlert size={15} strokeWidth={2} aria-hidden="true" />
+                  <span>Siaga Offline</span>
+                </Link>
+                <Link
+                  href="/safety-passport"
+                  onClick={closeMenu}
+                  className={`inline-flex items-center justify-center gap-1.5 min-h-11 px-3 rounded-xl bg-sunken border border-slate-200 text-slate-900 text-xs font-semibold transition-colors ${focusRing}`}
+                >
+                  <ShieldCheck size={15} strokeWidth={2} aria-hidden="true" />
+                  <span>Safety Passport</span>
+                </Link>
+              </div>
+
               <nav
                 aria-label="Navigasi utama (seluler)"
                 className="flex flex-col"
               >
-                {NAV_LINKS.map((link, i) => {
+                {[...NAV_LINKS, ...MOBILE_EXTRA_LINKS].map((link, i) => {
                   const isActive = currentPath === link.href;
                   return (
                     <Link
@@ -538,11 +652,11 @@ export default function Navbar({
                       href={link.href}
                       onClick={closeMenu}
                       aria-current={isActive ? "page" : undefined}
-                      style={{ transitionDelay: menuOpen ? `${80 + i * 60}ms` : "0ms" }}
-                      className={`flex items-center min-h-12 text-base font-medium rounded-sm transition-all duration-400 ${ease} ${focusRing} ${menuOpen
+                      style={{ transitionDelay: menuOpen ? `${40 + i * 35}ms` : "0ms" }}
+                      className={`flex items-center min-h-12 text-base font-medium rounded-lg px-2 transition-all duration-300 ${ease} ${focusRing} ${menuOpen
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 -translate-y-2"
-                        } ${isActive ? "text-brand-800 font-semibold" : "text-slate-800 hover:text-brand-700"}`}
+                        } ${isActive ? "text-brand-800 bg-brand-50 font-semibold" : "text-slate-800 hover:bg-slate-50 hover:text-brand-700"}`}
                     >
                       {link.label}
                     </Link>
@@ -550,20 +664,20 @@ export default function Navbar({
                 })}
               </nav>
               <div
-                style={{ transitionDelay: menuOpen ? "260ms" : "0ms" }}
-                className={`flex flex-col gap-3 pt-4 mt-2 border-t border-slate-200 transition-all duration-400 ${ease} ${menuOpen
+                style={{ transitionDelay: menuOpen ? "220ms" : "0ms" }}
+                className={`flex flex-col gap-3 pt-3 mt-1 border-t border-slate-200 transition-all duration-300 ${ease} ${menuOpen
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 -translate-y-2"
                   }`}
               >
-                <LocationMenu inline />
+                <LocationMenu inline onSelect={closeMenu} />
                 {!authLoading && user ? (
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       href="/dashboard"
                       onClick={closeMenu}
                       aria-current={currentPath === "/dashboard" ? "page" : undefined}
-                      className={`inline-flex items-center gap-2 min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
+                      className={`flex-1 inline-flex items-center justify-center gap-2 min-h-11 bg-brand-900 hover:bg-brand-950 text-white text-sm font-semibold px-4 rounded-full transition-colors duration-200 ${focusRing}`}
                     >
                       Dashboard ({user.childName})
                     </Link>
@@ -573,7 +687,7 @@ export default function Navbar({
                         closeMenu();
                         logout();
                       }}
-                      className={`inline-flex items-center min-h-11 px-4 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium ${focusRing}`}
+                      className={`inline-flex items-center justify-center min-h-11 px-4 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium ${focusRing}`}
                     >
                       Keluar
                     </button>
@@ -584,7 +698,7 @@ export default function Navbar({
                       href="/login"
                       onClick={closeMenu}
                       aria-current={currentPath === "/login" ? "page" : undefined}
-                      className={`inline-flex items-center min-h-11 px-4 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-sm font-semibold ${focusRing}`}
+                      className={`flex-1 inline-flex items-center justify-center min-h-11 px-4 rounded-full border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-sm font-semibold ${focusRing}`}
                     >
                       Masuk
                     </Link>
@@ -592,9 +706,9 @@ export default function Navbar({
                       href="/dashboard"
                       onClick={closeMenu}
                       aria-current={currentPath === "/dashboard" ? "page" : undefined}
-                      className={ctaClass}
+                      className={`flex-1 ${ctaClass}`}
                     >
-                      Akses Dashboard
+                      Dashboard
                       {ctaArrow}
                     </Link>
                   </div>
@@ -613,5 +727,47 @@ export default function Navbar({
         )}
       </div>
     </header>
+
+    {showBottomNav && (
+      <nav
+        aria-label="Navigasi bawah seluler"
+        className="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 backdrop-blur-md shadow-[0_-4px_16px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom,0px)]"
+      >
+        <ul className="grid grid-cols-5 items-stretch max-w-lg mx-auto">
+          {MOBILE_BOTTOM_NAV.map((item) => {
+            const Icon = item.icon;
+            const active = item.match(currentPath);
+            return (
+              <li key={item.href} className="min-w-0">
+                <Link
+                  href={item.href}
+                  onClick={closeMenu}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative flex flex-col items-center justify-center gap-0.5 min-h-14 px-0.5 min-[360px]:px-1 py-1.5 text-[10px] min-[360px]:text-[11px] tracking-tight min-[360px]:tracking-normal leading-tight transition-colors ${focusRing} ${
+                    active
+                      ? "text-fg-brand font-semibold"
+                      : "text-fg-muted hover:text-fg font-medium"
+                  }`}
+                >
+                  {active && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute top-0 left-3 right-3 h-0.5 rounded-full bg-action"
+                    />
+                  )}
+                  <Icon
+                    size={20}
+                    strokeWidth={active ? 2.25 : 1.75}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate max-w-full">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    )}
+    </>
   );
 }

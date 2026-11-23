@@ -223,12 +223,12 @@ const gateFocusRing =
  */
 function AuthGateScreen({ checking }: { checking: boolean }) {
   return (
-    <main className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-[var(--canvas-base)]">
+    <main className="w-full min-h-[calc(100dvh-4rem)] flex items-center justify-center px-4 py-6 sm:py-12 bg-[var(--canvas-base)]">
       <section
         aria-labelledby="mood-food-gate-title"
         className="w-full max-w-4xl grid md:grid-cols-5 overflow-hidden rounded-xl border border-[var(--brand-200)] bg-surface shadow-md"
       >
-        <div className="md:col-span-2 bg-[var(--brand-800)] text-white p-8 md:p-10 flex flex-col justify-between gap-10">
+        <div className="md:col-span-2 bg-[var(--brand-800)] text-white p-5 sm:p-8 md:p-10 flex flex-col justify-between gap-6 md:gap-10">
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--brand-300)] text-[var(--brand-800)]">
               <Salad size={24} strokeWidth={1.75} aria-hidden="true" />
@@ -248,7 +248,7 @@ function AuthGateScreen({ checking }: { checking: boolean }) {
           </div>
         </div>
 
-        <div className="md:col-span-3 p-8 md:p-10 flex flex-col justify-center">
+        <div className="md:col-span-3 p-5 sm:p-8 md:p-10 flex flex-col justify-center">
           {checking ? (
             <div role="status" className="flex items-center gap-3">
               <Loader2
@@ -657,11 +657,11 @@ export default function MoodFoodAnalyzer() {
   }
 
   return (
-    <div className="w-full bg-[#f7f9fb] text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen flex flex-col justify-between">
+    <div className="w-full bg-canvas text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen-safe flex flex-col justify-between">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl bg-[#012d1d] text-white shadow-xl animate-fade-in border border-emerald-500/30">
-          <span className="material-symbols-outlined text-[#92f7c3] text-[22px]">
+        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 flex items-center gap-3 px-4 py-3.5 rounded-xl bg-emphasis text-white shadow-xl animate-fade-in border border-emerald-500/30">
+          <span className="material-symbols-outlined text-[#92f7c3] text-[22px] shrink-0">
             check_circle
           </span>
           <span className="font-label-md text-sm">{toastMessage}</span>
@@ -670,7 +670,7 @@ export default function MoodFoodAnalyzer() {
 
 
       {/* MAIN CONTENT AREA */}
-      <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
+      <main className="w-full bg-canvas min-h-[calc(100dvh-20rem)] py-5 sm:py-8">
         <div className="flex flex-col w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 w-full flex flex-col gap-6 md:gap-8">
             {/* Breadcrumb & Protocol Badges */}
@@ -716,15 +716,15 @@ export default function MoodFoodAnalyzer() {
 
             {/* Header Section */}
             <AnimatedSection index={1}>
-              <div className="relative bg-white rounded-xl p-8 shadow-sm border border-slate-100">
+              <div className="relative bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-slate-100">
               <div className="max-w-3xl space-y-3">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#c1ecd4] text-[#274e3d] text-xs font-medium">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tint text-fg-brand text-xs font-medium">
                   <span className="material-symbols-outlined text-[16px]">
                     psychiatry
                   </span>
                   <span>Gut-Brain Axis &amp; PFA Psikosomatik</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-[#012d1d] tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-bold text-fg-brand tracking-tight">
                   Mood + Food AI Analyzer: Harmoni Emosi &amp; Nutrisi Jiwa
                 </h1>
                 <p className="text-sm sm:text-base text-[#414844] leading-relaxed">
@@ -738,12 +738,12 @@ export default function MoodFoodAnalyzer() {
             </AnimatedSection>
 
             {/* 2-Column Responsive Workspace Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
               {/* LEFT COLUMN: Main Interactive Form & Analyzer */}
-              <div className="lg:col-span-8 flex flex-col space-y-8">
+              <div className="lg:col-span-8 flex flex-col space-y-6 sm:space-y-8">
                 {/* Interactive Card (Form Wrapper) */}
                 <AnimatedSection index={2}>
-                  <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-8">
+                  <div className="bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-slate-100 space-y-7 sm:space-y-8">
                   {/* STEP 1: Pilih Mood Kamu Saat Ini */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -919,10 +919,10 @@ export default function MoodFoodAnalyzer() {
                         <button
                           type="button"
                           onClick={() => toggleSymptom("Cemas / Gelisah")}
-                          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                          className={`min-h-11 px-3.5 py-2 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                             selectedSymptoms.includes("Cemas / Gelisah")
-                              ? "bg-[#c1ecd4] text-[#012d1d]"
-                              : "bg-[#eceef0] text-[#414844] hover:bg-[#c1ecd4]/50 hover:text-[#012d1d]"
+                              ? "bg-tint text-fg-brand"
+                              : "bg-[#eceef0] text-[#414844] hover:bg-tint/60 hover:text-fg-brand"
                           }`}
                         >
                           <span className="material-symbols-outlined text-[16px]">
@@ -934,10 +934,10 @@ export default function MoodFoodAnalyzer() {
                         <button
                           type="button"
                           onClick={() => toggleSymptom("Kurang Tidur / Lelah")}
-                          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                          className={`min-h-11 px-3.5 py-2 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                             selectedSymptoms.includes("Kurang Tidur / Lelah")
-                              ? "bg-[#c1ecd4] text-[#012d1d]"
-                              : "bg-[#eceef0] text-[#414844] hover:bg-[#c1ecd4]/50 hover:text-[#012d1d]"
+                              ? "bg-tint text-fg-brand"
+                              : "bg-[#eceef0] text-[#414844] hover:bg-tint/60 hover:text-fg-brand"
                           }`}
                         >
                           <span className="material-symbols-outlined text-[16px]">
@@ -949,10 +949,10 @@ export default function MoodFoodAnalyzer() {
                         <button
                           type="button"
                           onClick={() => toggleSymptom("Sulit Fokus")}
-                          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                          className={`min-h-11 px-3.5 py-2 rounded-full text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                             selectedSymptoms.includes("Sulit Fokus")
-                              ? "bg-[#c1ecd4] text-[#012d1d]"
-                              : "bg-[#eceef0] text-[#414844] hover:bg-[#c1ecd4]/50 hover:text-[#012d1d]"
+                              ? "bg-tint text-fg-brand"
+                              : "bg-[#eceef0] text-[#414844] hover:bg-tint/60 hover:text-fg-brand"
                           }`}
                         >
                           <span className="material-symbols-outlined text-[16px]">
@@ -968,20 +968,20 @@ export default function MoodFoodAnalyzer() {
                   <div id="food-upload-section" className="space-y-4 pt-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#012d1d] text-white text-xs font-semibold">
+                        <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emphasis text-white text-xs font-semibold shrink-0">
                           2
                         </span>
-                        <h2 className="text-base sm:text-lg font-bold text-[#012d1d] uppercase tracking-wide">
+                        <h2 className="text-base sm:text-lg font-bold text-fg-brand uppercase tracking-wide">
                           UNGGAH FOTO MAKANAN ATAU AMBIL FOTO
                         </h2>
                       </div>
                     </div>
 
                     {/* Action Buttons for Uploading */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] transition-all text-[#012d1d] text-sm font-semibold cursor-pointer border border-transparent hover:border-slate-300 shadow-xs"
+                        className="flex items-center justify-center gap-2.5 min-h-12 py-3.5 px-4 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] transition-all text-[#012d1d] text-sm font-semibold cursor-pointer border border-transparent hover:border-slate-300 shadow-xs"
                         type="button"
                       >
                         <span className="material-symbols-outlined text-[20px]">
@@ -992,7 +992,7 @@ export default function MoodFoodAnalyzer() {
 
                       <button
                         onClick={() => cameraInputRef.current?.click()}
-                        className="flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] transition-all text-[#012d1d] text-sm font-semibold cursor-pointer border border-transparent hover:border-slate-300 shadow-xs"
+                        className="flex items-center justify-center gap-2.5 min-h-12 py-3.5 px-4 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] transition-all text-[#012d1d] text-sm font-semibold cursor-pointer border border-transparent hover:border-slate-300 shadow-xs"
                         type="button"
                       >
                         <span className="material-symbols-outlined text-[20px]">
@@ -1023,7 +1023,7 @@ export default function MoodFoodAnalyzer() {
                     {!previewUrl ? (
                       <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="rounded-xl border-2 border-dashed border-slate-300 hover:border-emerald-600/60 bg-[#f7f9fb] hover:bg-[#f1f7f4] p-6 text-center transition-all cursor-pointer group flex flex-col items-center justify-center gap-2.5"
+                        className="rounded-xl border-2 border-dashed border-slate-300 hover:border-emerald-600/60 bg-[#f7f9fb] hover:bg-[#f1f7f4] p-5 sm:p-6 text-center transition-all cursor-pointer group flex flex-col items-center justify-center gap-2.5"
                       >
                         <div className="w-12 h-12 rounded-full bg-[#eceef0] group-hover:bg-[#c1ecd4] text-[#006c48] flex items-center justify-center transition-colors">
                           <span className="material-symbols-outlined text-[24px]">
@@ -1047,9 +1047,9 @@ export default function MoodFoodAnalyzer() {
                               e.stopPropagation();
                               handleLoadSampleFood();
                             }}
-                            className="text-xs font-semibold text-[#006c48] hover:underline flex items-center gap-1 cursor-pointer"
+                            className="min-h-11 px-3 py-2 text-xs font-semibold text-fg-brand hover:underline flex items-center gap-1 cursor-pointer"
                           >
-                            <span className="material-symbols-outlined text-[15px]">
+                            <span className="material-symbols-outlined text-[15px] shrink-0">
                               restaurant_menu
                             </span>
                             <span>
@@ -1060,15 +1060,15 @@ export default function MoodFoodAnalyzer() {
                       </div>
                     ) : (
                       /* Interactive Food Preview Card when a photo IS selected */
-                      <div className="rounded-xl p-4 bg-[#f2f4f6] flex flex-col sm:flex-row items-center gap-5 border border-slate-200/60 animate-fade-in">
-                        <div className="relative w-full sm:w-44 h-32 rounded-lg overflow-hidden shrink-0 shadow-sm bg-[#eceef0]">
+                      <div className="rounded-xl p-4 bg-[#f2f4f6] flex flex-col sm:flex-row items-center gap-4 sm:gap-5 border border-slate-200/60 animate-fade-in">
+                        <div className="relative w-full sm:w-44 aspect-[4/3] sm:aspect-auto sm:h-32 max-w-full rounded-lg overflow-hidden shrink-0 shadow-sm bg-[#eceef0]">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             className="w-full h-full object-cover"
                             alt="Foto makanan posko yang dianalisis"
                             src={previewUrl}
                           />
-                          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-[#1b4332] text-white text-[10px] font-semibold flex items-center gap-1 shadow-xs">
+                          <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-emphasis text-white text-[10px] font-semibold flex items-center gap-1 shadow-xs">
                             <span className="material-symbols-outlined text-[12px]">
                               check_circle
                             </span>
@@ -1082,16 +1082,16 @@ export default function MoodFoodAnalyzer() {
                           </div>
                         </div>
 
-                        <div className="flex-1 w-full space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-base sm:text-lg font-bold text-[#012d1d]">
+                        <div className="flex-1 min-w-0 w-full space-y-2">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="text-base sm:text-lg font-bold text-[#012d1d] break-words min-w-0">
                               {isCustomUpload && fileData?.fileName
                                 ? fileData.fileName
                                 : analysisResult
                                   ? analysisResult.detectedFood
                                   : "Contoh Santapan Posko Nusantara"}
                             </span>
-                            <span className="text-xs text-[#414844] font-medium">
+                            <span className="text-xs text-[#414844] font-medium shrink-0">
                               {fileData?.fileSize ||
                                 (analysisResult
                                   ? analysisResult.fileMeta
@@ -1105,7 +1105,7 @@ export default function MoodFoodAnalyzer() {
                               : analysisResult.components}
                           </p>
 
-                          <div className="flex items-center gap-3 pt-1">
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                             <span className="inline-flex items-center gap-1 text-[12px] font-medium text-[#006c48]">
                               <span className="material-symbols-outlined text-[15px]">
                                 eco
@@ -1115,10 +1115,10 @@ export default function MoodFoodAnalyzer() {
 
                             <button
                               onClick={handleResetPhoto}
-                              className="text-[12px] font-semibold text-[#ba1a1a] hover:underline flex items-center gap-0.5 ml-auto cursor-pointer"
+                              className="min-h-11 px-2 text-[12px] font-semibold text-[#ba1a1a] hover:underline flex items-center gap-1 ml-auto cursor-pointer"
                               type="button"
                             >
-                              <span className="material-symbols-outlined text-[14px]">
+                              <span className="material-symbols-outlined text-[16px]">
                                 delete
                               </span>
                               Ganti / Hapus Foto
@@ -1139,7 +1139,7 @@ export default function MoodFoodAnalyzer() {
                           setNotes(e.target.value);
                           if (guardrailNotice) setGuardrailNotice(null);
                         }}
-                        className="w-full rounded-xl p-3 bg-white text-xs sm:text-sm text-[#191c1e] placeholder:text-[#717973] border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#006c48]/40 transition-all resize-none shadow-xs"
+                        className="w-full rounded-xl p-3 bg-white text-base sm:text-sm text-[#191c1e] placeholder:text-[#717973] border border-slate-200 focus:outline-none focus:ring-2 focus:ring-action/40 transition-all resize-none shadow-xs"
                         placeholder="Ceritakan porsi atau bagaimana perasaanmu saat menyantapnya (contoh: makan tergesa-gesa karena cemas, atau ditemani relawan posko)..."
                         rows={2}
                       />
@@ -1170,10 +1170,10 @@ export default function MoodFoodAnalyzer() {
                           </div>
                         </div>
                         {guardrailNotice.type === "crisis" && (
-                          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                          <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 pt-1">
                             <a
                               href="tel:119"
-                              className="px-4 py-2 rounded-lg bg-[#ba1a1a] text-white text-xs font-bold inline-flex items-center gap-1.5 hover:opacity-90"
+                              className="min-h-11 px-4 py-2.5 rounded-lg bg-[#ba1a1a] text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 hover:opacity-90"
                             >
                               <span className="material-symbols-outlined text-[16px]">
                                 call
@@ -1182,7 +1182,7 @@ export default function MoodFoodAnalyzer() {
                             </a>
                             <Link
                               href="/tele-screening"
-                              className="px-4 py-2 rounded-lg bg-white text-[#93000a] text-xs font-semibold border border-red-200 hover:bg-red-50"
+                              className="min-h-11 px-4 py-2.5 rounded-lg bg-white text-[#93000a] text-xs font-semibold border border-red-200 hover:bg-red-50 inline-flex items-center justify-center"
                             >
                               Skrining Triase DASS-21
                             </Link>
@@ -1195,7 +1195,7 @@ export default function MoodFoodAnalyzer() {
                     <button
                       onClick={handleAnalyze}
                       disabled={loading}
-                      className="w-full py-4 px-6 rounded-xl bg-[#1b4332] hover:bg-[#006c48] active:scale-[0.99] text-white text-base sm:text-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-3 cursor-pointer group disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="w-full min-h-12 py-3.5 px-5 sm:px-6 rounded-xl bg-action hover:bg-action-hover active:scale-[0.99] text-white text-sm sm:text-lg font-bold shadow-md hover:shadow-lg transition-all flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-center cursor-pointer group disabled:opacity-70 disabled:cursor-not-allowed"
                       type="button"
                     >
                       <span>
@@ -1204,13 +1204,13 @@ export default function MoodFoodAnalyzer() {
                           : "Analisis Makanan & Emosi Sekarang"}
                       </span>
                       <span
-                        className={`material-symbols-outlined text-[22px] transition-transform ${
+                        className={`material-symbols-outlined text-[22px] transition-transform shrink-0 ${
                           loading ? "animate-spin" : "group-hover:rotate-12"
                         }`}
                       >
                         {loading ? "progress_activity" : "auto_awesome"}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-[#92f7c3] text-[#002113] text-xs font-bold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#92f7c3] text-[#002113] text-xs font-bold shrink-0">
                         +40 XP
                       </span>
                     </button>
@@ -1222,7 +1222,7 @@ export default function MoodFoodAnalyzer() {
                 <AnimatedSection index={3}>
                   <div
                     id="analysis-results"
-                    className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-6"
+                    className="bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-slate-100 space-y-6"
                   >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#eceef0] gap-3">
                     <div className="flex items-center gap-3">
@@ -1281,7 +1281,7 @@ export default function MoodFoodAnalyzer() {
                           </div>
                           <button
                             onClick={handleResetAnalysis}
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#f2f4f6] hover:bg-[#e6e8ea] text-[#414844] hover:text-[#012d1d] text-xs font-semibold transition-colors cursor-pointer border border-slate-200/70"
+                            className="min-h-11 inline-flex items-center gap-1 px-3.5 py-2 rounded-full bg-[#f2f4f6] hover:bg-[#e6e8ea] text-[#414844] hover:text-[#012d1d] text-xs font-semibold transition-colors cursor-pointer border border-slate-200/70"
                             type="button"
                             title="Bersihkan hasil dan mulai analisis baru"
                           >
@@ -1391,7 +1391,7 @@ export default function MoodFoodAnalyzer() {
                       <div className="pt-1 flex flex-wrap items-center justify-center gap-3">
                         <button
                           onClick={scrollToUpload}
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1b4332] hover:bg-[#012d1d] text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+                          className="min-h-11 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors cursor-pointer shadow-xs"
                           type="button"
                         >
                           <span className="material-symbols-outlined text-[17px]">
@@ -1533,7 +1533,7 @@ export default function MoodFoodAnalyzer() {
 
                         <button
                           onClick={handleShare}
-                          className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#92f7c3] hover:bg-[#75daa8] text-[#00734d] text-xs font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                          className="w-full sm:w-auto min-h-11 px-5 py-2.5 rounded-full bg-[#92f7c3] hover:bg-[#75daa8] text-[#00734d] text-xs font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                           type="button"
                         >
                           <span className="material-symbols-outlined text-[18px]">
@@ -1549,7 +1549,7 @@ export default function MoodFoodAnalyzer() {
 
                 {/* STEP 4: RIWAYAT CATATAN NUTRISI & EMOSI DARI DATABASE */}
                 <AnimatedSection index={4}>
-                  <div className="bg-white rounded-xl p-6 md:p-8 shadow-sm border border-slate-100 space-y-5">
+                  <div className="bg-white rounded-xl p-4 sm:p-6 md:p-8 shadow-sm border border-slate-100 space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-lg bg-[#c1ecd4] text-[#012d1d] flex items-center justify-center">
@@ -1658,10 +1658,10 @@ export default function MoodFoodAnalyzer() {
                                 onClick={() =>
                                   handleSelectHistoryRecord(record)
                                 }
-                                className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                                className={`min-h-11 px-3.5 py-2 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
                                   isActive
-                                    ? "bg-[#012d1d] text-white"
-                                    : "bg-white hover:bg-[#006c48] hover:text-white text-[#006c48] border border-emerald-300"
+                                    ? "bg-emphasis text-white"
+                                    : "bg-white hover:bg-action hover:text-white text-fg-brand border border-line-strong"
                                 }`}
                               >
                                 <span className="material-symbols-outlined text-[14px]">

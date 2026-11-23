@@ -27,7 +27,7 @@ const focusRing =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]";
 
 const inputBase =
-  "w-full px-3.5 py-2.5 rounded-[0.5rem] border border-outline-variant/80 bg-surface-container-lowest text-[14px] text-on-surface placeholder:text-outline focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:outline-none transition-all";
+  "w-full min-h-11 px-3.5 py-2.5 rounded-[0.5rem] border border-outline-variant/80 bg-surface-container-lowest text-base sm:text-[14px] text-on-surface placeholder:text-outline focus:border-action focus:ring-1 focus:ring-action focus:outline-none transition-all";
 
 const ROLE_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
   { value: "CHILD", label: "Anak atau Remaja" },
@@ -156,9 +156,9 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="w-full min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-surface-container-lowest text-on-surface">
+    <main className="w-full min-h-screen-safe grid grid-cols-1 lg:grid-cols-2 bg-surface-container-lowest text-on-surface">
       {/* LEFT: immersive visual + brand messaging */}
-      <div className="relative min-h-[280px] sm:min-h-[400px] lg:min-h-screen flex flex-col justify-between p-6 sm:p-8 lg:p-14 overflow-hidden bg-primary-container text-on-primary">
+      <div className="relative min-h-0 sm:min-h-[360px] lg:min-h-screen-safe flex flex-col justify-between p-5 pt-[max(1.25rem,env(safe-area-inset-top,0px))] sm:p-8 lg:p-14 overflow-hidden bg-emphasis text-on-primary">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={acehBackground.src}
@@ -166,18 +166,18 @@ export default function RegisterPage() {
           className="absolute inset-0 w-full h-full object-cover object-center saturate-95"
         />
         <div
-          className="absolute inset-0 bg-primary/85 backdrop-blur-[2px]"
+          className="absolute inset-0 bg-brand-900/80 backdrop-blur-[2px]"
           aria-hidden="true"
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-primary via-primary-container/80 to-primary/90"
+          className="absolute inset-0 bg-gradient-to-t from-brand-900 via-brand-800/80 to-brand-900/90"
           aria-hidden="true"
         />
 
         <div className="relative z-10">
           <Link
             href="/"
-            className={`inline-flex items-center gap-3 group ${focusRing}`}
+            className={`inline-flex items-center gap-3 min-h-11 group ${focusRing}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -191,22 +191,22 @@ export default function RegisterPage() {
               <span className="font-display text-lg sm:text-xl font-extrabold tracking-tight text-white leading-none">
                 PERMATA
               </span>
-              <span className="text-[11px] text-primary-fixed-dim font-medium mt-1">
+              <span className="text-[11px] text-white/80 font-medium mt-1">
                 Resiliensi Jiwa &amp; PFA Anak
               </span>
             </span>
           </Link>
         </div>
 
-        <div className="relative z-10 my-auto py-8 lg:py-10 max-w-lg">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest/15 backdrop-blur-md text-secondary-fixed text-[12px] font-semibold mb-4 border border-secondary-fixed/20">
+        <div className="relative z-10 my-auto py-4 sm:py-8 lg:py-10 max-w-lg">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest/15 backdrop-blur-md text-brand-100 text-[12px] font-semibold mb-3 sm:mb-4 border border-white/20">
             <BrainCircuit size={15} strokeWidth={2} aria-hidden="true" />
             Sistem Resiliensi Psikososial Tanggap Bencana
           </div>
-          <h2 className="text-[30px] sm:text-[38px] lg:text-[42px] font-bold text-white leading-[1.18] tracking-tight mb-4">
+          <h2 className="text-2xl sm:text-[36px] lg:text-[42px] font-bold text-white leading-[1.18] tracking-tight mb-2 sm:mb-4">
             Pulihkan Senyum &amp; Resiliensi Jiwa Anak Pascabencana
           </h2>
-          <p className="text-primary-fixed-dim leading-relaxed mb-6 text-[14px] lg:text-[15.5px]">
+          <p className="text-white/85 leading-relaxed mb-0 sm:mb-6 text-sm lg:text-[15.5px]">
             Platform pendampingan psikososial berbasis kearifan budaya lokal
             untuk mengembalikan harapan dan keceriaan anak.
           </p>
@@ -237,8 +237,8 @@ export default function RegisterPage() {
       </div>
 
       {/* RIGHT: registration form */}
-      <div className="flex flex-col justify-start items-center p-6 sm:p-10 lg:p-14 bg-surface-container-lowest">
-        <AnimatedSection index={1} className="w-full max-w-lg py-6">
+      <div className="flex flex-col justify-start items-center px-4 py-6 sm:p-10 lg:p-14 pb-[max(2rem,env(safe-area-inset-bottom,0px))] bg-surface-container-lowest">
+        <AnimatedSection index={1} className="w-full max-w-lg py-2 sm:py-6">
           <div className="mb-6">
             <h1 className="text-[28px] font-bold text-on-surface tracking-tight">
               Buat Akun Pribadi{" "}
@@ -357,6 +357,7 @@ export default function RegisterPage() {
               <input
                 id="reg-email"
                 type="email"
+                inputMode="email"
                 autoComplete="email"
                 required
                 value={email}
@@ -367,7 +368,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <label
                   htmlFor="reg-password"
                   className="text-[13px] font-medium text-on-surface"
@@ -392,7 +393,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Minimal 8 karakter"
                   aria-describedby="reg-password-strength"
-                  className={`${inputBase} pr-10`}
+                  className={`${inputBase} pr-12`}
                 />
                 <button
                   type="button"
@@ -402,7 +403,7 @@ export default function RegisterPage() {
                       ? "Sembunyikan kata sandi"
                       : "Tampilkan kata sandi"
                   }
-                  className={`absolute right-2 p-1 rounded-[0.5rem] text-on-surface-variant hover:text-on-surface ${focusRing}`}
+                  className={`absolute right-0 min-w-11 min-h-11 inline-flex items-center justify-center rounded-[0.5rem] text-on-surface-variant hover:text-on-surface ${focusRing}`}
                 >
                   {showPassword ? (
                     <EyeOff size={18} strokeWidth={1.75} aria-hidden="true" />
@@ -438,11 +439,11 @@ export default function RegisterPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Ulangi kata sandi Anda"
-                  className={`${inputBase} ${passwordsMatch ? "pr-16" : "pr-10"}`}
+                  className={`${inputBase} ${passwordsMatch ? "pr-20" : "pr-12"}`}
                 />
                 {passwordsMatch && (
                   <span
-                    className="absolute right-9 flex items-center text-secondary"
+                    className="absolute right-11 flex items-center text-secondary"
                     role="img"
                     aria-label="Kata sandi cocok"
                   >
@@ -461,7 +462,7 @@ export default function RegisterPage() {
                       ? "Sembunyikan konfirmasi sandi"
                       : "Tampilkan konfirmasi sandi"
                   }
-                  className={`absolute right-2 p-1 rounded-[0.5rem] text-on-surface-variant hover:text-on-surface ${focusRing}`}
+                  className={`absolute right-0 min-w-11 min-h-11 inline-flex items-center justify-center rounded-[0.5rem] text-on-surface-variant hover:text-on-surface ${focusRing}`}
                 >
                   {showConfirm ? (
                     <EyeOff size={18} strokeWidth={1.75} aria-hidden="true" />
@@ -473,20 +474,20 @@ export default function RegisterPage() {
             </div>
 
             <div className="pt-1">
-              <label className="flex items-start gap-2.5 cursor-pointer select-none">
+              <label className="flex items-start gap-3 min-h-11 py-1 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className={`mt-1 w-4 h-4 rounded accent-primary-container cursor-pointer shrink-0 ${focusRing}`}
+                  className={`mt-0.5 w-5 h-5 rounded accent-action cursor-pointer shrink-0 ${focusRing}`}
                 />
                 <span className="text-[12.5px] leading-snug text-on-surface-variant">
                   Saya menyetujui{" "}
-                  <strong className="text-secondary font-semibold">
+                  <strong className="text-fg-brand font-semibold">
                     Ketentuan Layanan
                   </strong>{" "}
                   &amp;{" "}
-                  <strong className="text-secondary font-semibold">
+                  <strong className="text-fg-brand font-semibold">
                     Kebijakan Perlindungan Data Pribadi Anak
                   </strong>{" "}
                   sesuai standar{" "}
@@ -502,7 +503,7 @@ export default function RegisterPage() {
               type="submit"
               disabled={submitting}
               aria-busy={submitting}
-              className={`w-full mt-2 py-3 px-4 rounded-[0.75rem] bg-primary-container hover:bg-primary disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-[15px] flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.99] ${focusRing}`}
+              className={`w-full mt-2 min-h-12 py-3 px-4 rounded-[0.75rem] bg-action hover:bg-action-hover disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-[15px] flex items-center justify-center gap-2 transition-all shadow-sm active:scale-[0.99] ${focusRing}`}
             >
               <span>
                 {submitting ? "Mendaftarkan akun..." : "Daftar & Masuk"}
@@ -516,7 +517,7 @@ export default function RegisterPage() {
               Sudah memiliki akun?{" "}
               <Link
                 href="/login"
-                className={`font-semibold text-secondary hover:underline ${focusRing}`}
+                className={`font-semibold text-fg-brand hover:underline inline-flex items-center min-h-11 px-1 ${focusRing}`}
               >
                 Masuk di sini
               </Link>
@@ -532,7 +533,7 @@ export default function RegisterPage() {
 
             <Link
               href="/"
-              className={`w-full py-2.5 px-4 rounded-[0.75rem] border border-outline-variant hover:bg-surface-container text-on-surface font-semibold text-[14px] flex items-center justify-center gap-2 transition-all ${focusRing}`}
+              className={`w-full min-h-11 py-2.5 px-4 rounded-[0.75rem] border border-outline-variant hover:bg-surface-container text-on-surface font-semibold text-[14px] flex items-center justify-center gap-2 transition-all ${focusRing}`}
             >
               <ArrowLeft size={18} strokeWidth={2} aria-hidden="true" />
               <span>Kembali ke Beranda</span>

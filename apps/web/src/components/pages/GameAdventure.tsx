@@ -7,10 +7,10 @@ import { AnimatedSection } from "@/components/PageMotion";
 
 const GameAdventure = () => {
   return (
-    <div className="min-h-screen bg-canvas flex items-center justify-center p-6">
+    <div className="min-h-screen-safe bg-canvas flex items-center justify-center p-4 sm:p-6">
       <AnimatedSection
         index={0}
-        className="max-w-md w-full bg-surface border border-line rounded-xl p-8 shadow-lg text-center space-y-6"
+        className="max-w-md w-full bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-lg text-center space-y-6"
       >
         {/* Icon tile */}
         <div className="w-16 h-16 bg-tint rounded-lg flex items-center justify-center mx-auto">
@@ -44,7 +44,7 @@ const GameAdventure = () => {
         <Link
           href="/dashboard"
           prefetch={false}
-          className="inline-block text-sm text-fg-subtle hover:text-fg transition-colors duration-150"
+          className="inline-flex items-center justify-center min-h-11 px-4 text-sm text-fg-subtle hover:text-fg transition-colors duration-150"
         >
           Kembali ke Dashboard
         </Link>

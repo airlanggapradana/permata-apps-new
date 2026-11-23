@@ -174,8 +174,8 @@ export default function SafetyPassportPage() {
 
   if (authLoading) {
     return (
-      <main className="min-h-[calc(100vh-5rem)] bg-canvas text-fg py-12 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto bg-surface border border-line rounded-xl p-8 text-center text-sm text-fg-muted">
+      <main className="min-h-[calc(100dvh-5rem)] bg-canvas text-fg py-8 sm:py-12 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto bg-surface border border-line rounded-xl p-6 sm:p-8 text-center text-sm text-fg-muted">
           Memeriksa sesi akun Anda...
         </div>
       </main>
@@ -184,9 +184,9 @@ export default function SafetyPassportPage() {
 
   if (!user) {
     return (
-      <main className="min-h-[calc(100vh-5rem)] bg-canvas text-fg py-12 sm:py-16 px-4 sm:px-6">
+      <main className="min-h-[calc(100dvh-5rem)] bg-canvas text-fg py-8 sm:py-16 px-4 sm:px-6">
         <AnimatedSection index={0}>
-          <div className="max-w-xl mx-auto bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="max-w-xl mx-auto bg-surface border border-line rounded-xl p-5 sm:p-8 shadow-sm space-y-6">
           <div className="w-12 h-12 rounded-md bg-tint text-fg-brand flex items-center justify-center">
             <Lock size={24} strokeWidth={1.75} aria-hidden="true" />
           </div>
@@ -235,15 +235,15 @@ export default function SafetyPassportPage() {
   }
 
   return (
-    <main className="min-h-screen bg-canvas text-fg py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <main className="min-h-screen-safe bg-canvas text-fg py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <AnimatedSection index={0}>
-          <section className="bg-surface border border-line rounded-xl p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tint border border-[var(--brand-200)] text-fg-brand text-xs font-medium">
-              <ShieldCheck size={14} strokeWidth={1.75} aria-hidden="true" />
-              <span>Akses Pribadi Terautentikasi: {user.email}</span>
+          <section className="bg-surface border border-line rounded-xl p-4 sm:p-6 lg:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2 min-w-0">
+            <div className="inline-flex items-center gap-2 max-w-full px-3 py-1 rounded-full bg-tint border border-[var(--brand-200)] text-fg-brand text-xs font-medium">
+              <ShieldCheck size={14} strokeWidth={1.75} className="shrink-0" aria-hidden="true" />
+              <span className="truncate">Akses Pribadi Terautentikasi: {user.email}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-fg tracking-tight">
               My Safety Passport
@@ -454,6 +454,7 @@ export default function SafetyPassportPage() {
                           <input
                             id={`contact-phone-${idx}`}
                             type="tel"
+                            inputMode="tel"
                             value={contact.phone}
                             onChange={(e) => {
                               const next = [...passport.contacts];
@@ -464,7 +465,7 @@ export default function SafetyPassportPage() {
                               setPassport({ ...passport, contacts: next });
                             }}
                             placeholder="08xx-xxxx-xxxx"
-                            className={`w-full min-h-11 bg-surface border border-line-input rounded-md px-3 text-sm text-fg ${focusRing}`}
+                            className={`w-full min-h-11 bg-surface border border-line-input rounded-md px-3 text-base sm:text-sm text-fg ${focusRing}`}
                           />
                         </div>
                         <div className="space-y-1">
@@ -510,25 +511,36 @@ export default function SafetyPassportPage() {
                           <span>Tandai sebagai kontak utama</span>
                         </label>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setPassport({
-                              ...passport,
-                              contacts: passport.contacts.filter(
-                                (_, cIdx) => cIdx !== idx,
-                              ),
-                            })
-                          }
-                          className={`inline-flex items-center gap-1.5 min-h-11 px-3 rounded-md text-xs font-medium text-fg-muted hover:text-danger hover:bg-surface ${focusRing}`}
-                        >
-                          <Trash2
-                            size={15}
-                            strokeWidth={1.75}
-                            aria-hidden="true"
-                          />
-                          <span>Hapus</span>
-                        </button>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {contact.phone.trim() && (
+                            <a
+                              href={`tel:${contact.phone.replace(/[^+\d]/g, "")}`}
+                              className={`inline-flex items-center gap-1.5 min-h-11 px-3.5 rounded-md bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors ${focusRing}`}
+                            >
+                              <Phone size={14} strokeWidth={2} aria-hidden="true" />
+                              <span>Hubungi</span>
+                            </a>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setPassport({
+                                ...passport,
+                                contacts: passport.contacts.filter(
+                                  (_, cIdx) => cIdx !== idx,
+                                ),
+                              })
+                            }
+                            className={`inline-flex items-center gap-1.5 min-h-11 px-3 rounded-md text-xs font-medium text-fg-muted hover:text-danger hover:bg-surface ${focusRing}`}
+                          >
+                            <Trash2
+                              size={15}
+                              strokeWidth={1.75}
+                              aria-hidden="true"
+                            />
+                            <span>Hapus</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -640,6 +652,7 @@ export default function SafetyPassportPage() {
                         <div className="flex items-center justify-between gap-2">
                           <input
                             type="tel"
+                            inputMode="tel"
                             aria-label={`Nomor telepon ${member.name || "anggota keluarga"}`}
                             value={member.phoneNumber}
                             onChange={(e) => {
@@ -654,8 +667,17 @@ export default function SafetyPassportPage() {
                               });
                             }}
                             placeholder="Nomor telepon (opsional)"
-                            className={`flex-1 min-h-11 bg-surface border border-line-input rounded-md px-3 text-sm text-fg ${focusRing}`}
+                            className={`flex-1 min-w-0 min-h-11 bg-surface border border-line-input rounded-md px-3 text-base sm:text-sm text-fg ${focusRing}`}
                           />
+                          {member.phoneNumber.trim() && (
+                            <a
+                              href={`tel:${member.phoneNumber.replace(/[^+\d]/g, "")}`}
+                              aria-label={`Hubungi ${member.name || "anggota keluarga"}`}
+                              className={`min-h-11 min-w-11 inline-flex items-center justify-center rounded-md bg-action hover:bg-action-hover text-white shrink-0 ${focusRing}`}
+                            >
+                              <Phone size={16} strokeWidth={1.75} aria-hidden="true" />
+                            </a>
+                          )}
                           <button
                             type="button"
                             onClick={() =>
@@ -742,7 +764,7 @@ export default function SafetyPassportPage() {
                               });
                             }}
                             placeholder="Contoh: Lapangan Meunasah / Halaman Sekolah"
-                            className={`flex-1 min-h-11 bg-surface border border-line-input rounded-md px-3 text-sm text-fg ${focusRing}`}
+                            className={`flex-1 min-w-0 min-h-11 bg-surface border border-line-input rounded-md px-3 text-base sm:text-sm text-fg ${focusRing}`}
                           />
                           <button
                             type="button"
@@ -922,7 +944,7 @@ export default function SafetyPassportPage() {
                 type="submit"
                 disabled={saving}
                 aria-busy={saving}
-                className={`inline-flex items-center justify-center gap-2 min-h-11 px-6 rounded-md bg-action hover:bg-action-hover disabled:bg-sunken disabled:text-neutral-400 text-white text-sm font-medium transition-colors shrink-0 ${focusRing}`}
+                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-md bg-action hover:bg-action-hover disabled:bg-sunken disabled:text-neutral-400 text-white text-sm font-medium transition-colors shrink-0 ${focusRing}`}
               >
                 <Save size={16} strokeWidth={1.75} aria-hidden="true" />
                 <span>

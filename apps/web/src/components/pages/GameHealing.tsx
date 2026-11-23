@@ -233,7 +233,7 @@ export default function GameHealing() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-canvas px-4 py-6 sm:px-6 sm:py-10">
+    <main className="min-h-screen-safe bg-canvas px-4 py-5 sm:px-6 sm:py-10">
       <div className="mx-auto max-w-5xl space-y-6">
         <Link href="/dashboard" className={`${button} px-0 text-fg-brand`}>
           <ArrowLeft size={18} />
@@ -364,7 +364,7 @@ export default function GameHealing() {
                       type="button"
                       aria-pressed={control === "touch"}
                       onClick={() => setControl("touch")}
-                      className={`${button} ${control === "touch" ? "bg-action text-white" : "bg-sunken text-fg"}`}
+                      className={`${button} flex-1 sm:flex-none ${control === "touch" ? "bg-action text-white" : "bg-sunken text-fg"}`}
                     >
                       <Hand size={18} />
                       Sentuh / mouse
@@ -373,7 +373,7 @@ export default function GameHealing() {
                       type="button"
                       aria-pressed={control === "camera"}
                       onClick={() => setControl("camera")}
-                      className={`${button} ${control === "camera" ? "bg-action text-white" : "bg-sunken text-fg"}`}
+                      className={`${button} flex-1 sm:flex-none ${control === "camera" ? "bg-action text-white" : "bg-sunken text-fg"}`}
                     >
                       <Camera size={18} />
                       Kamera opsional
@@ -415,7 +415,7 @@ export default function GameHealing() {
                   setControl(control === "camera" ? "touch" : "camera");
                   setNotice("");
                 }}
-                className={`${button} bg-sunken text-fg`}
+                className={`${button} w-full sm:w-auto bg-sunken text-fg`}
               >
                 {control === "camera" ? "Matikan kamera" : "Gunakan kamera"}
               </button>
@@ -432,15 +432,15 @@ export default function GameHealing() {
               role="status"
               aria-live="polite"
               aria-atomic="true"
-              className="min-h-20 rounded-xl bg-tint p-4 text-sm leading-relaxed text-fg-brand"
+              className="min-h-16 sm:min-h-20 rounded-xl bg-tint p-3.5 sm:p-4 text-sm leading-relaxed text-fg-brand"
             >
               {feedback}
             </p>
             <div
               ref={boardRef}
-              className="grid gap-5 md:grid-cols-[1.35fr_1fr]"
+              className="grid gap-4 sm:gap-5 md:grid-cols-[1.35fr_1fr]"
             >
-              <div className="grid grid-cols-2 gap-3 rounded-2xl border border-line bg-surface p-4 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 rounded-2xl border border-line bg-surface p-3 sm:p-4 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-4">
                 {BAG_ITEMS.map((item) => {
                   const packed = items.includes(item.id);
                   return (
@@ -457,9 +457,9 @@ export default function GameHealing() {
                         selectItem(item.id);
                       }}
                       onClick={() => selectItem(item.id)}
-                      className={`relative flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border-2 p-3 text-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${packed ? "border-line bg-sunken opacity-60" : selected === item.id ? "border-action bg-tint" : "border-transparent bg-canvas hover:border-line-strong"}`}
+                      className={`relative flex min-h-24 sm:min-h-32 flex-col items-center justify-center gap-2 sm:gap-3 rounded-xl border-2 p-2.5 sm:p-3 text-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${packed ? "border-line bg-sunken opacity-60" : selected === item.id ? "border-action bg-tint" : "border-transparent bg-canvas hover:border-line-strong"}`}
                     >
-                      <span aria-hidden="true" className="text-4xl">
+                      <span aria-hidden="true" className="text-3xl sm:text-4xl">
                         {item.emoji}
                       </span>
                       <span className="text-xs font-semibold leading-snug">
@@ -485,23 +485,23 @@ export default function GameHealing() {
                   event.preventDefault();
                   placeItem(event.dataTransfer.getData("text/plain"));
                 }}
-                className="flex min-h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-action bg-tint p-6 text-center text-fg-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action"
+                className="flex min-h-40 sm:min-h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-action bg-tint p-4 sm:p-6 text-center text-fg-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action"
               >
-                <Backpack size={76} strokeWidth={1.25} aria-hidden="true" />
-                <span className="mt-4 text-lg font-bold">Tas siagamu</span>
-                <span className="mt-2 text-sm">
+                <Backpack className="w-12 h-12 sm:w-[76px] sm:h-[76px]" strokeWidth={1.25} aria-hidden="true" />
+                <span className="mt-3 sm:mt-4 text-base sm:text-lg font-bold">Tas siagamu</span>
+                <span className="mt-1.5 sm:mt-2 text-sm">
                   {selected
                     ? `Masukkan ${BAG_ITEMS.find((item) => item.id === selected)?.name}`
                     : "Pilih barang, lalu ketuk di sini"}
                 </span>
                 <span
-                  className="mt-5 flex flex-wrap justify-center gap-2"
+                  className="mt-4 sm:mt-5 flex flex-wrap justify-center gap-2"
                   aria-label="Barang di dalam tas"
                 >
                   {items.map((id) => (
                     <span
                       key={id}
-                      className="rounded-lg bg-surface p-2 text-2xl"
+                      className="rounded-lg bg-surface p-1.5 sm:p-2 text-xl sm:text-2xl"
                       aria-label={
                         BAG_ITEMS.find((item) => item.id === id)?.name
                       }
@@ -512,14 +512,14 @@ export default function GameHealing() {
                 </span>
               </button>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-between gap-3">
               <p className="text-xs text-fg-muted">
                 Pilihan kurang tepat tidak mengurangi poin. Coba lagi, ya.
               </p>
               <button
                 type="button"
                 onClick={() => finish()}
-                className={`${button} bg-surface text-fg-muted border border-line`}
+                className={`${button} w-full sm:w-auto bg-surface text-fg-muted border border-line`}
               >
                 Akhiri latihan
               </button>
@@ -587,7 +587,7 @@ export default function GameHealing() {
                   <button
                     type="button"
                     onClick={() => void saveResult(result)}
-                    className={`${button} mt-3 bg-action text-white`}
+                    className={`${button} mt-3 w-full sm:w-auto bg-action text-white`}
                   >
                     Coba Simpan Lagi
                   </button>
@@ -601,7 +601,7 @@ export default function GameHealing() {
                   </Link>
                 )}
               </div>
-              <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <div className="mt-6 flex flex-col sm:flex-row flex-wrap justify-center gap-3">
                 <button
                   type="button"
                   disabled={saveState === "saving" || saveState === "error"}
@@ -610,14 +610,14 @@ export default function GameHealing() {
                     setControl("touch");
                     setNotice("");
                   }}
-                  className={`${button} bg-action text-white hover:bg-action-hover`}
+                  className={`${button} w-full sm:w-auto bg-action text-white hover:bg-action-hover`}
                 >
                   <RotateCcw size={17} />
                   Main Lagi
                 </button>
                 <Link
                   href="/dashboard"
-                  className={`${button} border border-line text-fg-brand`}
+                  className={`${button} w-full sm:w-auto border border-line text-fg-brand`}
                 >
                   Lihat Pohon Harapan
                 </Link>

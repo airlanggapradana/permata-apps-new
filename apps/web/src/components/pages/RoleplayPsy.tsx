@@ -424,7 +424,7 @@ export default function RoleplayPsy() {
 
   return (
     <main
-      className={`min-h-screen bg-canvas px-4 sm:px-6 ${run && !completed ? "py-3 sm:py-7" : "py-6 sm:py-10"}`}
+      className={`min-h-screen-safe bg-canvas px-4 sm:px-6 ${run && !completed ? "py-3 sm:py-7" : "py-5 sm:py-10"}`}
     >
       <div
         className={`mx-auto max-w-6xl ${run && !completed ? "space-y-4" : "space-y-7"}`}
@@ -446,7 +446,7 @@ export default function RoleplayPsy() {
           <>
             <section className="animate-fade-in overflow-hidden rounded-3xl border border-line bg-surface motion-reduce:animate-none">
               <div className="grid items-center lg:grid-cols-[1.05fr_1fr]">
-                <div className="px-6 py-8 sm:p-10 lg:pr-0">
+                <div className="px-4 py-6 sm:p-10 lg:pr-0">
                   <p className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[.14em] text-fg-brand">
                     <HeartHandshake size={18} aria-hidden="true" /> Ruang
                     latihan empati
@@ -506,10 +506,10 @@ export default function RoleplayPsy() {
                       : "Lanjutkan dari adegan terakhir"}
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 w-full sm:w-auto">
                   <button
                     type="button"
-                    className={primary}
+                    className={`${primary} w-full sm:w-auto`}
                     onClick={() => {
                       activeMsRef.current = resume.activeMs;
                       setRun(resume);
@@ -523,7 +523,7 @@ export default function RoleplayPsy() {
                   </button>
                   <button
                     type="button"
-                    className={`${button} text-fg-muted`}
+                    className={`${button} w-full sm:w-auto text-fg-muted`}
                     onClick={() => {
                       clearRoleplayRun(resume.ownerId);
                       setResume(null);
@@ -793,32 +793,38 @@ export default function RoleplayPsy() {
                 </div>
               </div>
             </section>
-            <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-line bg-surface p-2 sm:px-5 sm:py-3">
+            <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:static z-20 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-line bg-surface/95 backdrop-blur-sm p-2 shadow-md md:shadow-none sm:px-5 sm:py-3">
               <p className="hidden text-sm text-fg-muted sm:block">
                 Butuh ruang sebentar? Cerita boleh menunggu.
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-1.5 sm:gap-2 w-full sm:w-auto">
                 <button
                   type="button"
-                  className={`${button} px-3 text-fg-brand`}
+                  aria-label="Napas pelan"
+                  className={`${button} px-2 sm:px-3 text-xs sm:text-base text-fg-brand text-center`}
                   onClick={() => setTool("breath")}
                 >
-                  <Wind size={18} aria-hidden="true" />
-                  Napas pelan
+                  <Wind size={16} className="shrink-0" aria-hidden="true" />
+                  <span className="truncate sm:hidden">Napas</span>
+                  <span className="hidden sm:inline">Napas pelan</span>
                 </button>
                 <button
                   type="button"
-                  className={`${button} px-3 text-fg-brand`}
+                  aria-label="Kenali sekitar"
+                  className={`${button} px-2 sm:px-3 text-xs sm:text-base text-fg-brand text-center`}
                   onClick={() => setTool("grounding")}
                 >
-                  Kenali sekitar
+                  <span className="truncate sm:hidden">Sekitar</span>
+                  <span className="hidden sm:inline">Kenali sekitar</span>
                 </button>
                 <button
                   type="button"
-                  className={`${button} px-3 text-fg-brand`}
+                  aria-label="Cari pendamping"
+                  className={`${button} px-2 sm:px-3 text-xs sm:text-base text-fg-brand text-center`}
                   onClick={() => setTool("help")}
                 >
-                  Cari pendamping
+                  <span className="truncate sm:hidden">Pendamping</span>
+                  <span className="hidden sm:inline">Cari pendamping</span>
                 </button>
               </div>
             </div>

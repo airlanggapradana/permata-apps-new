@@ -323,11 +323,11 @@ export default function TeleScreening() {
   };
 
   return (
-    <div className="w-full bg-[#f7f9fb] text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen flex flex-col justify-between">
+    <div className="w-full bg-canvas text-[#191c1e] antialiased selection:bg-[#006c48] selection:text-white min-h-screen-safe flex flex-col justify-between">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl bg-[#012d1d] text-white shadow-xl animate-fade-in">
-          <span className="material-symbols-outlined text-[#92f7c3] text-[22px]">
+        <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 flex items-center gap-3 px-4 py-3.5 rounded-xl bg-emphasis text-white shadow-xl animate-fade-in">
+          <span className="material-symbols-outlined text-[#92f7c3] text-[22px] shrink-0">
             check_circle
           </span>
           <span className="font-label-md text-label-md">{toastMessage}</span>
@@ -336,12 +336,12 @@ export default function TeleScreening() {
 
 
       {/* MAIN CONTAINER */}
-      <main className="w-full bg-[#f7f9fb] min-h-[calc(100vh-20rem)] py-8">
+      <main className="w-full bg-canvas min-h-[calc(100dvh-20rem)] py-5 sm:py-8">
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-2">
           {/* Breadcrumb & Protocol Badges */}
           <AnimatedSection index={0}>
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <div className="flex items-center gap-2 text-[#414844] font-label-md text-label-md">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 sm:mb-6">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[#414844] font-label-md text-label-md">
               <Link
                 className="hover:text-[#012d1d] transition-colors flex items-center gap-1"
                 href="/"
@@ -395,7 +395,7 @@ export default function TeleScreening() {
             <AnimatedSection index={1}>
               <div className="flex flex-col gap-8 animate-fade-in">
               {/* Result Banner Card */}
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#012d1d] to-[#1b4332] p-6 sm:p-8 text-white shadow-sm">
+              <div className="relative overflow-hidden rounded-xl bg-emphasis p-5 sm:p-8 text-white shadow-sm">
                 <div className="relative z-10 max-w-3xl">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md font-label-sm text-label-sm text-[#c1ecd4] mb-3">
                     <span className="material-symbols-outlined text-[16px]">
@@ -683,11 +683,11 @@ export default function TeleScreening() {
                 </div>
 
                 {/* Bottom Navigation Buttons */}
-                <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100">
+                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-4 border-t border-slate-100">
                   <button
                     type="button"
                     onClick={handleRestart}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#191c1e] font-label-md text-sm font-semibold transition-colors"
+                    className="w-full sm:w-auto min-h-11 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#191c1e] font-label-md text-sm font-semibold transition-colors"
                   >
                     <span className="material-symbols-outlined text-[18px]">
                       replay
@@ -695,10 +695,10 @@ export default function TeleScreening() {
                     <span>Ulangi Skrining</span>
                   </button>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                     <Link
                       href="/journal"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#012d1d] font-label-md text-sm font-semibold transition-colors"
+                      className="w-full sm:w-auto min-h-11 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#eceef0] hover:bg-[#e6e8ea] text-[#012d1d] font-label-md text-sm font-semibold transition-colors"
                     >
                       <span className="material-symbols-outlined text-[18px]">
                         yard
@@ -707,7 +707,7 @@ export default function TeleScreening() {
                     </Link>
                     <Link
                       href="/dashboard"
-                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#012d1d] hover:bg-[#006c48] text-white font-label-md text-sm font-semibold transition-all shadow-sm"
+                      className="w-full sm:w-auto min-h-11 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-action hover:bg-action-hover text-white font-label-md text-sm font-semibold transition-all shadow-sm"
                     >
                       <span>Akses Dashboard</span>
                       <span className="material-symbols-outlined text-[18px]">
@@ -724,7 +724,7 @@ export default function TeleScreening() {
             <div className="flex flex-col w-full">
               {/* Main Title Card / Editorial Scrim Banner */}
               <AnimatedSection index={1}>
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#012d1d] to-[#1b4332] p-6 sm:p-8 text-white shadow-sm mb-8">
+                <div className="relative overflow-hidden rounded-xl bg-emphasis p-5 sm:p-8 text-white shadow-sm mb-6 sm:mb-8">
                 <div className="relative z-10 max-w-3xl">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md font-label-sm text-label-sm text-[#c1ecd4] mb-3">
                     <span className="material-symbols-outlined text-[16px]">
@@ -766,15 +766,15 @@ export default function TeleScreening() {
                 <div className="lg:col-span-8 flex flex-col gap-6">
                   {/* Category Tracker / Domain Sub-Navigation */}
                   <AnimatedSection index={2}>
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Kecemasan Pill */}
                       <button
                         type="button"
                         onClick={() => jumpToDomain(anxietyIndexes)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-sm text-label-sm transition-all ${
+                        className={`min-h-11 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-label-sm text-label-sm transition-all ${
                           currentDomain.key === "anxiety"
-                            ? "bg-[#012d1d] text-white shadow-xs"
+                            ? "bg-emphasis text-white shadow-xs"
                             : "bg-[#e6e8ea] text-[#414844] hover:bg-[#eceef0]"
                         }`}
                       >
@@ -788,9 +788,9 @@ export default function TeleScreening() {
                       <button
                         type="button"
                         onClick={() => jumpToDomain(stressIndexes)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-sm text-label-sm transition-all ${
+                        className={`min-h-11 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-label-sm text-label-sm transition-all ${
                           currentDomain.key === "stress"
-                            ? "bg-[#012d1d] text-white shadow-xs"
+                            ? "bg-emphasis text-white shadow-xs"
                             : "bg-[#e6e8ea] text-[#414844] hover:bg-[#eceef0]"
                         }`}
                       >
@@ -804,9 +804,9 @@ export default function TeleScreening() {
                       <button
                         type="button"
                         onClick={() => jumpToDomain(depressionIndexes)}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-sm text-label-sm transition-all ${
+                        className={`min-h-11 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-label-sm text-label-sm transition-all ${
                           currentDomain.key === "depression"
-                            ? "bg-[#012d1d] text-white shadow-xs"
+                            ? "bg-emphasis text-white shadow-xs"
                             : "bg-[#e6e8ea] text-[#414844] hover:bg-[#eceef0]"
                         }`}
                       >
@@ -817,7 +817,7 @@ export default function TeleScreening() {
                       </button>
                     </div>
 
-                    <span className="font-label-sm text-label-sm text-[#006c48] font-semibold flex items-center gap-1">
+                    <span className="font-label-sm text-label-sm text-fg-brand font-semibold flex items-center gap-1">
                       <span className="material-symbols-outlined text-[16px]">
                         healing
                       </span>
@@ -828,25 +828,25 @@ export default function TeleScreening() {
 
                   {/* Question Container */}
                   <AnimatedSection index={3}>
-                    <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-slate-100 flex flex-col gap-6 relative">
+                    <div className="bg-white rounded-xl p-4 sm:p-6 lg:p-8 shadow-sm border border-slate-100 flex flex-col gap-5 sm:gap-6 relative">
                     {/* Step indicator & Progress */}
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between text-label-sm font-label-sm">
+                    <div className="sticky top-16 md:static z-20 bg-white/95 backdrop-blur-xs -mx-4 px-4 py-2.5 sm:mx-0 sm:px-0 sm:py-0 sm:bg-transparent border-b border-line sm:border-b-0 flex flex-col gap-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-label-sm font-label-sm">
                         <div className="flex items-center gap-2">
-                          <span className="px-2.5 py-0.5 rounded-full bg-[#92f7c3] text-[#012d1d] font-bold">
+                          <span className="px-2.5 py-0.5 rounded-full bg-tint text-fg-brand font-bold">
                             Soal {current + 1}
                           </span>
                           <span className="text-[#414844]">
                             dari 21 Pertanyaan
                           </span>
                         </div>
-                        <span className="text-[#006c48] font-semibold">
+                        <span className="text-fg-brand font-semibold">
                           {progressPercent}% Selesai
                         </span>
                       </div>
                       <div className="w-full bg-[#eceef0] h-2.5 rounded-full overflow-hidden">
                         <div
-                          className="bg-[#006c48] h-full rounded-full transition-all duration-300"
+                          className="bg-action h-full rounded-full transition-all duration-300"
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
@@ -854,11 +854,11 @@ export default function TeleScreening() {
 
                     {/* Question Prompt */}
                     <div
-                      className={`py-2 transition-opacity duration-200 ${
+                      className={`py-1 sm:py-2 transition-opacity duration-200 ${
                         animate ? "opacity-20" : "opacity-100"
                       }`}
                     >
-                      <span className="font-label-sm text-label-sm uppercase tracking-wider text-[#006c48] font-semibold mb-2 block">
+                      <span className="font-label-sm text-label-sm uppercase tracking-wider text-fg-brand font-semibold mb-2 block">
                         Refleksi Sepekan Terakhir • {currentDomain.label}
                       </span>
                       <h2 className="font-headline-md text-headline-md font-bold text-[#191c1e] leading-snug">
@@ -874,7 +874,7 @@ export default function TeleScreening() {
                     {/* 4 Interactive Option Cards */}
                     <div
                       aria-label="Skala Pilihan Respon"
-                      className="flex flex-col gap-3.5"
+                      className="flex flex-col gap-3"
                       role="radiogroup"
                     >
                       {DASS_OPTIONS.map((opt) => {
@@ -883,13 +883,13 @@ export default function TeleScreening() {
                           <label
                             key={opt.score}
                             onClick={() => handleSelectOption(opt.score)}
-                            className={`group relative flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-all border ${
+                            className={`group relative flex items-start gap-3 sm:gap-4 min-h-[60px] p-3.5 sm:p-4 rounded-xl cursor-pointer transition-all border ${
                               isSelected
-                                ? "bg-white ring-2 ring-[#006c48] border-[#006c48] shadow-sm"
+                                ? "bg-white ring-2 ring-action border-action shadow-sm"
                                 : "bg-[#f2f4f6] hover:bg-[#eceef0] border-transparent"
                             }`}
                           >
-                            <div className="pt-0.5">
+                            <div className="pt-0.5 shrink-0">
                               <input
                                 className="sr-only peer"
                                 name={`dass_q_${current}`}
@@ -901,7 +901,7 @@ export default function TeleScreening() {
                               <div
                                 className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                                   isSelected
-                                    ? "bg-[#012d1d] text-white"
+                                    ? "bg-emphasis text-white"
                                     : "bg-white border border-slate-300 group-hover:border-slate-400"
                                 }`}
                               >
@@ -912,20 +912,20 @@ export default function TeleScreening() {
                                 />
                               </div>
                             </div>
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center gap-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
+                                <div className="flex flex-wrap items-center gap-2 min-w-0">
                                   <span
                                     className={`font-headline-sm text-headline-sm font-semibold ${
                                       isSelected
-                                        ? "text-[#012d1d] font-bold"
+                                        ? "text-fg-brand font-bold"
                                         : "text-[#191c1e]"
                                     }`}
                                   >
                                     {opt.title}
                                   </span>
                                   {isSelected && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#92f7c3] text-[#012d1d] text-xs font-semibold">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tint text-fg-brand text-xs font-semibold">
                                       <span className="material-symbols-outlined text-[14px]">
                                         check
                                       </span>{" "}
@@ -934,9 +934,9 @@ export default function TeleScreening() {
                                   )}
                                 </div>
                                 <span
-                                  className={`font-label-sm text-label-sm px-2 py-0.5 rounded font-semibold ${
+                                  className={`font-label-sm text-label-sm px-2 py-0.5 rounded font-semibold shrink-0 ${
                                     isSelected
-                                      ? "text-[#006c48] bg-[#92f7c3]/50"
+                                      ? "text-fg-brand bg-tint"
                                       : "text-[#414844] bg-[#eceef0]"
                                   }`}
                                 >
@@ -953,11 +953,11 @@ export default function TeleScreening() {
                     </div>
 
                     {/* Bottom Navigation Action Bar */}
-                    <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
+                    <div className="pt-4 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 border-t border-slate-100">
                       <button
                         onClick={handlePrev}
                         disabled={current === 0}
-                        className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-label-md text-label-md font-semibold transition-colors ${
+                        className={`w-full sm:w-auto min-h-12 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-label-md text-label-md font-semibold transition-colors ${
                           current === 0
                             ? "bg-[#eceef0] text-[#c1c8c2] cursor-not-allowed"
                             : "bg-[#eceef0] text-[#191c1e] hover:bg-[#e6e8ea]"
@@ -970,10 +970,10 @@ export default function TeleScreening() {
                         <span>Sebelumnya</span>
                       </button>
 
-                      <div className="w-full sm:w-auto flex items-center gap-3">
+                      <div className="w-full sm:w-auto flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
                         <button
                           onClick={handleSkip}
-                          className="w-1/2 sm:w-auto px-4 py-2.5 rounded-xl text-[#414844] hover:text-[#191c1e] font-label-md text-label-md font-medium transition-colors"
+                          className="w-full sm:w-auto min-h-11 px-4 py-2.5 rounded-xl text-[#414844] hover:text-[#191c1e] hover:bg-[#f2f4f6] font-label-md text-label-md font-medium transition-colors"
                           type="button"
                         >
                           {current === totalQuestions - 1
@@ -983,7 +983,7 @@ export default function TeleScreening() {
                         <button
                           onClick={handleNext}
                           disabled={isSubmitting}
-                          className="w-1/2 sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#012d1d] text-white font-label-md text-label-md font-semibold hover:bg-[#006c48] transition-all shadow-sm"
+                          className="w-full sm:w-auto min-h-12 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-action text-white font-label-md text-label-md font-semibold hover:bg-action-hover transition-all shadow-sm"
                           type="button"
                         >
                           <span>

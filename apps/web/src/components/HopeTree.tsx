@@ -23,9 +23,13 @@ const HopeTree = ({ level }: HopeTreeProps) => {
             scale: [1, 1.02, 1],
           }}
           transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-          className="text-fg-brand"
+          className="text-fg-brand max-w-full"
         >
-          <TreePine size={size} strokeWidth={1.5} />
+          <TreePine
+            size={size}
+            strokeWidth={1.5}
+            className="w-36 h-36 sm:w-auto sm:h-auto max-w-full"
+          />
         </motion.div>
 
         {/* Progress Dots */}

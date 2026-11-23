@@ -34,7 +34,7 @@ export function RoleplayDialog({
         onClose();
       }}
       aria-labelledby="roleplay-dialog-title"
-      className="m-auto max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-3xl border border-line bg-surface p-6 text-fg shadow-lg backdrop:bg-black/40 sm:p-8"
+      className="mb-0 mt-auto sm:m-auto max-h-[90dvh] w-full sm:w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-t-3xl rounded-b-none sm:rounded-3xl border border-line bg-surface p-5 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] text-fg shadow-lg backdrop:bg-black/40 sm:p-8"
     >
       <div className="mb-5 flex items-start justify-between gap-4">
         <h2 id="roleplay-dialog-title" className="text-xl font-semibold">

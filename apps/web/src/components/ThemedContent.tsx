@@ -365,10 +365,19 @@ export default function ThemedContent({
     }
   };
 
+  const isAuthRoute =
+    displayedPath === "/login" || displayedPath === "/register";
+  const isGameRoute = displayedPath.startsWith("/game-");
+  const hasMobileBottomNav = !isAuthRoute && !isGameRoute;
+
   return (
     <div
       onClickCapture={handleClickCapture}
-      className="min-h-screen bg-canvas text-fg font-sans selection:bg-action selection:text-white"
+      className={`min-h-screen-safe bg-canvas text-fg font-sans selection:bg-action selection:text-white ${
+        hasMobileBottomNav
+          ? "pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-0"
+          : ""
+      }`}
     >
       <PageTransitionOverlay
         phase={transitionPhase}
@@ -376,9 +385,7 @@ export default function ThemedContent({
         transitionId={transitionId}
       />
       {/* Halaman login & register punya header merek sendiri (layout split-screen). */}
-      {displayedPath !== "/login" && displayedPath !== "/register" && (
-        <Navbar currentPath={displayedPath} />
-      )}
+      {!isAuthRoute && <Navbar currentPath={displayedPath} />}
       <OfflineRuntime currentPath={displayedPath} />
       <PageMotionProvider transitionPhase={transitionPhase}>
         {renderPage()}

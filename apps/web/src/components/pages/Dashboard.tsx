@@ -420,11 +420,11 @@ export default function Dashboard({
   const treeSize = Math.min(96 + activeLevel * 10, 136);
 
   return (
-    <div className="w-full bg-canvas min-h-screen">
-      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-8 space-y-8">
+    <div className="w-full bg-canvas min-h-screen-safe">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-5 sm:py-8 space-y-6 sm:space-y-8">
         {/* ================= TOP GREETING & CULTURAL WISDOM BANNER ================= */}
         <AnimatedCard index={0} ready={ready} reducedMotion={prefersReducedMotion}>
-          <section className="bg-surface border border-line rounded-xl p-6 lg:p-8 shadow-xs relative overflow-hidden">
+          <section className="bg-surface border border-line rounded-xl p-4 sm:p-6 lg:p-8 shadow-xs relative overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-3 max-w-3xl">
                 <div className="flex flex-wrap items-center gap-2.5">
@@ -456,17 +456,17 @@ export default function Dashboard({
               </div>
 
               {/* Live Quick Status Chips */}
-              <div className="flex flex-wrap sm:flex-nowrap md:flex-col gap-2.5 shrink-0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-col gap-2.5 shrink-0">
                 <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg bg-sunken border border-line">
                   <span
                     aria-hidden="true"
                     className="w-2.5 h-2.5 rounded-full bg-[var(--brand-500)] shrink-0"
                   />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col min-w-0">
                     <span className="text-xs font-semibold text-fg">
                       Mode Pemulihan Pribadi
                     </span>
-                    <span className="text-xs text-fg-muted">
+                    <span className="text-xs text-fg-muted truncate">
                       {treeStats ? treeStats.levelName : "Lv 1: Benih Asa"}
                     </span>
                   </div>
@@ -474,7 +474,7 @@ export default function Dashboard({
 
                 <Link
                   href="/offline-survival"
-                  className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg bg-sunken border border-line hover:border-line-strong transition-colors ${focusRing}`}
+                  className={`flex items-center gap-2.5 min-h-11 px-3.5 py-2.5 rounded-lg bg-sunken border border-line hover:border-line-strong transition-colors ${focusRing}`}
                 >
                   <CloudCheck
                     size={18}
@@ -848,13 +848,15 @@ export default function Dashboard({
                         </Link>
                       )}
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={journaledToday}
-                      disabled
-                      aria-label="Status target Jurnal Hikmah hari ini"
-                      className="w-5 h-5 accent-action rounded mt-1 shrink-0"
-                    />
+                    <span className="inline-flex items-center justify-center min-w-11 min-h-11 -mr-2 -mt-1 rounded-lg shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={journaledToday}
+                        disabled
+                        aria-label="Status target Jurnal Hikmah hari ini"
+                        className="w-5 h-5 accent-action rounded shrink-0"
+                      />
+                    </span>
                   </div>
                 </AnimatedCard>
 
@@ -885,17 +887,22 @@ export default function Dashboard({
                         <span>Mulai Latihan</span>
                       </Link>
                     </div>
-                    <input
-                      id="task-napas"
-                      type="checkbox"
-                      checked={breathedToday}
-                      disabled={breathedToday || recordingBreath}
-                      onChange={(e) =>
-                        handleToggleBreathingGoal(e.target.checked)
-                      }
-                      aria-label="Tandai Latihan Napas selesai hari ini"
-                      className={`w-5 h-5 accent-action rounded mt-1 shrink-0 cursor-pointer ${focusRing}`}
-                    />
+                    <label
+                      htmlFor="task-napas"
+                      className="inline-flex items-center justify-center min-w-11 min-h-11 -mr-2 -mt-1 rounded-lg hover:bg-sunken cursor-pointer shrink-0 transition-colors"
+                    >
+                      <input
+                        id="task-napas"
+                        type="checkbox"
+                        checked={breathedToday}
+                        disabled={breathedToday || recordingBreath}
+                        onChange={(e) =>
+                          handleToggleBreathingGoal(e.target.checked)
+                        }
+                        aria-label="Tandai Latihan Napas selesai hari ini"
+                        className={`w-5 h-5 accent-action rounded shrink-0 cursor-pointer ${focusRing}`}
+                      />
+                    </label>
                   </div>
                 </AnimatedCard>
 
@@ -930,16 +937,21 @@ export default function Dashboard({
                         <span>Buka Aktivitas</span>
                       </Link>
                     </div>
-                    <input
-                      id="task-meditasi"
-                      type="checkbox"
-                      checked={meditationChecked}
-                      onChange={(e) =>
-                        handleToggleMeditationGoal(e.target.checked)
-                      }
-                      aria-label="Tandai Meditasi Budaya selesai hari ini"
-                      className={`w-5 h-5 accent-action rounded mt-1 shrink-0 cursor-pointer ${focusRing}`}
-                    />
+                    <label
+                      htmlFor="task-meditasi"
+                      className="inline-flex items-center justify-center min-w-11 min-h-11 -mr-2 -mt-1 rounded-lg hover:bg-sunken cursor-pointer shrink-0 transition-colors"
+                    >
+                      <input
+                        id="task-meditasi"
+                        type="checkbox"
+                        checked={meditationChecked}
+                        onChange={(e) =>
+                          handleToggleMeditationGoal(e.target.checked)
+                        }
+                        aria-label="Tandai Meditasi Budaya selesai hari ini"
+                        className={`w-5 h-5 accent-action rounded shrink-0 cursor-pointer ${focusRing}`}
+                      />
+                    </label>
                   </div>
                 </AnimatedCard>
               </div>
@@ -1532,7 +1544,7 @@ export default function Dashboard({
               </span>
               <a
                 href="tel:119"
-                className={`text-xs sm:text-sm text-white underline underline-offset-4 font-semibold hover:text-white/90 ${focusRing}`}
+                className={`inline-flex items-center min-h-11 px-2 text-xs sm:text-sm text-white underline underline-offset-4 font-semibold hover:text-white/90 ${focusRing}`}
               >
                 Hubungi 119 Ext 8
               </a>
