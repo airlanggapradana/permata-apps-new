@@ -28,7 +28,10 @@ import RoleplayTools, {
   RoleplayDialog,
   type RoleplayTool,
 } from "@/components/games/RoleplayTools";
-import RoleplayPortrait from "@/components/games/RoleplayPortrait";
+import RoleplayPortrait, {
+  ROLEPLAY_CHARACTER_ATLAS,
+} from "@/components/games/RoleplayPortrait";
+import RoleplayCast from "@/components/games/RoleplayCast";
 import {
   getRoleplayReflections,
   getRoleplayScene,
@@ -38,6 +41,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useCulture } from "@/context/CultureContext";
 import {
   ROLEPLAY_SCENARIOS,
+  ROLEPLAY_CHARACTERS,
+  getRoleplayCast,
   ROLEPLAY_VERSION,
   ROLEPLAY_XP,
   replayRoleplay,
@@ -73,104 +78,6 @@ const subscribeOnline = (callback: () => void) => {
     window.removeEventListener("offline", callback);
   };
 };
-
-function SceneArtwork({ culture }: { culture: "aceh" | "kalimantan" }) {
-  return (
-    <svg
-      viewBox="0 0 520 350"
-      aria-hidden="true"
-      className="mx-auto w-full max-w-lg"
-    >
-      <ellipse cx="262" cy="307" rx="196" ry="19" fill="var(--brand-100)" />
-      <circle cx="272" cy="156" r="132" fill="var(--brand-50)" />
-      <circle cx="429" cy="72" r="20" fill="var(--accent-200)" />
-      <path
-        d="M46 269V150l95-54 95 54v119"
-        fill="var(--surface)"
-        stroke="var(--brand-200)"
-        strokeWidth="4"
-      />
-      <path
-        d={
-          culture === "aceh"
-            ? "M36 153l105-74 105 74-105-36Z"
-            : "M34 153l42-8 65-67 65 67 42 8-107-36Z"
-        }
-        fill="var(--brand-700)"
-      />
-      <path
-        d="M118 269v-76h46v76M72 173h25v31H72m113-31h25v31h-25"
-        fill="var(--brand-100)"
-      />
-      <path
-        d="M395 280v-88m0 30c-39-4-45-30-40-40 23-2 40 14 40 40m0-16c27-6 41-25 37-40-25 1-37 18-37 40"
-        fill="var(--brand-400)"
-        stroke="var(--brand-600)"
-        strokeWidth="4"
-        strokeLinejoin="round"
-      />
-      <rect
-        x="159"
-        y="266"
-        width="197"
-        height="12"
-        rx="6"
-        fill="var(--brand-700)"
-      />
-      <path
-        d="M174 277v28m166-28v28"
-        stroke="var(--brand-700)"
-        strokeWidth="9"
-        strokeLinecap="round"
-      />
-      <path
-        d="M218 253l-4 44m27-44 10 44m50-44 5 44m20-44 14 44"
-        stroke="var(--brand-800)"
-        strokeWidth="13"
-        strokeLinecap="round"
-      />
-      <path d="M197 261v-52c0-37 56-37 56 0v52" fill="var(--brand-600)" />
-      <path d="M281 261v-52c0-37 56-37 56 0v52" fill="var(--accent-500)" />
-      <path
-        d="M203 209l-12 31m57-31 24 20 15-15m44-5 14 33"
-        stroke="#c58966"
-        strokeWidth="12"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <circle cx="224" cy="161" r="28" fill="#dca47d" />
-      <circle cx="309" cy="161" r="28" fill="#c58966" />
-      <path
-        d="M195 158c-5-48 63-47 59 0l-14-19-29 8-16 11m85 0c-5-46 62-47 58 1l-18-18-24 6-16 11"
-        fill="var(--brand-900)"
-      />
-      <path
-        d="M216 164v3m17-3v3m68-3v3m17-3v3"
-        stroke="var(--brand-900)"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <path
-        d="M219 176q6 5 12 0m72 0q6 5 12 0"
-        fill="none"
-        stroke="#71472f"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M267 73h67a13 13 0 0 1 13 13v30a13 13 0 0 1-13 13h-42l-18 15v-15h-7a13 13 0 0 1-13-13V86a13 13 0 0 1 13-13"
-        fill="var(--surface)"
-        stroke="var(--brand-200)"
-        strokeWidth="3"
-      />
-      <path
-        d="M284 98c-12-13-25 6 17 22 42-16 29-35 17-22-7-11-27-11-34 0"
-        fill="var(--brand-400)"
-        transform="translate(15 8) scale(.9)"
-      />
-    </svg>
-  );
-}
 
 export default function RoleplayPsy() {
   const { culture } = useCulture();
@@ -216,7 +123,9 @@ export default function RoleplayPsy() {
   const reflections =
     run && completed ? getRoleplayReflections(run.scenarioId, run.answers) : [];
   const activeCulture = run?.culture ?? culture;
-  const text = (value: string) => roleplayText(value, activeCulture);
+  const cast = getRoleplayCast(run?.scenarioId ?? "teman-di-posko");
+  const text = (value: string) =>
+    roleplayText(value, activeCulture, run?.scenarioId);
 
   useEffect(() => {
     runRef.current = run;
@@ -409,7 +318,7 @@ export default function RoleplayPsy() {
     setDownloadState("loading");
     setDownloadMessage("Menyiapkan cerita dan aset untuk perangkat ini…");
     try {
-      await syncOfflineSurvivalBundle(["/roleplay"]);
+      await syncOfflineSurvivalBundle(["/roleplay", ROLEPLAY_CHARACTER_ATLAS]);
       setDownloadState("ready");
       setDownloadMessage(
         "Paket tersimpan. Cerita dapat dibuka kembali di perangkat dan peramban ini saat offline.",
@@ -472,7 +381,7 @@ export default function RoleplayPsy() {
                   </div>
                 </div>
                 <div className="bg-tint/40 px-4 py-3 lg:py-10">
-                  <SceneArtwork culture={culture} />
+                  <RoleplayCast />
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-4 border-t border-line bg-sunken/50 px-6 py-4 sm:px-10">
@@ -554,6 +463,8 @@ export default function RoleplayPsy() {
               <div className="grid gap-5 md:grid-cols-2">
                 {ROLEPLAY_SCENARIOS.map((scenario) => {
                   const Icon = icons[scenario.icon];
+                  const storyCast = getRoleplayCast(scenario.id);
+                  const friend = ROLEPLAY_CHARACTERS[storyCast.friend];
                   return (
                     <div
                       key={scenario.id}
@@ -561,13 +472,20 @@ export default function RoleplayPsy() {
                     >
                       <article className="flex h-full flex-col rounded-2xl border border-line bg-surface p-6 transition-shadow hover:shadow-md sm:p-7">
                         <div className="mb-5 flex items-center justify-between gap-3">
-                          <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-tint text-fg-brand">
-                            <Icon size={26} aria-hidden="true" />
-                          </span>
+                          <RoleplayPortrait
+                            character={storyCast.friend}
+                            mood={getRoleplayScene(scenario.id, "sapa").mood}
+                            className="h-24 w-24"
+                          />
                           <span className="rounded-full bg-sunken px-3 py-1.5 text-sm text-fg-muted">
                             {scenario.topic}
                           </span>
                         </div>
+                        <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-fg-brand">
+                          <Icon size={17} aria-hidden="true" />
+                          Bersama {friend.name} · {friend.age} tahun ·{" "}
+                          {friend.origin}
+                        </p>
                         <h3 className="text-xl font-semibold">
                           {scenario.title}
                         </h3>
@@ -687,9 +605,9 @@ export default function RoleplayPsy() {
                 <div className="border-b border-line bg-tint/30 p-4 sm:p-6 lg:self-stretch lg:border-b-0 lg:border-r lg:p-8">
                   <div className="flex items-center gap-3 sm:gap-4">
                     <RoleplayPortrait
-                      culture={run.culture}
+                      character={cast.friend}
                       mood={scene?.mood ?? "listening"}
-                      className="h-16 w-16 sm:h-24 sm:w-24"
+                      className="h-20 w-20 sm:h-28 sm:w-28 lg:h-40 lg:w-40"
                     />
                     <div>
                       <p className="text-lg font-semibold">
@@ -697,6 +615,10 @@ export default function RoleplayPsy() {
                       </p>
                       <p className="mt-1 text-sm text-fg-muted">
                         {ROLEPLAY_MOODS[scene?.mood ?? "listening"]}
+                      </p>
+                      <p className="mt-1 text-sm text-fg-muted">
+                        {ROLEPLAY_CHARACTERS[cast.friend].age} tahun ·{" "}
+                        {ROLEPLAY_CHARACTERS[cast.friend].origin}
                       </p>
                     </div>
                   </div>
@@ -717,6 +639,27 @@ export default function RoleplayPsy() {
                   <blockquote className="mt-2 rounded-xl bg-surface p-3 text-base leading-6 sm:mt-4 sm:p-4 sm:text-lg sm:leading-relaxed">
                     “{text(replay.node.dialogue)}”
                   </blockquote>
+                  {(scene?.mood === "supported" ||
+                    replay.node.stage >= 3 ||
+                    run.scenarioId === "tenang-bersama") && (
+                    <div
+                      className="mt-4 flex items-center gap-3 rounded-xl border border-line bg-surface p-3"
+                      data-roleplay-guide={cast.guide}
+                    >
+                      <RoleplayPortrait
+                        character={cast.guide}
+                        mood="listening"
+                        className="h-14 w-14"
+                      />
+                      <p className="text-sm leading-relaxed text-fg-muted">
+                        <span className="block font-semibold text-fg-brand">
+                          {ROLEPLAY_CHARACTERS[cast.guide].name}
+                        </span>
+                        {ROLEPLAY_CHARACTERS[cast.guide].role}, siap menemani
+                        kalian.
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="p-4 sm:p-6 lg:p-8">
                   <h2
@@ -729,9 +672,19 @@ export default function RoleplayPsy() {
                   </h2>
                   {!feedback ? (
                     <>
-                      <p className="mb-4 mt-2 text-base text-fg-muted">
-                        Apa yang ingin kamu katakan atau lakukan?
-                      </p>
+                      <div className="mb-4 mt-3 flex items-center gap-3">
+                        <RoleplayPortrait
+                          character="aira"
+                          mood="listening"
+                          className="h-12 w-12"
+                        />
+                        <p className="text-base text-fg-muted">
+                          <span className="block text-sm font-semibold text-fg-brand">
+                            Kamu sebagai Aira
+                          </span>
+                          Apa yang ingin kamu katakan atau lakukan?
+                        </p>
+                      </div>
                       <div className="space-y-3">
                         {replay.node.options.map((item) => (
                           <button
@@ -759,7 +712,7 @@ export default function RoleplayPsy() {
                       <div className="rounded-2xl bg-tint p-4 sm:p-5">
                         <div className="mb-3 flex items-center gap-3">
                           <RoleplayPortrait
-                            culture={run.culture}
+                            character={cast.friend}
                             mood={reactionMood ?? "listening"}
                             className="h-14 w-14"
                           />
@@ -837,7 +790,7 @@ export default function RoleplayPsy() {
           >
             <div className="bg-tint px-6 pb-7 pt-8 text-center sm:px-10">
               <RoleplayPortrait
-                culture={run.culture}
+                character={cast.friend}
                 mood="supported"
                 className="mx-auto mb-5 h-24 w-24"
               />
@@ -1027,15 +980,25 @@ export default function RoleplayPsy() {
           onClose={() => setSelectedStory(null)}
         >
           <div className="space-y-5">
+            <RoleplayCast scenarioId={selectedStory.id} />
             <p className="text-base leading-relaxed text-fg-muted">
               {selectedStory.description}
             </p>
             <div className="rounded-2xl bg-tint p-5 text-base leading-relaxed">
               <p className="font-semibold text-fg-brand">Sebelum mulai</p>
               <p className="mt-2">
-                Kamu menemani tokoh fiktif. Tidak perlu mengingat atau
-                menceritakan kejadianmu sendiri. Cerita boleh dijeda atau
-                ditutup kapan saja.
+                Kamu bermain sebagai Aira dan menemani{" "}
+                {
+                  ROLEPLAY_CHARACTERS[getRoleplayCast(selectedStory.id).friend]
+                    .name
+                }
+                , bersama{" "}
+                {
+                  ROLEPLAY_CHARACTERS[getRoleplayCast(selectedStory.id).guide]
+                    .name
+                }
+                . Tidak perlu mengingat atau menceritakan kejadianmu sendiri.
+                Cerita boleh dijeda atau ditutup kapan saja.
               </p>
             </div>
             {resume && (

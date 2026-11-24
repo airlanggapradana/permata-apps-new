@@ -14,6 +14,8 @@ import {
   VolumeX,
   RotateCcw,
   Flag,
+  Vibrate,
+  Lightbulb,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import type { TreeStats } from "@/lib/treeProgress";
@@ -32,12 +34,12 @@ import {
   type QuakeInput,
   type QuakeState,
 } from "@/lib/games/sigapBencana";
-import styles from "./GameSiagaMinang.module.css";
-import skin from "./GameQuake.module.css";
+import styles from "./GameQuake.module.css";
+const skin = styles;
 
 type Phase = "intro" | "loading" | "playing" | "question" | "paused" | "result";
 const button =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f2d28f] disabled:opacity-50";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-semibold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2b6a56] disabled:opacity-50";
 type Handlers = {
   ready: () => void;
   question: (id: string) => void;
@@ -71,6 +73,8 @@ export default function GameQuake() {
   const [saveMessage, setSaveMessage] = useState("");
   const [sound, setSound] = useState(false);
   const soundRef = useRef(false);
+  const [shakeEnabled, setShakeEnabled] = useState(true);
+  const shakeEnabledRef = useRef(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const root = useRef<HTMLElement>(null);
   const modalHeading = useRef<HTMLHeadingElement>(null);
@@ -89,6 +93,7 @@ export default function GameQuake() {
     inputRef,
     stateRef: gameRef,
     reducedMotionRef: reducedRef,
+    shakeEnabledRef,
     onReady: () => callbacks.current?.ready(),
     onUpdate: setSnapshot,
     onQuestion: (id) => callbacks.current?.question(id),
@@ -393,12 +398,6 @@ export default function GameQuake() {
             <section className={styles.menus + " grid gap-6 md:grid-cols-2"}>
               <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
                 <div className={skin.illustration} aria-hidden="true">
-                  <span className={skin.houseRoof} />
-                  <span className={skin.houseBody}>
-                    <span className={skin.window} />
-                    <span className={skin.door} />
-                    <span className={skin.window} />
-                  </span>
                   <span className={skin.illustrationTag}>LATIHAN DI RUMAH</span>
                 </div>
                 <h2 className="text-xl font-semibold">
@@ -447,6 +446,11 @@ export default function GameQuake() {
                     Esc: jeda atau lanjut
                   </p>
                 </div>
+                <p className="text-sm leading-relaxed text-fg-muted">
+                  Arena berguncang singkat pada adegan gempa. Gunakan tombol
+                  Getaran untuk mematikannya kapan saja. Efek mati otomatis bila
+                  perangkat memakai pengurangan animasi.
+                </p>
                 <div className="rounded-xl bg-canvas p-4 text-sm">
                   <strong>HP / tablet</strong>
                   <p className="mt-2 text-fg-muted">
@@ -495,18 +499,56 @@ export default function GameQuake() {
             <QuakeScene bridge={bridge} onError={loadError} />
             <div className={styles.hud}>
               <div className={styles.stats}>
-                <p>{snapshot.answers.length} / 3 langkah dipelajari</p>
-                <p>
-                  {Math.floor(snapshot.activeMs / 1000)} detik aktif · tanpa
-                  batas waktu
-                </p>
-                <div className={styles.progressTrack} aria-hidden="true">
-                  <span
-                    style={{ width: (snapshot.answers.length / 3) * 100 + "%" }}
-                  />
+                <span className={styles.statIcon} aria-hidden="true">
+                  📚
+                </span>
+                <div className={styles.statCopy}>
+                  <p>
+                    <strong>{snapshot.answers.length} / 3</strong> langkah
+                    dipelajari
+                  </p>
+                  <p>
+                    {Math.floor(snapshot.activeMs / 1000)} detik aktif · tanpa
+                    batas waktu
+                  </p>
+                  <div className={styles.progressTrack} aria-hidden="true">
+                    <span
+                      style={{
+                        width: (snapshot.answers.length / 3) * 100 + "%",
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
               <div className={styles.actions}>
+                <button
+                  type="button"
+                  className={styles.hudButton}
+                  aria-label={
+                    shakeEnabled && !reducedMotion
+                      ? "Matikan Getaran"
+                      : "Nyalakan Getaran"
+                  }
+                  aria-pressed={shakeEnabled && !reducedMotion}
+                  disabled={phase !== "playing" || Boolean(reducedMotion)}
+                  title={
+                    reducedMotion
+                      ? "Getaran mati mengikuti pengaturan pengurangan animasi"
+                      : "Efek guncangan pada adegan gempa"
+                  }
+                  onClick={() => {
+                    shakeEnabledRef.current = !shakeEnabledRef.current;
+                    setShakeEnabled(shakeEnabledRef.current);
+                    root.current
+                      ?.querySelector("canvas")
+                      ?.focus({ preventScroll: true });
+                  }}
+                >
+                  <Vibrate size={22} />
+                  <span className={styles.actionLabel}>
+                    Getaran {shakeEnabled && !reducedMotion ? "aktif" : "mati"}
+                  </span>
+                </button>
                 <button
                   type="button"
                   className={styles.hudButton}
@@ -540,11 +582,14 @@ export default function GameQuake() {
                 </button>
               </div>
             </div>
-            <p role="status" aria-live="polite" className={styles.feedback}>
-              {phase === "loading"
-                ? "Menyiapkan rumah dan karakter…"
-                : feedback}
-            </p>
+            <div className={styles.feedback}>
+              <Lightbulb size={28} aria-hidden="true" />
+              <p role="status" aria-live="polite">
+                {phase === "loading"
+                  ? "Menyiapkan rumah dan karakter…"
+                  : feedback}
+              </p>
+            </div>
             <div
               className={styles.controls}
               aria-label="Tombol kendali karakter"
@@ -563,9 +608,9 @@ export default function GameQuake() {
                     {...controlHandlers(action)}
                   >
                     {action === "left" ? (
-                      <ArrowLeft size={28} />
+                      <ArrowLeft size={36} strokeWidth={3.5} />
                     ) : (
-                      <ArrowRight size={28} />
+                      <ArrowRight size={36} strokeWidth={3.5} />
                     )}
                   </button>
                 ))}
@@ -578,7 +623,7 @@ export default function GameQuake() {
                 disabled={phase !== "playing"}
                 {...controlHandlers("jump")}
               >
-                <ArrowUp size={26} />
+                <ArrowUp size={38} strokeWidth={3.5} />
                 Lompat
               </button>
             </div>
@@ -615,7 +660,9 @@ export default function GameQuake() {
                     <button
                       ref={resumeButton}
                       type="button"
-                      className={button + " w-full sm:w-auto bg-action text-white"}
+                      className={
+                        button + " w-full sm:w-auto bg-action text-white"
+                      }
                       onClick={resume}
                     >
                       <Play size={18} />
@@ -623,7 +670,9 @@ export default function GameQuake() {
                     </button>
                     <button
                       type="button"
-                      className={button + " w-full sm:w-auto bg-tint text-fg-brand"}
+                      className={
+                        button + " w-full sm:w-auto bg-tint text-fg-brand"
+                      }
                       onClick={() => {
                         if (gameRef.current) {
                           revisitQuakeRoom(gameRef.current);
@@ -638,7 +687,9 @@ export default function GameQuake() {
                     </button>
                     <button
                       type="button"
-                      className={button + " w-full sm:w-auto bg-canvas text-fg-muted"}
+                      className={
+                        button + " w-full sm:w-auto bg-canvas text-fg-muted"
+                      }
                       onClick={() => finish()}
                     >
                       <Flag size={17} />
@@ -708,7 +759,9 @@ export default function GameQuake() {
                   )}
                   <button
                     type="button"
-                    className={button + " w-full sm:w-auto bg-canvas text-fg-muted"}
+                    className={
+                      button + " w-full sm:w-auto bg-canvas text-fg-muted"
+                    }
                     onClick={() => finish()}
                   >
                     Akhiri Latihan

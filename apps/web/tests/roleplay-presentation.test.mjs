@@ -39,7 +39,9 @@ test("every scene has a compact introduction and an accessible expression in bot
         `${scenario.id}/${node.id} stays concise`,
       );
       for (const culture of ["aceh", "kalimantan"])
-        assert.ok(!/[{}]/.test(domain.roleplayText(scene.intro, culture)));
+        assert.ok(
+          !/[{}]/.test(domain.roleplayText(scene.intro, culture, scenario.id)),
+        );
     }
   assert.equal(moods.size, 6);
   assert.match(
@@ -49,6 +51,50 @@ test("every scene has a compact introduction and an accessible expression in bot
   assert.match(
     getRoleplayScene("kabar-di-posko", "dengar-arahan").intro,
     /Dalam cerita ini/,
+  );
+});
+
+test("story characters keep their identities in both cultural settings and resolve every story text", () => {
+  const expected = [
+    ["teman-di-posko", "rusdi", "naya"],
+    ["rindu-rumah", "cut", "sari"],
+    ["tenang-bersama", "evan", "naya"],
+    ["kabar-di-posko", "lani", "sari"],
+  ];
+  for (const [id, friend, guide] of expected) {
+    const cast = domain.getRoleplayCast(id);
+    assert.equal(cast.player, "aira");
+    assert.equal(cast.friend, friend);
+    assert.equal(cast.guide, guide);
+    for (const culture of ["aceh", "kalimantan"]) {
+      assert.equal(
+        domain.roleplayText("{player} / {friend} / {guide}", culture, id),
+        `Aira / ${domain.ROLEPLAY_CHARACTERS[friend].name} / ${domain.ROLEPLAY_CHARACTERS[guide].name}`,
+      );
+      const scenario = domain.getRoleplayScenario(id);
+      for (const node of scenario.nodes) {
+        const values = [
+          node.situation,
+          node.dialogue,
+          getRoleplayScene(id, node.id).intro,
+        ];
+        for (const option of node.options)
+          values.push(option.text, option.reaction, option.explanation);
+        for (const value of values) {
+          const resolved = domain.roleplayText(value, culture, id);
+          assert.ok(!/[{}]/.test(resolved), `${id}/${node.id}: ${resolved}`);
+          assert.ok(!/\b(Rafi|Lala)\b/.test(resolved));
+        }
+      }
+    }
+  }
+  assert.match(
+    domain.roleplayText("{place}", "aceh", "tenang-bersama"),
+    /gampong/,
+  );
+  assert.match(
+    domain.roleplayText("{place}", "kalimantan", "rindu-rumah"),
+    /Betang/,
   );
 });
 

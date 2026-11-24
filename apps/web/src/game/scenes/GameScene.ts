@@ -4,7 +4,7 @@ import {
   stepQuake,
   quakeSnapshot,
   QUAKE_WIDTH,
-  QUAKE_HEIGHT,
+  QUAKE_FLOOR,
   QUAKE_SPEED,
   QUAKE_LESSONS,
 } from "@/lib/games/sigapBencana";
@@ -17,7 +17,8 @@ export default class GameScene extends Phaser.Scene {
   private hero!: Phaser.GameObjects.Image;
   private shadow!: Phaser.GameObjects.Ellipse;
   private heroTexture!: Phaser.Textures.CanvasTexture;
-  private markers: Phaser.GameObjects.Text[] = [];
+  private heroArt?: HTMLImageElement;
+  private markers: Phaser.GameObjects.Container[] = [];
   private accumulator = 0;
   private previousX = 100;
   private previousY = 452;
@@ -38,35 +39,81 @@ export default class GameScene extends Phaser.Scene {
     super("SigapBencana");
     this.bridge = bridge;
   }
+  preload() {
+    const base = "/images/sigap-bencana/";
+    this.load.image("sigap-living-art", base + "living-room-v2.webp");
+    this.load.image("sigap-corridor-art", base + "corridor-v2.webp");
+    this.load.image("sigap-exit-art", base + "exit-hall-v2.webp");
+    this.load.image("sigap-hero-art", base + "hero-v2.webp");
+  }
   create() {
     this.cameras.main.setOrigin(0, 0);
     this.bridge.stateRef.current = createQuakeState();
     const room = this.textures.createCanvas("sigap-room", QUAKE_WIDTH, 1800);
     if (!room) throw new Error("Gambar rumah belum tersedia.");
-    drawQuakeHouse(room.getContext());
+    const roomKeys = [
+      "sigap-living-art",
+      "sigap-corridor-art",
+      "sigap-exit-art",
+    ];
+    drawQuakeHouse(
+      room.getContext(),
+      roomKeys.every((key) => this.textures.exists(key))
+        ? {
+            rooms: roomKeys.map(
+              (key) =>
+                this.textures.get(key).getSourceImage() as HTMLImageElement,
+            ),
+          }
+        : undefined,
+    );
+    if (this.textures.exists("sigap-hero-art"))
+      this.heroArt = this.textures
+        .get("sigap-hero-art")
+        .getSourceImage() as HTMLImageElement;
     room.refresh();
     this.add.image(0, -800, "sigap-room").setOrigin(0);
     for (let i = 0; i < QUAKE_LESSONS.length; i++) {
       const lesson = QUAKE_LESSONS[i];
-      this.add.circle(lesson.x, 388, 19, 0x31675f).setStrokeStyle(2, 0xf1d69b);
-      this.add
-        .text(lesson.x, 388, String(i + 1), {
-          fontFamily: "sans-serif",
-          fontSize: "18px",
+      const marker = this.add.container(lesson.x, 366);
+      const plate = this.add.graphics();
+      plate.fillStyle(0x000000, 0.1).fillRoundedRect(-72, -72, 144, 34, 12);
+      plate.fillStyle(0x245c50).fillRoundedRect(-74, -74, 148, 34, 12);
+      plate.lineStyle(2, 0xffedb3).strokeRoundedRect(-74, -74, 148, 34, 12);
+      plate.fillStyle(0x245c50).fillTriangle(-8, -40, 8, -40, 0, -32);
+      plate.fillStyle(0xf9ca31).fillTriangle(-8, 20, 8, 20, 0, 52);
+      plate.fillStyle(0xfff3bf).fillCircle(0, 0, 27);
+      plate.fillStyle(0xe9b923).fillCircle(0, 0, 25);
+      plate.fillStyle(0x2b695b).fillCircle(0, 0, 22);
+      plate.lineStyle(1.5, 0x92b99b).strokeCircle(0, 0, 20);
+      plate.lineStyle(4, 0xffefad);
+      plate.lineBetween(-36, -28, -43, -35);
+      plate.lineBetween(-39, -11, -48, -13);
+      const number = this.add
+        .text(0, 0, String(i + 1), {
+          fontFamily: "Arial, sans-serif",
+          fontSize: "27px",
           fontStyle: "bold",
-          color: "#fff0c3",
+          color: "#fffbe6",
+          shadow: {
+            offsetX: 0,
+            offsetY: 2,
+            color: "#174d42",
+            blur: 1,
+            fill: true,
+          },
         })
         .setOrigin(0.5);
       const label = this.add
-        .text(lesson.x, 340, lesson.room, {
-          fontFamily: "sans-serif",
-          fontSize: "12px",
-          color: "#fff5d8",
-          backgroundColor: "#28524d",
-          padding: { x: 12, y: 8 },
+        .text(0, -57, lesson.room, {
+          fontFamily: "Arial, sans-serif",
+          fontSize: lesson.room.length > 15 ? "14px" : "17px",
+          fontStyle: "bold",
+          color: "#fffbe6",
         })
         .setOrigin(0.5);
-      this.markers.push(label);
+      marker.add([plate, number, label]);
+      this.markers.push(marker);
     }
     this.shadow = this.add.ellipse(100, 503, 36, 7, 0x304d3c, 0.2);
     const heroTexture = this.textures.createCanvas("sigap-hero", 192, 280);
@@ -76,7 +123,7 @@ export default class GameScene extends Phaser.Scene {
     this.hero = this.add
       .image(100, 500, "sigap-hero")
       .setOrigin(0.5, 132 / 140)
-      .setScale(0.41);
+      .setScale(this.heroArt ? 0.5 : 0.65);
     this.game.canvas.setAttribute(
       "aria-label",
       "Area permainan Sigap Bencana. Gunakan A D atau panah untuk berjalan dan Spasi untuk melompat.",
@@ -153,7 +200,20 @@ export default class GameScene extends Phaser.Scene {
       });
     this.renderedX = x;
     this.renderedY = y;
-    drawQuakeHero(this.heroTexture.getContext(), this.pose);
+    const frame = this.bridge.reducedMotionRef.current
+      ? 0
+      : !state.grounded
+        ? state.vy < 0
+          ? 6
+          : 7
+        : this.pose.run > 0.15
+          ? 1 + (Math.floor(this.pose.gait / 1.6) % 5)
+          : 0;
+    drawQuakeHero(
+      this.heroTexture.getContext(),
+      this.pose,
+      this.heroArt ? { image: this.heroArt, frame } : undefined,
+    );
     this.heroTexture.refresh();
     this.hero.setPosition(x, y + 48);
     this.shadow
@@ -171,10 +231,25 @@ export default class GameScene extends Phaser.Scene {
       this.cameraX = target;
     else if (this.bridge.inputRef.current.enabled)
       this.cameraX += (target - this.cameraX) * (1 - Math.exp(-elapsed / 0.09));
-    const bottom = window.matchMedia("(pointer: coarse)").matches ? 80 : 24;
+    const floorPixel = height - Math.max(90, Math.min(210, height * 0.21));
+    // Tremors belong to the first, "during shaking" lesson. DOM controls stay still.
+    const tremorTime = (state.elapsed / 1000) % 5.6;
+    const tremor =
+      this.bridge.shakeEnabledRef.current &&
+      !this.bridge.reducedMotionRef.current &&
+      this.bridge.inputRef.current.enabled &&
+      state.answers.length === 0 &&
+      tremorTime < 1.8
+        ? Math.sin((tremorTime / 1.8) * Math.PI) * 2.8
+        : 0;
+    const shakeX = Math.sin(state.elapsed * 0.065) * tremor;
+    const shakeY = Math.cos(state.elapsed * 0.083) * tremor * 0.7;
     this.cameras.main
       .setZoom(zoom)
-      .setScroll(this.cameraX, QUAKE_HEIGHT - height / zoom + bottom / zoom);
+      .setScroll(
+        this.cameraX + shakeX,
+        QUAKE_FLOOR - floorPixel / zoom + shakeY,
+      );
     for (let i = 0; i < this.markers.length; i++)
       this.markers[i].setAlpha(i < state.answers.length ? 0.5 : 1);
     const canvas = this.game.canvas;
@@ -182,6 +257,10 @@ export default class GameScene extends Phaser.Scene {
     canvas.dataset.playerY = state.y.toFixed(2);
     canvas.dataset.visualX = x.toFixed(3);
     canvas.dataset.grounded = String(state.grounded);
+    canvas.dataset.quakeShaking = String(tremor > 0);
+    canvas.dataset.quakeOffset = Math.hypot(shakeX, shakeY).toFixed(3);
+    canvas.dataset.heroFrame = String(frame);
+    canvas.dataset.illustrated = String(Boolean(this.heroArt));
     if (time - this.lastUpdate >= 100 && this.bridge.inputRef.current.enabled) {
       this.bridge.onUpdate(quakeSnapshot(state));
       this.lastUpdate = time;

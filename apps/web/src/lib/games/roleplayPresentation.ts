@@ -38,12 +38,12 @@ const SCENES: Record<string, Record<string, ScenePresentation>> = {
     pilihan: {
       mood: "listening",
       intro:
-        "Pendamping ada di dekat kalian. {friend} ingin memilih langkah berikutnya.",
+        "{guide} ada di dekat kalian. {friend} ingin memilih langkah berikutnya.",
     },
     hubungkan: {
       mood: "supported",
       intro:
-        "Pendamping mendekat. Kamu bisa membantu teman menyampaikan kebutuhannya.",
+        "{guide} mendekat. Kamu bisa membantu teman menyampaikan kebutuhannya.",
     },
     selesai: {
       mood: "supported",
@@ -73,7 +73,7 @@ const SCENES: Record<string, Record<string, ScenePresentation>> = {
     },
     hubungkan: {
       mood: "supported",
-      intro: "Pendamping mendekat dan ingin mendengarkan kebutuhan kalian.",
+      intro: "{guide} mendekat dan ingin mendengarkan kebutuhan kalian.",
     },
     selesai: {
       mood: "supported",
@@ -85,7 +85,7 @@ const SCENES: Record<string, Record<string, ScenePresentation>> = {
     sapa: {
       mood: "worried",
       intro:
-        "Guncangan sudah berhenti. Ikuti pendamping menuju titik kumpul bersama {friend}.",
+        "Guncangan sudah berhenti. Ikuti {guide} menuju titik kumpul bersama {friend}.",
     },
     ruang: {
       mood: "hesitant",
@@ -107,7 +107,7 @@ const SCENES: Record<string, Record<string, ScenePresentation>> = {
     },
     hubungkan: {
       mood: "supported",
-      intro: "Pendamping menanyakan apa yang {friend} perlukan.",
+      intro: "{guide} menanyakan apa yang {friend} perlukan.",
     },
     selesai: {
       mood: "supported",
@@ -128,7 +128,7 @@ const SCENES: Record<string, Record<string, ScenePresentation>> = {
     periksa: {
       mood: "hesitant",
       intro:
-        "Petugas informasi dan pendamping bisa membantu kalian memeriksa kabar.",
+        "Petugas informasi dan {guide} bisa membantu kalian memeriksa kabar.",
     },
     "dengar-arahan": {
       mood: "listening",

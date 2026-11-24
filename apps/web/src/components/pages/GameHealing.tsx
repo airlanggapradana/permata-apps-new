@@ -5,7 +5,6 @@ import Link from "next/link";
 import { AnimatedSection } from "@/components/PageMotion";
 import {
   ArrowLeft,
-  Backpack,
   Camera,
   Check,
   Clock3,
@@ -13,6 +12,11 @@ import {
   Leaf,
   RotateCcw,
   Trophy,
+  Gamepad2,
+  Lightbulb,
+  Music2,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import type { TreeStats } from "@/lib/treeProgress";
@@ -25,6 +29,10 @@ import {
   type BagMode,
 } from "@/lib/games/emergencyBag";
 import BagCamera from "@/components/games/BagCamera";
+import BagArtwork from "@/components/games/BagArtwork";
+import BagGuideDialog from "@/components/games/BagGuideDialog";
+import { BAG_INTRO_DIALOGUE } from "@/lib/games/bagPresentation";
+import styles from "./GameHealing.module.css";
 
 type Result = { items: string[]; wrongSelections: number; completed: boolean };
 const button =
@@ -35,6 +43,13 @@ export default function GameHealing() {
   const [phase, setPhase] = useState<"intro" | "playing" | "result">("intro");
   const [mode, setMode] = useState<BagMode>("practice");
   const [control, setControl] = useState<"touch" | "camera">("touch");
+  const [introStep, setIntroStep] = useState(0);
+  const [skipTyping, setSkipTyping] = useState(false);
+  const [narration, setNarration] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [music, setMusic] = useState(false);
+  const musicRef = useRef<HTMLAudioElement | null>(null);
+  const startingRef = useRef(false);
   const [items, setItems] = useState<string[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [feedback, setFeedback] = useState(
@@ -52,11 +67,68 @@ export default function GameHealing() {
   const [saveMessage, setSaveMessage] = useState("");
   const [awardedXp, setAwardedXp] = useState(0);
   const boardRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
   const bagRef = useRef<string[]>([]);
   const selectedRef = useRef<string | null>(null);
   const mistakesRef = useRef(0);
   const finishedRef = useRef(false);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
+  const narrationUnavailable = useCallback(() => {
+    setNarration(false);
+    setNotice(
+      "Pembacaan suara belum tersedia di peramban ini. Dialog Aira tetap bisa dibaca.",
+    );
+  }, []);
+
+  useEffect(() => {
+    setSpeechSupported(
+      "speechSynthesis" in window && "SpeechSynthesisUtterance" in window,
+    );
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!music || phase === "result") {
+      musicRef.current?.pause();
+      return;
+    }
+    const audio = (musicRef.current ??= new Audio("/audio/bgm.mp3"));
+    audio.loop = true;
+    audio.volume = 0.09;
+    let cancelled = false;
+    if (!document.hidden)
+      void audio
+        .play()
+        .then(() => {
+          if (cancelled) audio.pause();
+        })
+        .catch(() => setMusic(false));
+    const hide = () => {
+      if (document.hidden) {
+        audio.pause();
+        setMusic(false);
+      }
+    };
+    document.addEventListener("visibilitychange", hide);
+    return () => {
+      cancelled = true;
+      audio.pause();
+      document.removeEventListener("visibilitychange", hide);
+    };
+  }, [music, phase]);
+
+  useEffect(
+    () => () => {
+      musicRef.current?.pause();
+      musicRef.current?.removeAttribute("src");
+      musicRef.current?.load();
+    },
+    [],
+  );
 
   const saveResult = useCallback(
     async (snapshot: Result) => {
@@ -150,7 +222,40 @@ export default function GameHealing() {
     if (phase === "result") resultHeadingRef.current?.focus();
   }, [phase]);
 
+  useEffect(() => {
+    const keepFocusInGame = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return;
+      const root = rootRef.current;
+      const targets = root
+        ? [
+            ...root.querySelectorAll<HTMLElement>(
+              "a[href],button:not(:disabled),input:not(:disabled)",
+            ),
+          ].filter(
+            (element) =>
+              element.tabIndex >= 0 && element.getClientRects().length > 0,
+          )
+        : [];
+      const first = targets[0],
+        last = targets[targets.length - 1];
+      if (
+        first &&
+        last &&
+        (!root?.contains(document.activeElement) ||
+          (event.shiftKey && document.activeElement === first) ||
+          (!event.shiftKey && document.activeElement === last))
+      ) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      }
+    };
+    window.addEventListener("keydown", keepFocusInGame);
+    return () => window.removeEventListener("keydown", keepFocusInGame);
+  }, []);
+
   async function start() {
+    if (startingRef.current) return;
+    startingRef.current = true;
     setStarting(true);
     setNotice("");
     let newAttemptId: string | null = null;
@@ -192,6 +297,7 @@ export default function GameHealing() {
           : "Sesi belum bisa dimulai. Periksa koneksi dan coba lagi.",
       );
     } finally {
+      startingRef.current = false;
       setStarting(false);
     }
   }
@@ -203,7 +309,13 @@ export default function GameHealing() {
   }, []);
 
   function placeItem(id: string | null) {
-    if (!id || finishedRef.current || bagRef.current.includes(id)) return;
+    if (
+      phase !== "playing" ||
+      !id ||
+      finishedRef.current ||
+      bagRef.current.includes(id)
+    )
+      return;
     const item = BAG_ITEMS.find((candidate) => candidate.id === id);
     if (!item) return;
     selectedRef.current = null;
@@ -233,303 +345,334 @@ export default function GameHealing() {
   }, []);
 
   return (
-    <main className="min-h-screen-safe bg-canvas px-4 py-5 sm:px-6 sm:py-10">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <Link href="/dashboard" className={`${button} px-0 text-fg-brand`}>
-          <ArrowLeft size={18} />
-          Kembali ke Dashboard
+    <main ref={rootRef} className={styles.game} data-bag-phase={phase}>
+      <div className={styles.stage}>
+        <Link
+          href="/dashboard"
+          className={styles.back}
+          onClick={() => {
+            musicRef.current?.pause();
+            if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+          }}
+        >
+          <ArrowLeft size={22} aria-hidden="true" />
+          <span>Kembali ke Dashboard</span>
         </Link>
-        <header className="flex items-start gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-tint text-fg-brand">
-            <Backpack size={30} />
-          </span>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-fg-brand">
-              Game Center Resiliensi
-            </p>
-            <h1 className="mt-1 text-2xl font-bold text-fg sm:text-3xl">
-              Tas Siaga Bencana
-            </h1>
-            <p className="mt-2 text-sm text-fg-muted">
-              Langkah kecil hari ini, bekal untuk lebih siap bersama keluarga.
-            </p>
-          </div>
-        </header>
-
-        {notice && (
-          <div
-            role="alert"
-            className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
+        <div className={styles.audioControls} aria-label="Pengaturan suara">
+          <button
+            type="button"
+            className={styles.audioButton}
+            aria-pressed={narration}
+            aria-label={narration ? "Matikan suara karakter" : "Bacakan dialog"}
+            title={
+              speechSupported
+                ? "Bacakan dialog Aira"
+                : "Pembacaan suara tidak tersedia di peramban ini"
+            }
+            disabled={!speechSupported}
+            onClick={() => setNarration(!narration)}
           >
-            {notice}
+            {narration ? <Volume2 size={25} /> : <VolumeX size={25} />}
+          </button>
+          <button
+            type="button"
+            className={styles.audioButton}
+            aria-pressed={music}
+            aria-label={music ? "Matikan musik" : "Nyalakan musik"}
+            onClick={() => setMusic(!music)}
+          >
+            <Music2 size={25} />
+          </button>
+        </div>
+        <header className={styles.header}>
+          <p className={styles.badge}>
+            <Gamepad2 size={20} aria-hidden="true" /> Game Center Resiliensi
+          </p>
+          <div className={styles.titleRow}>
+            <BagArtwork index={8} className={styles.titleBag} />
+            <h1>
+              <span>Tas</span> <span>Siaga</span> <span>Bencana</span>
+            </h1>
           </div>
+          <p className={styles.subtitle}>
+            Langkah kecil hari ini, bekal untuk lebih siap bersama keluarga.
+          </p>
+        </header>
+        {notice && (
+          <p role="alert" className={styles.notice}>
+            {notice}
+          </p>
         )}
-
-        {phase === "intro" && (
-          <AnimatedSection index={0}>
-            <section className="grid gap-6 md:grid-cols-[1.2fr_1fr]">
-              <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
-                <h2 className="text-xl font-semibold">
-                  Yuk, siapkan tas siagamu!
-                </h2>
-                <p className="mt-3 leading-relaxed text-fg-muted">
-                  Temukan enam perlengkapan utama untuk tas darurat. Kamu boleh
-                  mencoba, keliru, dan memperbaiki pilihanmu.
-                </p>
-                <ol className="mt-6 space-y-4 text-sm text-fg-muted">
-                  <li>
-                    <strong className="text-fg">1. Pilih barang.</strong> Ketuk
-                    atau klik barang yang ingin dibawa.
-                  </li>
-                  <li>
-                    <strong className="text-fg">2. Masukkan ke tas.</strong>{" "}
-                    Ketuk tas atau seret barang langsung ke dalamnya.
-                  </li>
-                  <li>
-                    <strong className="text-fg">
-                      3. Pelajari kegunaannya.
-                    </strong>{" "}
-                    Setiap pilihan punya cerita. Lengkapi keenam perlengkapan
-                    utamanya.
-                  </li>
-                </ol>
-                <div className="mt-6 rounded-xl bg-tint p-4 text-sm text-fg-brand">
-                  <Leaf className="mr-2 inline" size={18} />
-                  Penyelesaian pertama setiap hari mendapat {BAG_GAME_XP} XP.
-                  Berlatih lagi selalu boleh.
-                </div>
-                {!user && !isLoading && (
-                  <p className="mt-4 text-sm text-fg-muted">
-                    Bisa dimainkan tanpa login.{" "}
-                    <Link
-                      href="/login?next=/game-healing"
-                      className="font-semibold text-fg-brand underline"
-                    >
-                      Masuk
-                    </Link>{" "}
-                    agar hasil dan XP tersimpan.
+        {phase !== "result" && (
+          <div className={styles.playArea}>
+            <section
+              className={styles.statusBar}
+              aria-label="Progres tas siaga"
+            >
+              <div className={styles.progressCopy}>
+                <BagArtwork index={8} className={styles.statusBag} />
+                <div>
+                  <p className={styles.progressLabel}>
+                    {items.length} / {BAG_ESSENTIAL_IDS.length} perlengkapan
+                    siap
                   </p>
-                )}
-              </div>
-              <div className="space-y-5 rounded-2xl border border-line bg-surface p-6">
-                <fieldset>
-                  <legend className="mb-3 font-semibold">
-                    Pilih cara berlatih
-                  </legend>
-                  <div className="space-y-3">
-                    {(
-                      [
-                        {
-                          id: "practice",
-                          title: "Latihan santai",
-                          text: "Tanpa batas waktu. Belajar sesuai ritmemu.",
-                        },
-                        {
-                          id: "challenge",
-                          title: "Tantangan 60 detik",
-                          text: "Coba melengkapi tas sebelum waktu berakhir.",
-                        },
-                      ] as const
-                    ).map((choice) => (
-                      <label
-                        key={choice.id}
-                        className={`flex min-h-20 cursor-pointer items-start gap-3 rounded-xl border p-4 ${mode === choice.id ? "border-action bg-tint" : "border-line"}`}
-                      >
-                        <input
-                          className="mt-1 accent-[var(--action)]"
-                          type="radio"
-                          name="bag-mode"
-                          value={choice.id}
-                          checked={mode === choice.id}
-                          onChange={() => setMode(choice.id)}
-                        />
-                        <span>
-                          <span className="block text-sm font-semibold">
-                            {choice.title}
-                          </span>
-                          <span className="mt-1 block text-xs leading-relaxed text-fg-muted">
-                            {choice.text}
-                          </span>
-                        </span>
-                      </label>
+                  <div
+                    className={styles.slots}
+                    role="progressbar"
+                    aria-label="Perlengkapan utama di tas"
+                    aria-valuemin={0}
+                    aria-valuemax={BAG_ESSENTIAL_IDS.length}
+                    aria-valuenow={items.length}
+                  >
+                    {BAG_ESSENTIAL_IDS.map((id, index) => (
+                      <span key={id} data-filled={index < items.length} />
                     ))}
                   </div>
-                </fieldset>
-                <fieldset>
-                  <legend className="mb-3 font-semibold">
-                    Kontrol permainan
-                  </legend>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      aria-pressed={control === "touch"}
-                      onClick={() => setControl("touch")}
-                      className={`${button} flex-1 sm:flex-none ${control === "touch" ? "bg-action text-white" : "bg-sunken text-fg"}`}
-                    >
-                      <Hand size={18} />
-                      Sentuh / mouse
-                    </button>
-                    <button
-                      type="button"
-                      aria-pressed={control === "camera"}
-                      onClick={() => setControl("camera")}
-                      className={`${button} flex-1 sm:flex-none ${control === "camera" ? "bg-action text-white" : "bg-sunken text-fg"}`}
-                    >
-                      <Camera size={18} />
-                      Kamera opsional
-                    </button>
-                  </div>
-                  <p className="mt-3 text-xs leading-relaxed text-fg-muted">
-                    Kamera hanya diminta setelah kamu mulai dengan kontrol
-                    kamera. Bisa dimatikan kapan saja.
-                  </p>
-                </fieldset>
-                <button
-                  type="button"
-                  disabled={starting || isLoading}
-                  onClick={() => void start()}
-                  className={`${button} w-full bg-action text-white hover:bg-action-hover`}
-                >
-                  {starting ? "Menyiapkan permainan…" : "Mulai Bermain"}
-                </button>
+                </div>
               </div>
-            </section>
-          </AnimatedSection>
-        )}
-
-        {phase === "playing" && (
-          <section className="space-y-4" aria-label="Permainan tas siaga">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4">
-              <p className="text-sm font-semibold">
-                {items.length} / {BAG_ESSENTIAL_IDS.length} perlengkapan siap
-              </p>
-              <p className="inline-flex items-center gap-2 text-sm text-fg-muted">
-                <Clock3 size={17} />
+              <p className={styles.timer}>
+                <Clock3 size={22} aria-hidden="true" />
                 {mode === "practice"
                   ? "Latihan santai · tanpa timer"
-                  : `${seconds} detik tersisa`}
+                  : phase === "intro"
+                    ? "Tantangan 60 detik"
+                    : seconds + " detik tersisa"}
               </p>
               <button
                 type="button"
+                className={styles.cameraButton}
+                disabled={phase !== "playing"}
                 onClick={() => {
                   setControl(control === "camera" ? "touch" : "camera");
                   setNotice("");
                 }}
-                className={`${button} w-full sm:w-auto bg-sunken text-fg`}
               >
+                <Camera size={20} aria-hidden="true" />{" "}
                 {control === "camera" ? "Matikan kamera" : "Gunakan kamera"}
               </button>
-            </div>
-            {control === "camera" && (
-              <BagCamera
-                boardRef={boardRef}
-                onSelect={selectItem}
-                onDrop={cameraDrop}
-                onUnavailable={cameraUnavailable}
-              />
-            )}
-            <p
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-              className="min-h-16 sm:min-h-20 rounded-xl bg-tint p-3.5 sm:p-4 text-sm leading-relaxed text-fg-brand"
-            >
-              {feedback}
-            </p>
-            <div
-              ref={boardRef}
-              className="grid gap-4 sm:gap-5 md:grid-cols-[1.35fr_1fr]"
-            >
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 rounded-2xl border border-line bg-surface p-3 sm:p-4 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-4">
-                {BAG_ITEMS.map((item) => {
-                  const packed = items.includes(item.id);
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      data-bag-item={item.id}
-                      disabled={packed}
-                      aria-pressed={selected === item.id}
-                      aria-label={`${item.name}${packed ? ", sudah di tas" : ""}`}
-                      draggable={!packed}
-                      onDragStart={(event) => {
-                        event.dataTransfer.setData("text/plain", item.id);
-                        selectItem(item.id);
-                      }}
-                      onClick={() => selectItem(item.id)}
-                      className={`relative flex min-h-24 sm:min-h-32 flex-col items-center justify-center gap-2 sm:gap-3 rounded-xl border-2 p-2.5 sm:p-3 text-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action ${packed ? "border-line bg-sunken opacity-60" : selected === item.id ? "border-action bg-tint" : "border-transparent bg-canvas hover:border-line-strong"}`}
-                    >
-                      <span aria-hidden="true" className="text-3xl sm:text-4xl">
-                        {item.emoji}
-                      </span>
-                      <span className="text-xs font-semibold leading-snug">
-                        {item.name}
-                      </span>
-                      {packed && (
-                        <Check
-                          aria-hidden="true"
-                          className="absolute right-2 top-2 text-fg-brand"
-                          size={18}
-                        />
-                      )}
-                    </button>
-                  );
-                })}
+            </section>
+            {phase === "playing" && control === "camera" && (
+              <div className={styles.cameraPanel}>
+                <BagCamera
+                  boardRef={boardRef}
+                  onSelect={selectItem}
+                  onDrop={cameraDrop}
+                  onUnavailable={cameraUnavailable}
+                />
               </div>
-              <button
-                type="button"
-                data-bag-target="true"
-                onClick={() => placeItem(selectedRef.current)}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => {
-                  event.preventDefault();
-                  placeItem(event.dataTransfer.getData("text/plain"));
-                }}
-                className="flex min-h-40 sm:min-h-64 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-action bg-tint p-4 sm:p-6 text-center text-fg-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-action"
+            )}
+            <BagGuideDialog
+              key={phase === "intro" ? "intro-" + introStep : feedback}
+              text={
+                phase === "intro" ? BAG_INTRO_DIALOGUE[introStep] : feedback
+              }
+              narration={narration}
+              step={phase === "intro" ? introStep : undefined}
+              instant={phase === "intro" && skipTyping}
+              busy={starting || isLoading}
+              onUnavailable={narrationUnavailable}
+              onNext={
+                phase === "intro"
+                  ? () => {
+                      if (introStep === 3) void start();
+                      else setIntroStep(introStep + 1);
+                    }
+                  : undefined
+              }
+              onSkip={
+                phase === "intro"
+                  ? () => {
+                      setIntroStep(3);
+                      setSkipTyping(true);
+                    }
+                  : undefined
+              }
+            />
+            {phase === "intro" ? (
+              <section
+                className={styles.introPanel}
+                aria-label="Persiapan permainan"
               >
-                <Backpack className="w-12 h-12 sm:w-[76px] sm:h-[76px]" strokeWidth={1.25} aria-hidden="true" />
-                <span className="mt-3 sm:mt-4 text-base sm:text-lg font-bold">Tas siagamu</span>
-                <span className="mt-1.5 sm:mt-2 text-sm">
-                  {selected
-                    ? `Masukkan ${BAG_ITEMS.find((item) => item.id === selected)?.name}`
-                    : "Pilih barang, lalu ketuk di sini"}
-                </span>
-                <span
-                  className="mt-4 sm:mt-5 flex flex-wrap justify-center gap-2"
-                  aria-label="Barang di dalam tas"
-                >
-                  {items.map((id) => (
-                    <span
-                      key={id}
-                      className="rounded-lg bg-surface p-1.5 sm:p-2 text-xl sm:text-2xl"
-                      aria-label={
-                        BAG_ITEMS.find((item) => item.id === id)?.name
-                      }
-                    >
-                      {BAG_ITEMS.find((item) => item.id === id)?.emoji}
+                <div className={styles.introWelcome}>
+                  <BagArtwork index={8} className={styles.welcomeBag} />
+                  <h2>Yuk, siapkan tas siagamu!</h2>
+                  <p>
+                    Kenali barangnya, pelajari kegunaannya, dan siapkan bekal
+                    bersama keluarga.
+                  </p>
+                  <p className={styles.reward}>
+                    <Leaf size={18} aria-hidden="true" /> Hingga {BAG_GAME_XP}{" "}
+                    XP per hari
+                  </p>
+                  {!user && !isLoading && (
+                    <p className={styles.guest}>
+                      Bisa dimainkan tanpa login.{" "}
+                      <Link href="/login?next=/game-healing">Masuk</Link> agar
+                      hasil dan XP tersimpan.
+                    </p>
+                  )}
+                </div>
+                <div className={styles.settings}>
+                  <fieldset>
+                    <legend>Pilih cara berlatih</legend>
+                    {[
+                      {
+                        id: "practice",
+                        title: "Latihan santai",
+                        text: "Tanpa batas waktu. Ikuti ritmemu.",
+                      },
+                      {
+                        id: "challenge",
+                        title: "Tantangan 60 detik",
+                        text: "Timer dimulai setelah Mulai Bermain.",
+                      },
+                    ].map((choice) => (
+                      <label
+                        key={choice.id}
+                        className={styles.modeChoice}
+                        data-selected={mode === choice.id}
+                      >
+                        <input
+                          type="radio"
+                          name="bag-mode"
+                          value={choice.id}
+                          checked={mode === choice.id}
+                          onChange={() => setMode(choice.id as BagMode)}
+                        />
+                        <span>
+                          <strong>{choice.title}</strong>
+                          <span>{choice.text}</span>
+                        </span>
+                      </label>
+                    ))}
+                  </fieldset>
+                  <fieldset>
+                    <legend>Kontrol permainan</legend>
+                    <div className={styles.controlChoices}>
+                      <button
+                        type="button"
+                        aria-pressed={control === "touch"}
+                        onClick={() => setControl("touch")}
+                      >
+                        <Hand size={18} /> Sentuh / mouse
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={control === "camera"}
+                        onClick={() => setControl("camera")}
+                      >
+                        <Camera size={18} /> Kamera opsional
+                      </button>
+                    </div>
+                    <p className={styles.cameraNote}>
+                      Kamera hanya diminta setelah mulai dan bisa dimatikan
+                      kapan saja.
+                    </p>
+                  </fieldset>
+                </div>
+              </section>
+            ) : (
+              <section aria-label="Permainan tas siaga">
+                <div ref={boardRef} className={styles.board}>
+                  <div className={styles.itemsGrid}>
+                    {BAG_ITEMS.map((item, index) => {
+                      const packed = items.includes(item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          data-bag-item={item.id}
+                          disabled={packed}
+                          aria-pressed={selected === item.id}
+                          aria-label={
+                            item.name + (packed ? ", sudah di tas" : "")
+                          }
+                          draggable={!packed}
+                          onDragStart={(event) => {
+                            event.dataTransfer.setData("text/plain", item.id);
+                            selectItem(item.id);
+                          }}
+                          onClick={() => selectItem(item.id)}
+                          className={styles.itemCard}
+                          data-packed={packed}
+                        >
+                          <BagArtwork
+                            index={index}
+                            className={styles.itemArt}
+                          />
+                          <span>{item.name}</span>
+                          {packed && (
+                            <Check
+                              className={styles.packedCheck}
+                              aria-hidden="true"
+                              size={22}
+                            />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button
+                    type="button"
+                    data-bag-target="true"
+                    className={styles.bagTarget}
+                    onClick={() => placeItem(selectedRef.current)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      placeItem(event.dataTransfer.getData("text/plain"));
+                    }}
+                  >
+                    <BagArtwork index={8} className={styles.largeBag} />
+                    <span className={styles.bagName}>Tas siagamu</span>
+                    <span className={styles.dropHint}>
+                      {selected
+                        ? "Masukkan " +
+                          BAG_ITEMS.find((item) => item.id === selected)?.name
+                        : "Pilih barang, lalu ketuk di sini"}
                     </span>
-                  ))}
-                </span>
-              </button>
-            </div>
-            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-between gap-3">
-              <p className="text-xs text-fg-muted">
-                Pilihan kurang tepat tidak mengurangi poin. Coba lagi, ya.
-              </p>
-              <button
-                type="button"
-                onClick={() => finish()}
-                className={`${button} w-full sm:w-auto bg-surface text-fg-muted border border-line`}
-              >
-                Akhiri latihan
-              </button>
-            </div>
-          </section>
+                    <span
+                      className={styles.packedItems}
+                      aria-label="Barang di dalam tas"
+                    >
+                      {items.map((id) => (
+                        <span
+                          key={id}
+                          aria-label={
+                            BAG_ITEMS.find((item) => item.id === id)?.name
+                          }
+                        >
+                          <BagArtwork
+                            index={BAG_ITEMS.findIndex(
+                              (item) => item.id === id,
+                            )}
+                          />
+                        </span>
+                      ))}
+                    </span>
+                  </button>
+                </div>
+                <footer className={styles.footer}>
+                  <p>
+                    <Lightbulb size={23} aria-hidden="true" /> Pilihan kurang
+                    tepat tidak mengurangi poin. Coba lagi, ya.
+                  </p>
+                  <button
+                    type="button"
+                    className={styles.finish}
+                    onClick={() => finish()}
+                  >
+                    Akhiri latihan
+                  </button>
+                </footer>
+              </section>
+            )}
+          </div>
         )}
 
         {phase === "result" && result && (
           <AnimatedSection index={0}>
-            <section className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
+            <section className={styles.result}>
               <div className="text-center">
                 <Trophy className="mx-auto text-fg-brand" size={44} />
                 <h2
@@ -553,9 +696,11 @@ export default function GameHealing() {
                     key={item.id}
                     className="flex gap-3 rounded-xl bg-canvas p-4"
                   >
-                    <span className="text-2xl" aria-hidden="true">
-                      {item.emoji}
-                    </span>
+                    <BagArtwork
+                      index={BAG_ITEMS.findIndex(
+                        (candidate) => candidate.id === item.id,
+                      )}
+                    />
                     <div>
                       <p className="text-sm font-semibold">
                         {item.name}{" "}
@@ -607,6 +752,9 @@ export default function GameHealing() {
                   disabled={saveState === "saving" || saveState === "error"}
                   onClick={() => {
                     setPhase("intro");
+                    setIntroStep(0);
+                    setSkipTyping(false);
+                    setItems([]);
                     setControl("touch");
                     setNotice("");
                   }}

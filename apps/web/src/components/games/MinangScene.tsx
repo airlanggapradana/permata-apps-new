@@ -12,6 +12,8 @@ import {
   MINANG_GROUND_Y,
   MINANG_CHECKPOINTS,
   MINANG_PLATFORMS,
+  MINANG_HERO_HEIGHT,
+  MINANG_ITEMS,
   type MinangState,
   type MinangInput,
   type MinangSnapshot,
@@ -23,6 +25,16 @@ import {
   drawMinangPalm,
   drawMinangPlatform,
 } from "./minangScenery";
+import {
+  loadMinangArtwork,
+  drawMinangArtBackdrop,
+  drawMinangArtPlatform,
+  drawMinangArtSupply,
+  drawMinangArtHero,
+  drawMinangBridge,
+  drawMinangGuide,
+  type MinangArtwork,
+} from "./minangArtwork";
 
 type Spark = { x: number; y: number; vx: number; vy: number; life: number };
 
@@ -36,39 +48,101 @@ function paint(
   reducedMotion: boolean,
   sparks: Spark[],
   visual: { x: number; y: number; pose: MinangPose },
+  art: MinangArtwork | null,
 ) {
   const time = reducedMotion ? 0 : state.elapsedMs / 1000;
   const frame = time * 60;
-  drawMinangBackdrop(
-    ctx,
-    viewWidth,
-    viewHeight,
-    reducedMotion ? 0 : cameraX,
-    time,
-  );
+  if (art)
+    drawMinangArtBackdrop(
+      ctx,
+      art,
+      viewWidth,
+      viewHeight,
+      Math.min(2, state.answers.length),
+      reducedMotion ? 0 : cameraX,
+    );
+  else
+    drawMinangBackdrop(
+      ctx,
+      viewWidth,
+      viewHeight,
+      reducedMotion ? 0 : cameraX,
+      time,
+    );
   ctx.save();
   ctx.translate(0, offsetY);
-  for (const worldX of [700, 1420, 2230, 2730, 3540, 4130]) {
+  for (const worldX of art ? [] : [700, 1420, 2230, 2730, 3540, 4130]) {
     const x = worldX - cameraX;
     if (x > -100 && x < viewWidth + 100)
       drawMinangPalm(ctx, x, MINANG_GROUND_Y, time, worldX % 3 ? 1 : 0.85);
   }
+  if (art) {
+    drawMinangArtPlatform(
+      ctx,
+      art,
+      -500 - cameraX,
+      MINANG_GROUND_Y,
+      500,
+      Math.max(200, viewHeight),
+      false,
+    );
+    for (const gap of [
+      { x: 1100, width: 100 },
+      { x: 2400, width: 110 },
+      { x: 3700, width: 110 },
+    ]) {
+      ctx.fillStyle = "#20b8ea";
+      ctx.fillRect(
+        gap.x - cameraX,
+        MINANG_GROUND_Y + 10,
+        gap.width,
+        viewHeight,
+      );
+      ctx.strokeStyle = "#a2f2ff";
+      ctx.lineWidth = 3;
+      for (let y = MINANG_GROUND_Y + 27; y < MINANG_GROUND_Y + 160; y += 20) {
+        ctx.beginPath();
+        ctx.moveTo(gap.x - cameraX, y);
+        ctx.quadraticCurveTo(
+          gap.x - cameraX + gap.width / 2,
+          y + Math.sin(time * 2) * 5,
+          gap.x - cameraX + gap.width,
+          y,
+        );
+        ctx.stroke();
+      }
+    }
+  }
   for (const platform of MINANG_PLATFORMS) {
     const x = platform.x - cameraX;
     if (x + platform.width < 0 || x > viewWidth) continue;
-    drawMinangPlatform(
-      ctx,
-      x,
-      platform.y,
-      platform.width,
-      Math.max(platform.height, viewHeight - platform.y - offsetY),
-      platform.kind === "wood",
-    );
+    if (art)
+      drawMinangArtPlatform(
+        ctx,
+        art,
+        x,
+        platform.y,
+        platform.width,
+        Math.max(platform.height, viewHeight - platform.y - offsetY),
+        platform.kind === "wood",
+      );
+    else
+      drawMinangPlatform(
+        ctx,
+        x,
+        platform.y,
+        platform.width,
+        Math.max(platform.height, viewHeight - platform.y - offsetY),
+        platform.kind === "wood",
+      );
   }
+  if (art) drawMinangBridge(ctx, cameraX, state.bridgeActivated);
   for (const checkpoint of MINANG_CHECKPOINTS) {
     const x = checkpoint.x - cameraX;
     if (x < -60 || x > viewWidth + 80) continue;
     const visited = state.checkpoints.includes(checkpoint.id);
+    if (art)
+      drawMinangGuide(ctx, art, x, MINANG_CHECKPOINTS.indexOf(checkpoint));
     rounded(ctx, x - 5, MINANG_GROUND_Y - 2, 10, 5, 2, "#4c6346");
     ctx.strokeStyle = "#cbb57b";
     ctx.lineWidth = 4;
@@ -108,33 +182,44 @@ function paint(
       MINANG_GROUND_Y - 134,
     );
   }
-  ClassicPainter.drawRumahGadang(
-    ctx,
-    MINANG_WORLD_WIDTH - 250 - cameraX,
-    MINANG_GROUND_Y - 80,
-    1,
-    true,
-  );
+  if (!art)
+    ClassicPainter.drawRumahGadang(
+      ctx,
+      MINANG_WORLD_WIDTH - 250 - cameraX,
+      MINANG_GROUND_Y - 80,
+      1,
+      true,
+    );
   for (const pickup of MINANG_PICKUPS) {
     if (state.collectedPickups.includes(pickup.id)) continue;
     const x = pickup.x - cameraX;
     if (x < -50 || x > viewWidth + 50) continue;
-    ClassicPainter.drawSupply(
-      ctx,
-      x,
-      pickup.y,
-      pickup.type === "first-aid" ? "kit" : pickup.type,
-      frame,
-    );
+    if (art)
+      drawMinangArtSupply(
+        ctx,
+        art,
+        MINANG_ITEMS.findIndex((item) => item.id === pickup.type),
+        x,
+        pickup.y,
+        time,
+      );
+    else
+      ClassicPainter.drawSupply(
+        ctx,
+        x,
+        pickup.y,
+        pickup.type === "first-aid" ? "kit" : pickup.type,
+        frame,
+      );
   }
   const surface = MINANG_PLATFORMS.find(
     (platform) =>
       visual.x >= platform.x &&
       visual.x <= platform.x + platform.width &&
-      platform.y >= visual.y + 46,
+      platform.y >= visual.y + MINANG_HERO_HEIGHT - 2,
   );
   if (surface) {
-    const altitude = Math.max(0, surface.y - visual.y - 48);
+    const altitude = Math.max(0, surface.y - visual.y - MINANG_HERO_HEIGHT);
     ctx.fillStyle = "#173e3426";
     ctx.beginPath();
     ctx.ellipse(
@@ -149,9 +234,12 @@ function paint(
     ctx.fill();
   }
   ctx.save();
-  ctx.translate(visual.x - cameraX, visual.y + 48);
-  ctx.scale(0.82, 0.82);
-  ClassicPainter.drawHero(ctx, 0, 0, visual.pose);
+  ctx.translate(visual.x - cameraX, visual.y + MINANG_HERO_HEIGHT);
+  if (art) drawMinangArtHero(ctx, art, visual.pose, state.vy, state.onGround);
+  else {
+    ctx.scale(1.2, 1.2);
+    ClassicPainter.drawHero(ctx, 0, 0, visual.pose);
+  }
   ctx.restore();
   if (!reducedMotion)
     for (const spark of sparks) {
@@ -182,6 +270,25 @@ export default function MinangScene({
   onFinish: (snapshot: MinangSnapshot) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const artRef = useRef<MinangArtwork | null>(null);
+  useEffect(() => {
+    let active = true;
+    void loadMinangArtwork()
+      .then((art) => {
+        if (active) artRef.current = art;
+      })
+      .catch(() => {
+        if (active)
+          onEvent({
+            type: "guide",
+            message:
+              "Sebagian ilustrasi belum termuat. Permainan tetap bisa dilanjutkan.",
+          });
+      });
+    return () => {
+      active = false;
+    };
+  }, [onEvent]);
   const reducedRef = useRef(reducedMotion);
   useEffect(() => {
     reducedRef.current = reducedMotion;
@@ -225,9 +332,12 @@ export default function MinangScene({
         dpr = Math.min(2, window.devicePixelRatio || 1);
       viewHeight = height / scale;
       offsetY =
-        viewHeight -
-        MINANG_HEIGHT -
-        (window.matchMedia("(pointer: coarse)").matches ? 80 : 24) / scale;
+        (height - Math.max(100, Math.min(250, height * 0.25))) / scale -
+        MINANG_GROUND_Y;
+      cameraX = Math.max(
+        width >= 1000 ? -220 : -60,
+        Math.min(MINANG_WORLD_WIDTH - viewport, state.x - viewport * 0.35),
+      );
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       canvas.style.height = `${height}px`;
@@ -318,8 +428,8 @@ export default function MinangScene({
           time: 0,
         });
       const target = Math.max(
-        0,
-        Math.min(MINANG_WORLD_WIDTH - viewport, visual.x - viewport * 0.32),
+        canvas.clientWidth >= 1000 ? -220 : -60,
+        Math.min(MINANG_WORLD_WIDTH - viewport, visual.x - viewport * 0.35),
       );
       if (inputRef.current.enabled) {
         for (const spark of sparks) {
@@ -345,12 +455,16 @@ export default function MinangScene({
         reducedRef.current,
         sparks,
         visual,
+        artRef.current,
       );
       canvas.dataset.visualX = visual.x.toFixed(3);
       canvas.dataset.visualY = visual.y.toFixed(3);
       canvas.dataset.playerX = state.x.toFixed(2);
       canvas.dataset.playerY = state.y.toFixed(2);
       canvas.dataset.grounded = String(state.onGround);
+      canvas.dataset.artReady = String(Boolean(artRef.current));
+      canvas.dataset.bridgeActivated = String(state.bridgeActivated);
+      canvas.dataset.question = state.question ?? "";
       if (
         now - lastUpdate >= 100 &&
         (inputRef.current.enabled || lastUpdate === -Infinity)

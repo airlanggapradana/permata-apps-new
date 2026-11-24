@@ -1,0 +1,10 @@
+Kak Naya — Siaga Minang reference update
+
+Generated with the built-in image_gen tool.
+Reference: C:/Users/ASUS/Downloads/Kak Naya Joins Aira’s Jungle Adventure.png
+Final asset: apps/web/public/images/siaga-minang/naya-v2.webp
+Transparent full-body sprite, resized to 900px high for the game.
+Used in all three checkpoint scenes and the quiz portrait.
+
+Final prompt:
+Use case: illustration-story / playable game sprite. REFERENCE IMAGE role: character design reference only. Create ONE isolated FULL-BODY Kak Naya, the adult woman standing immediately to the right of the little girl in the reference. Match her specific face, brown wavy high ponytail tied with an ivory scrunchie, large warm brown eyes, open happy smile, cream collared long-sleeved shirt rolled to elbows, dark teal-green volunteer utility vest with pockets, a small white heart symbol and tiny white markings, lanyard and ID badge, tan/brown cargo trousers, white and beige sneakers. She waves with her right hand on viewer LEFT and holds a brown clipboard close to her body in her left hand on viewer RIGHT. Adult young Indonesian woman, friendly companion, taller and slimmer than Aira, same polished chibi/anime children's game art, rich clean outlines and dimensional painted shading, front/three-quarter pose facing slightly right. Reproduce this character closely, do not redesign her. Portrait canvas, fully visible from ponytail to soles, tightly composed with 3 percent transparent padding around entire character. TRANSPARENT BACKGROUND, clean true alpha. No Aira, no scenery, no ground or platform, no cast ground shadow, no nameplate, no words outside vest, no border, no sticker outline, no hat. Exactly one single standing character, no sprite grid, no alternate poses. This sprite will stand on a separately rendered game platform.

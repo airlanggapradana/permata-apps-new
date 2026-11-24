@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { createBagCameraSession } from "@/lib/games/bagCameraSession";
 
 type Landmark = { x: number; y: number };
 type GripAnchor = { pointer: Landmark; palm: Landmark };
@@ -59,6 +60,7 @@ export default function BagCamera({
     let cancelled = false;
     let stream: MediaStream | undefined;
     let tracker: HandTracker | undefined;
+    let session: ReturnType<typeof createBagCameraSession> | undefined;
     let frame = 0;
     let cursorFrame = 0;
     let pinched = false;
@@ -108,13 +110,17 @@ export default function BagCamera({
     };
     cursorFrame = requestAnimationFrame(paintPointer);
     const stop = () => {
+      if (cancelled) return;
       cancelled = true;
       window.clearTimeout(loadingTimer);
       cancelAnimationFrame(frame);
       cancelAnimationFrame(cursorFrame);
       resetPointer();
       stream?.getTracks().forEach((track) => track.stop());
-      if (tracker) void tracker.close().catch(() => {});
+      const current = session;
+      session = undefined;
+      tracker = undefined;
+      if (current) void current.stop();
     };
     const fail = () => {
       if (cancelled) return;
@@ -153,6 +159,7 @@ export default function BagCamera({
           return;
         }
         tracker = new Hands({ locateFile: (file) => `${HANDS_CDN}/${file}` });
+        session = createBagCameraSession(tracker);
         tracker.setOptions({
           maxNumHands: 1,
           modelComplexity: 0,
@@ -227,13 +234,15 @@ export default function BagCamera({
           if (!trackingGrip) grip = null;
         });
         async function detect() {
-          if (cancelled || !tracker) return;
+          if (cancelled || !session) return;
           try {
-            if (video && video.readyState >= 2)
-              await tracker.send({ image: video });
-            if (!cancelled) {
+            if (video && video.readyState >= 2) {
+              await session.send({ image: video });
+              if (cancelled) return;
               window.clearTimeout(loadingTimer);
               setReady(true);
+            }
+            if (!cancelled) {
               frame = requestAnimationFrame(detect);
             }
           } catch {
